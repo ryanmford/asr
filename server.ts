@@ -62,7 +62,7 @@ async function startServer() {
   });
 
   // Generate Dynamic OG Images
-  app.get('/api/og', async (req, res) => {
+  app.get('/api/og.png', async (req, res) => {
     try {
       const title = (req.query.title as string) || 'Apex Speed Run';
       const desc = (req.query.desc as string) || 'Global Parkour Leaderboards and Course Directory';
@@ -267,6 +267,10 @@ async function startServer() {
     app.use(vite.middlewares);
 
     app.get('*', async (req, res, next) => {
+      // Prevent returning HTML for missing static files (images, css, js)
+      if (req.path.match(/\.(png|jpe?g|gif|svg|ico|css|js|map|woff2?|ttf|eot)$/i)) {
+        return res.status(404).end();
+      }
       try {
         const url = req.originalUrl;
         let template = await fs.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
@@ -277,7 +281,7 @@ async function startServer() {
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
-        const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
+        const ogImageUrl = `${baseUrl}/api/og.png?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
@@ -309,6 +313,10 @@ async function startServer() {
     app.use(express.static(distPath, { index: false })); // Disable index fallback from static
     
     app.get('*', async (req, res, next) => {
+      // Prevent returning HTML for missing static files (images, css, js)
+      if (req.path.match(/\.(png|jpe?g|gif|svg|ico|css|js|map|woff2?|ttf|eot)$/i)) {
+        return res.status(404).end();
+      }
       try {
         let template = await fs.readFile(path.join(distPath, 'index.html'), 'utf-8');
         const searchParams = new URLSearchParams(req.query as any);
@@ -316,7 +324,7 @@ async function startServer() {
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
-        const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
+        const ogImageUrl = `${baseUrl}/api/og.png?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
