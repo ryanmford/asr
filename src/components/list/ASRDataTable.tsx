@@ -21,6 +21,82 @@ interface ASRDataTableProps {
  showVideoColumn?: boolean;
 }
 
+const MemoizedVirtualRow = React.memo(({
+  virtualRow,
+  item,
+  viewType,
+  statColumns,
+  columns,
+  showVideoColumn,
+  onItemClick,
+  measureElement
+}: any) => {
+  const absoluteTransform = `translateY(${virtualRow.start}px)`;
+
+  const stats = React.useMemo(() => {
+    return statColumns.map((c: any) => ({
+      value: typeof c.getValue === "function" ? c.getValue(item) : item[c.key],
+      color: c.color,
+      label: c.label,
+    }));
+  }, [statColumns, item]);
+
+  const handleClick = React.useCallback(() => {
+    if (onItemClick) onItemClick(item);
+  }, [onItemClick, item]);
+
+  if (item.isDivider) {
+    return (
+      <div
+        data-index={virtualRow.index}
+        ref={measureElement}
+        style={{
+          position: "absolute",
+          top: 0, left: 0, width: "100%", transform: absoluteTransform,
+        }}
+        className={cn(
+          "flex items-center gap-4 py-8 px-4",
+          viewType === "card" ? "col-span-full" : "",
+        )}
+      >
+        <div className="h-[1px] flex-1 bg-zinc-800/20" />
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-muted">
+          {item.label}
+        </span>
+        <div className="h-[1px] flex-1 bg-zinc-800/20" />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      data-index={virtualRow.index}
+      ref={measureElement}
+      style={{
+        position: "absolute",
+        top: 0, left: 0, width: "100%", transform: absoluteTransform,
+      }}
+      className={cn("w-full px-4", viewType === "card" && "pb-3")}
+    >
+      <ASRListItem
+        variant={viewType}
+        rank={item.currentRank}
+        title={item.name}
+        subtitle={null}
+        flag={item.region || item.flag || item.country}
+        stats={stats}
+        videoUrl={item.videoUrl || item.demoVideo}
+        mapUrl={item.mapUrl}
+        columns={columns}
+        shouldFade={item.shouldFade}
+        badgeContent={item.badgeContent}
+        onClick={handleClick}
+        showVideoIcon={showVideoColumn}
+      />
+    </div>
+  );
+});
+
 export const ASRDataTable = React.memo(
  ({
  data,
@@ -35,9 +111,15 @@ export const ASRDataTable = React.memo(
  const theme = useContext(ThemeContext);
  const hasError = useDataStore(s => s.hasError);
  
+ const estimateSize = React.useCallback(() => {
+   return viewType === "card" 
+     ? (window.innerWidth >= 1024 ? 120 : window.innerWidth >= 640 ? 100 : 100) 
+     : (window.innerWidth >= 1024 ? 80 : 64);
+ }, [viewType]);
+
  const virtualizer = useWindowVirtualizer({
  count: data?.length || 0,
- estimateSize: () => viewType === "card" ? (window.innerWidth >= 1024 ? 120 : window.innerWidth >= 640 ? 100 : 100) : (window.innerWidth >= 1024 ? 80 : 64),
+ estimateSize,
  overscan: 5,
  });
 
@@ -179,77 +261,18 @@ export const ASRDataTable = React.memo(
  >
  {virtualizer.getVirtualItems().map((virtualRow) => {
  const item = data[virtualRow.index];
- const absoluteTransform = `translateY(${virtualRow.start}px)`;
-
- if (item.isDivider) {
  return (
- <div
- key={virtualRow.key}
- data-index={virtualRow.index}
- ref={virtualizer.measureElement}
- style={{
- position: "absolute",
- top: 0,
- left: 0,
- width: "100%",
- transform: absoluteTransform,
- }}
- className={cn(
- "flex items-center gap-4 py-8 px-4",
- viewType === "card" ? "col-span-full" : "",
- )}
- >
- <div className="h-[1px] flex-1 bg-zinc-800/20" />
- <span
- className={cn(
- "text-[10px] font-black uppercase tracking-[0.2em]",
- "theme-text-muted",
- )}
- >
- {item.label}
- </span>
- <div className="h-[1px] flex-1 bg-zinc-800/20" />
- </div>
- );
- }
-
- return (
- <div
- key={virtualRow.key}
- data-index={virtualRow.index}
- ref={virtualizer.measureElement}
- style={{
- position: "absolute",
- top: 0,
- left: 0,
- width: "100%",
- transform: absoluteTransform,
- }}
- className={cn("w-full px-4", viewType === "card" && "pb-3")}
- >
- <ASRListItem
- variant={viewType}
- rank={item.currentRank}
- title={item.name}
- subtitle={null}
- flag={item.region || item.flag || item.country}
- stats={statColumns.map((c: any) => ({
- value:
- typeof c.getValue === "function"
- ? c.getValue(item)
- : item[c.key],
- color: c.color,
- label: c.label,
- }))}
- videoUrl={item.videoUrl || item.demoVideo}
- mapUrl={item.mapUrl}
- columns={columns}
- shouldFade={item.shouldFade}
- badgeContent={item.badgeContent}
- onClick={() => onItemClick && onItemClick(item)}
- showVideoIcon={showVideoColumn}
- />
- </div>
+   <MemoizedVirtualRow
+     key={virtualRow.key}
+     virtualRow={virtualRow}
+     item={item}
+     viewType={viewType}
+     statColumns={statColumns}
+     columns={columns}
+     showVideoColumn={showVideoColumn}
+     onItemClick={onItemClick}
+     measureElement={virtualizer.measureElement}
+   />
  );
  })}
  </div>

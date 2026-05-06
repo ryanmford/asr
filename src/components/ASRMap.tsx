@@ -232,11 +232,18 @@ export const ASRMap = ({
   // Watch for container resizes
   useEffect(() => {
     if (!mapRef.current || !mapContainerRef.current) return;
+    let timeout: ReturnType<typeof setTimeout>;
     const observer = new ResizeObserver(() => {
-      if (mapRef.current) mapRef.current.invalidateSize();
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (mapRef.current) mapRef.current.invalidateSize();
+      }, 100);
     });
     observer.observe(mapContainerRef.current);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeout);
+      observer.disconnect();
+    };
   }, [isScriptsLoaded]);
 
   // Update tiles on theme switch

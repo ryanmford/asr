@@ -49,9 +49,10 @@ export const ASRRankList = ({
 
   const finalAthletes = limit ? displayAthletes.slice(0, limit) : displayAthletes;
 
+  const estimateSize = React.useCallback(() => isCompact ? 80 : 100, [isCompact]);
   const virtualizer = useWindowVirtualizer({
     count: finalAthletes.length,
-    estimateSize: () => isCompact ? 80 : 100,
+    estimateSize,
     overscan: 5,
   });
 

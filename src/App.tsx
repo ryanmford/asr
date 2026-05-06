@@ -284,7 +284,7 @@ function MainAppContent({ theme, setTheme }: any) {
       <main
         className="flex-1 w-full max-w-7xl mx-auto flex flex-col relative pt-4"
       >
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col">
             <RouteErrorBoundary>
             <React.Suspense fallback={
               <div className="flex-1 flex flex-col items-center justify-center min-h-[50vh]">

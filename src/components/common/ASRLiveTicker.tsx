@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { useDataStore } from "../../store/useDataStore";
 
@@ -10,32 +10,7 @@ interface ASRLiveTickerProps {
 export const ASRLiveTicker = React.memo(
   ({ onEntityClick, theme }: ASRLiveTickerProps) => {
     const feed = useDataStore((s) => s.recentFeed);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
-
-    useEffect(() => {
-      if (!scrollContainerRef.current || isHovered) return;
-      const container = scrollContainerRef.current;
-      let animationFrameId: number;
-      let lastTime = 0;
-      const speed = 1.0;
-
-      const animate = (time: number) => {
-        if (lastTime === 0) lastTime = time;
-        let delta = time - lastTime;
-        if (delta > 50) delta = 16.6; // Cap delta to prevent jumps when tab active
-        lastTime = time;
-
-        container.scrollLeft += (speed * delta) / 16.6;
-        const halfWidth = container.scrollWidth / 2;
-        if (container.scrollLeft >= halfWidth && halfWidth > 0) {
-          container.scrollLeft -= halfWidth;
-        }
-        animationFrameId = requestAnimationFrame(animate);
-      };
-      animationFrameId = requestAnimationFrame(animate);
-      return () => window.cancelAnimationFrame(animationFrameId);
-    }, [isHovered, feed]);
 
     if (!feed || feed.length === 0) {
       return (
@@ -60,6 +35,11 @@ export const ASRLiveTicker = React.memo(
       extendedFeed = [...extendedFeed, ...feed];
     }
     const duplicatedFeed = [...extendedFeed, ...extendedFeed];
+    
+    // Calculate a consistent scroll speed (~60 pixels per second)
+    const estimatedWidthPerItem = 300;
+    const scrollDistance = extendedFeed.length * estimatedWidthPerItem;
+    const animationDurationSeconds = Math.max(20, scrollDistance / 60);
 
     return (
       <div
@@ -75,13 +55,13 @@ export const ASRLiveTicker = React.memo(
         onPointerLeave={(e) => {
           if (e.pointerType === "mouse") setIsHovered(false);
         }}
-        onTouchStart={() => setIsHovered(true)}
-        onTouchEnd={() => setIsHovered(false)}
-        onTouchCancel={() => setIsHovered(false)}
       >
         <div
-          ref={scrollContainerRef}
-          className="flex items-center whitespace-nowrap overflow-x-hidden no-scrollbar gap-12 sm:gap-20 px-8"
+          className="flex items-center shrink-0 whitespace-nowrap gap-12 sm:gap-20 px-8 animate-marquee"
+          style={{ 
+            animationDuration: `${animationDurationSeconds}s`,
+            animationPlayState: isHovered ? "paused" : "running" 
+          }}
         >
           {duplicatedFeed.map((item: any, idx: number) => {
             const fires = item.fireCount || 0;

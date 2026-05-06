@@ -88,6 +88,8 @@ body {
   background-color: #000; /* Dark background matches dark theme default */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 /* Ensure Leaflet maps don't break the layout stack */
@@ -101,6 +103,12 @@ body {
 .ios-clip-fix {
   isolation: isolate;
   overflow: hidden;
+}
+
+.ios-gpu-fix {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Base style for the premium shadow used in the theme object */
