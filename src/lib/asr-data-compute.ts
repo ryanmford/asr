@@ -444,11 +444,9 @@ export function computeAllState(payload: any) {
     courseList_AT: cListAT,
     courseList_OP: cListOP,
     settersList: sList,
-    teamList_M_AT: computeTeamList("M", true),
-    teamList_F_AT: computeTeamList("F", true),
-    teamList_Coed_AT: computeTeamList("Coed", true),
-    teamList_M_OP: computeTeamList("M", false),
-    teamList_F_OP: computeTeamList("F", false),
-    teamList_Coed_OP: computeTeamList("Coed", false),
+    teamList_gyms_AT: computeTeamList("gyms", true),
+    teamList_teams_AT: computeTeamList("teams", true),
+    teamList_gyms_OP: computeTeamList("gyms", false),
+    teamList_teams_OP: computeTeamList("teams", false),
   };
 }

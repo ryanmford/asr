@@ -280,15 +280,15 @@ export const useSettersListOut = () => {
 export const useTeamList = () => {
   const teamCategory = useAppStore((s) => s.teamCategory);
   const isAllTimeContext = useURLState().isAllTimeContext;
-  return useDataStore((s) => {
+  return useDataStore((s: any) => {
     if (isAllTimeContext) {
-      if (teamCategory === 'M') return s.teamList_M_AT;
-      if (teamCategory === 'F') return s.teamList_F_AT;
-      return s.teamList_Coed_AT;
+      if (teamCategory === 'gyms') return s.teamList_gyms_AT;
+      if (teamCategory === 'teams') return s.teamList_teams_AT;
+      return [];
     } else {
-      if (teamCategory === 'M') return s.teamList_M_OP;
-      if (teamCategory === 'F') return s.teamList_F_OP;
-      return s.teamList_Coed_OP;
+      if (teamCategory === 'gyms') return s.teamList_gyms_OP;
+      if (teamCategory === 'teams') return s.teamList_teams_OP;
+      return [];
     }
   }) || [];
 };

@@ -53,10 +53,8 @@ export const useFetchASRData = () => {
       }
 
       const cacheBucket = Math.floor(Date.now() / CONFIG.REFRESH_INTERVAL);
-      const getProxyUrl = (gid: string) => {
-        const spreadsheetId = "1DcLZyAO2QZij_176vsC7_rWWTVbxwt8X9Jw7YWM_7j4";
-        return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}&cb=${cacheBucket}`;
-      };
+      const getProxyUrl = (gid: string) =>
+        `/api/proxy-sheet?gid=${gid}&cb=${cacheBucket}`;
 
       const safeFetch = async (url: string, retries: number = 2) => {
         for (let i = 0; i <= retries; i++) {

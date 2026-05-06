@@ -33,12 +33,10 @@ interface ASRDataState {
   courseList_AT: unknown[];
   courseList_OP: unknown[];
   settersList: unknown[];
-  teamList_M_AT: unknown[];
-  teamList_F_AT: unknown[];
-  teamList_Coed_AT: unknown[];
-  teamList_M_OP: unknown[];
-  teamList_F_OP: unknown[];
-  teamList_Coed_OP: unknown[];
+  teamList_gyms_AT: unknown[];
+  teamList_teams_AT: unknown[];
+  teamList_gyms_OP: unknown[];
+  teamList_teams_OP: unknown[];
 
   isLoading: boolean;
   isSyncing: boolean;
@@ -81,12 +79,10 @@ export const useDataStore = create<ASRDataState>((set) => ({
   courseList_AT: [],
   courseList_OP: [],
   settersList: [],
-  teamList_M_AT: [],
-  teamList_F_AT: [],
-  teamList_Coed_AT: [],
-  teamList_M_OP: [],
-  teamList_F_OP: [],
-  teamList_Coed_OP: [],
+  teamList_gyms_AT: [],
+  teamList_teams_AT: [],
+  teamList_gyms_OP: [],
+  teamList_teams_OP: [],
 
   isLoading: true,
   isSyncing: false,
