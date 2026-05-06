@@ -69,8 +69,15 @@ export const ASRLiveTicker = React.memo(
             ? "bg-zinc-950/80 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             : "bg-white/80 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
         )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onPointerEnter={(e) => {
+          if (e.pointerType === "mouse") setIsHovered(true);
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType === "mouse") setIsHovered(false);
+        }}
+        onTouchStart={() => setIsHovered(true)}
+        onTouchEnd={() => setIsHovered(false)}
+        onTouchCancel={() => setIsHovered(false)}
       >
         <div
           ref={scrollContainerRef}
