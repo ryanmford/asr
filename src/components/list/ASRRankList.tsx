@@ -1,0 +1,247 @@
+import React, { useContext } from "react";
+import { Activity } from "lucide-react";
+import { motion } from "motion/react";
+import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity } from "../../lib/asr-utils";
+import { ThemeContext } from "../../App";
+import { ASRSectionHeading } from "../common/ASRSectionHeading";
+import { ASRListItem } from "../ASRListItems";
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
+
+interface ASRRankListProps {
+ title?: string;
+ athletes: any[];
+ valueLabel?: string;
+ dataContext?: any;
+ onPlayerClick?: (meta: any) => void;
+ onEntityClick: (type: string, data: any) => void;
+ limit?: number | null;
+ className?: string;
+ hideSubtitle?: boolean;
+ entityType?: "player" | "setter" | "course" | "team" | "region";
+ padTo?: number;
+ isCompact?: boolean;
+}
+
+export const ASRRankList = ({
+ title,
+ athletes,
+ valueLabel = "TIME",
+ dataContext = {},
+ onPlayerClick,
+ onEntityClick,
+ limit = 0,
+ className,
+ hideSubtitle,
+ entityType,
+ padTo = 0,
+ isCompact = true,
+}: ASRRankListProps) => {
+ const theme = useContext(ThemeContext);
+ const { atMet = {}, cMet = {} } = dataContext;
+
+ const displayAthletes = [...athletes];
+  if (padTo > 0 && displayAthletes.length < padTo) {
+    const padCount = padTo - displayAthletes.length;
+    for (let i = 0; i < padCount; i++) {
+      displayAthletes.push({ pKey: "UNCLAIMED RANK", isUnclaimed: true });
+    }
+  }
+
+  const finalAthletes = limit ? displayAthletes.slice(0, limit) : displayAthletes;
+
+  const virtualizer = useWindowVirtualizer({
+    count: finalAthletes.length,
+    estimateSize: () => isCompact ? 80 : 100,
+    overscan: 5,
+  });
+
+ // Generate a composite key based on list composition to trigger stagger animations when swapping lists (like Open vs All-Time)
+ const listRenderKey = React.useMemo(() => {
+ if (!displayAthletes || displayAthletes.length === 0) return "empty";
+ const firstItem = displayAthletes[0];
+ const topKey = Array.isArray(firstItem)
+ ? firstItem[0]
+ : firstItem.pKey || firstItem.label || "unknown";
+ return `${topKey}`;
+ }, [displayAthletes]);
+
+ return (
+ <div className={cn("space-y-6 text-left overflow-visible", className)}>
+ {title && (
+ <ASRSectionHeading title={title} theme={theme as "dark" | "light"} />
+ )}
+ <motion.div key={listRenderKey} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3 overflow-visible">
+ {finalAthletes && finalAthletes.length > 0 ? (
+          <div style={{ position: 'relative', width: '100%', height: `${virtualizer.getTotalSize()}px` }}>
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const i = virtualRow.index;
+              const item = finalAthletes[i];
+ const isArray = Array.isArray(item);
+ const pKey = isArray
+ ? item[0]
+ : item.pKey || item.label || item.id || "";
+ const points = isArray ? undefined : (item.pts ?? item.points);
+ const time = isArray
+ ? item[1]
+ : (item.time ?? item.value ?? item.num);
+ const explicitVideoUrl = isArray ? item[2] : item.videoUrl;
+
+ const meta =
+ atMet[pKey] ||
+ cMet[String(pKey).toUpperCase()] ||
+ (isArray ? { name: pKey } : item);
+ if (isPlaceholderPlayer(meta.name) && pKey !== "UNCLAIMED RANK")
+ return null;
+
+ const stats = [];
+ const isUnclaimedItem = item.isUnclaimed;
+
+ if (isUnclaimedItem) {
+ stats.push({ value: "---", label: "PTS" });
+ stats.push({ value: "---", label: "TIME" });
+ } else if (!isArray && points !== undefined && time !== undefined) {
+ stats.push({
+ value: (cleanNumeric(points) || 0).toFixed(2),
+ label: "PTS",
+ });
+ stats.push({
+ value:
+ item.timeDisplay ||
+ (typeof time === "number" ? `${time.toFixed(2)}s` : time) ||
+ "--:--",
+ label: "TIME",
+ });
+ } else {
+ const value = isArray
+ ? item[1]
+ : (item.pts ??
+ item.points ??
+ item.value ??
+ item.impact ??
+ item.runs ??
+ item.num);
+ const isWholeNumber = [
+ "IMPACT",
+ "🔥",
+ "FIRE",
+ "WINS",
+ "RECORDS",
+ "SETS",
+ "RANK",
+ "RUNS",
+ ].includes(String(valueLabel || "").toUpperCase());
+ stats.push({
+ value:
+ typeof value === "number"
+ ? isWholeNumber
+ ? Math.round(value).toString()
+ : value.toFixed(2)
+ : value || "--",
+ label: valueLabel,
+ });
+ }
+
+ const courseMeta =
+ cMet[String(pKey).toUpperCase()] || item.rawCourse || {};
+
+ const titleStr = isUnclaimedItem
+ ? "--"
+ : String(
+ isArray
+ ? meta.name || pKey
+ : item.label || item.name || meta.name || pKey || "UNKNOWN",
+ ).toUpperCase();
+
+ return (
+            <div
+              key={virtualRow.key}
+              data-index={virtualRow.index}
+              ref={virtualizer.measureElement}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              <div className="pb-3">
+                <ASRListItem
+ variant="card"
+ isCompact={isCompact}
+ rank={
+ isArray
+ ? i + 1
+ : item.rank ||
+ item.currentRank ||
+ (isUnclaimedItem ? i + 1 : "UR")
+ }
+ title={titleStr}
+ isUnclaimed={isUnclaimedItem}
+ shouldFade={isUnclaimedItem || item.shouldFade}
+ subtitle={
+ isUnclaimedItem
+ ? "--"
+ : hideSubtitle
+ ? null
+ : isArray
+ ? meta.location || meta.countryName || null
+ : item.city ||
+ item.location ||
+ meta.location ||
+ meta.city
+ }
+ flag={
+ item.flag || 
+ meta.flag || 
+ meta.region || 
+ (meta.countryName ? fixCountryEntity(meta.countryName, "").flag : null) ||
+ (meta.country ? fixCountryEntity(meta.country, "").flag : null) ||
+ (item.country ? fixCountryEntity(item.country, "").flag : null)
+ }
+ stats={stats}
+ videoUrl={explicitVideoUrl || item.videoUrl || item.demoVideo}
+ mapUrl={
+ item.mapUrl ||
+ item.coordinates ||
+ meta.coordinates ||
+ meta.mapUrl ||
+ courseMeta.coordinates ||
+ courseMeta.mapUrl
+ }
+ onClick={() => {
+ if (entityType) onEntityClick(entityType, meta);
+ else if (!isArray && item.label)
+ onEntityClick("course", { name: item.label });
+ else if (!isArray && item.name && valueLabel === "IMPACT")
+ onEntityClick("course", { name: item.name });
+ else if (onPlayerClick) onPlayerClick(meta);
+ else onEntityClick("player", meta);
+ }}
+ showVideoIcon={true}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+ <div
+ className={cn(
+ "p-8 sm:p-12 w-full max-w-sm mx-auto mt-4 rounded-[2rem] border border-dashed flex flex-col items-center justify-center text-center gap-4 transition-colors",
+ "theme-panel",
+ )}
+ >
+ <div className={cn("w-14 h-14 rounded-full flex items-center justify-center mb-1", "bg-black/5 dark:bg-white/5")}>
+ <Activity size={24} className={"theme-text-faint"} />
+ </div>
+ <h2 className={cn("text-sm sm:text-base font-black uppercase tracking-widest", "theme-text-base")}>
+ NO ENTRIES FOUND
+ </h2>
+ </div>
+ )}
+ 
+ </motion.div>
+ </div>
+ );
+};

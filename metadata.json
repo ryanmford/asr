@@ -1,0 +1,8 @@
+{
+  "name": "Apex Speed Run",
+  "description": "ASR Leaderboard and Course Directory",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
