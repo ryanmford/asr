@@ -98,7 +98,24 @@ export const ASRWallOfFame = React.memo(
  );
  }, [data, lbAT, atMet, atPerfs, medalSort, settersWithImpact]);
 
- if (!stats) return null;
+ const hasError = useDataStore((s) => s.hasError);
+
+ if (!stats) {
+  if (hasError) {
+   return (
+    <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center animate-in fade-in duration-700 min-h-[50vh]">
+     <div className={cn("p-8 sm:p-12 w-full max-w-sm rounded-[2rem] border border-dashed flex flex-col items-center justify-center text-center gap-4 transition-colors", "theme-panel")}>
+      <div className={cn("w-14 h-14 rounded-full flex items-center justify-center mb-1", theme === "dark" ? "bg-red-500/10" : "bg-red-500/10")}>
+       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><path d="m2 2 20 20"/><path d="M17.5 17.5 22 22"/><path d="M22 22 17.5 17.5"/><path d="m2 22 4.5-4.5"/><path d="M6.5 17.5 2 22"/><path d="M10 17h4v4h-4z"/><path d="M12 2v4"/><path d="M12 10v4"/><path d="M2 12h4"/><path d="M10 12h4"/><path d="M18 12h4"/></svg>
+      </div>
+      <h3 className={cn("text-lg sm:text-xl font-black uppercase tracking-widest", theme === "dark" ? "text-red-400" : "text-red-600")}>NETWORK ERROR</h3>
+      <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50 px-2 line-clamp-2", theme === "dark" ? "text-red-400" : "text-red-600")}>WE COULDN'T CONNECT TO THE ASSETS SERVER.</p>
+     </div>
+    </div>
+   );
+  }
+  return null;
+ }
 
  const sections = [
  { l: "TOP LQ", k: "rating" },

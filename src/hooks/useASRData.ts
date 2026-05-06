@@ -53,18 +53,29 @@ export const useFetchASRData = () => {
       }
 
       const cacheBucket = Math.floor(Date.now() / CONFIG.REFRESH_INTERVAL);
-      const getProxyUrl = (gid: string) =>
-        `/api/proxy-sheet?gid=${gid}&cb=${cacheBucket}`;
+      const getProxyUrlApi = (gid: string) => `/api/proxy-sheet?gid=${gid}&cb=${cacheBucket}`;
+      const getProxyUrlDirect = (gid: string) => {
+        const spreadsheetId = CONFIG.SPREADSHEET_ID;
+        return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}&cb=${cacheBucket}`;
+      };
 
-      const safeFetch = async (url: string, retries: number = 2) => {
+      const safeFetch = async (gid: string, retries: number = 2) => {
         for (let i = 0; i <= retries; i++) {
           try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            // Try direct google sheets first for speed, it works 95% of the time.
+            // If it fails (CORS in PWA, adblockers, tracking prevention), we fall back to our API.
+            let res = await fetch(getProxyUrlDirect(gid)).catch(() => null);
+            
+            // If fetch threw (network error/CORS), or gave a bad status, fallback to local proxy.
+            if (!res || !res.ok) {
+              res = await fetch(getProxyUrlApi(gid));
+            }
+            
+            if (!res || !res.ok) throw new Error(`HTTP ${res?.status}`);
             return await res.text();
           } catch (e) {
             if (i === retries) {
-              console.error(`Final fetch failure for ${url}:`, e);
+              console.error(`Final fetch failure for sheet ${gid}:`, e);
               return null;
             }
             await new Promise((r) => setTimeout(r, 1000 * (i + 1))); // Exponential-ish backoff
@@ -75,10 +86,10 @@ export const useFetchASRData = () => {
 
       try {
         const [rM, rF, rLive, rSet] = await Promise.all([
-          safeFetch(getProxyUrl(CONFIG.SHEET_GIDS.MENS)),
-          safeFetch(getProxyUrl(CONFIG.SHEET_GIDS.WOMENS)),
-          safeFetch(getProxyUrl(CONFIG.SHEET_GIDS.LIVE)),
-          safeFetch(getProxyUrl(CONFIG.SHEET_GIDS.SETS)),
+          safeFetch(CONFIG.SHEET_GIDS.MENS),
+          safeFetch(CONFIG.SHEET_GIDS.WOMENS),
+          safeFetch(CONFIG.SHEET_GIDS.LIVE),
+          safeFetch(CONFIG.SHEET_GIDS.SETS),
         ]);
 
         const hasTotalError = rM === null && rF === null && rLive === null;
