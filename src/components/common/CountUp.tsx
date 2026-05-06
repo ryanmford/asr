@@ -41,7 +41,7 @@ export const CountUp = React.memo(
           "text-current",
         )}
       >
-        {count.toLocaleString()}
+        {count}
       </span>
     );
   },

@@ -276,12 +276,14 @@ async function startServer() {
         const meta = await getPageMeta(req.path, searchParams);
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
+        const currentUrl = `${baseUrl}${req.originalUrl}`;
         const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
           .replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${meta.title}">`)
           .replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${meta.description}">`)
+          .replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${currentUrl}">`)
           .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${ogImageUrl}">`)
           .replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${meta.title}">`)
           .replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${meta.description}">`)
@@ -313,12 +315,14 @@ async function startServer() {
         const meta = await getPageMeta(req.path, searchParams);
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
+        const currentUrl = `${baseUrl}${req.originalUrl}`;
         const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
           .replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${meta.title}">`)
           .replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${meta.description}">`)
+          .replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${currentUrl}">`)
           .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${ogImageUrl}">`)
           .replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${meta.title}">`)
           .replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${meta.description}">`)
