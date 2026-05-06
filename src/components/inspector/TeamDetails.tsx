@@ -86,7 +86,7 @@ export const TeamDetails = React.memo(
     );
 
     const randomPlayersPromo = useMemo(() => {
-      const types: PromoType[] = ["coach", "crowdfund"];
+      const types: PromoType[] = ["coach"];
       return types[Math.floor(Math.random() * types.length)];
     }, []);
 
@@ -131,8 +131,6 @@ export const TeamDetails = React.memo(
               options={[
                 { label: "PLAYERS", value: "players" },
                 { label: "SETTERS", value: "setters" },
-                { label: "VAULT", value: "vault" },
-                { label: "BIO", value: "bio" },
               ]}
               activeOption={activeTab}
               onChange={(t) => setActiveTab(t)}
