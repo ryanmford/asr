@@ -76,7 +76,7 @@ export const THEME = {
     ),
 };
 
-export const cn = (...classes: any[]) => classes.filter(Boolean).join(" ");
+export const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(" ");
 
 export const normalizeName = (n: string) => {
   if (!n) return "";
@@ -104,7 +104,7 @@ export const normalizeCountryName = (name: string) => {
   n = n.trim().replace(/,$/, "").trim();
 
   if (n === "UNKNOWN" || n === "UNDEFINED" || n === "NULL") return "";
-  const map: any = {
+  const map: Record<string, string> = {
     "UNITED STATES OF AMERICA": "USA",
     "UNITED STATES": "USA",
     US: "USA",
@@ -142,7 +142,7 @@ export const fixCountryEntity = (name: string, flag: string) => {
     return { name: n || CONFIG.FALLBACKS.UNKNOWN_LOCATION, flag: f };
 
   const normalized = normalizeCountryName(n);
-  const flagMandatoryMap: any = {
+  const flagMandatoryMap: Record<string, string> = {
     USA: "🇺🇸",
     UK: "🇬🇧",
     CANADA: "🇨🇦",
@@ -200,7 +200,7 @@ export const getSetterLevel = (impact: number, sets: number): string | null => {
   return null;
 };
 
-export const formatLocation = (locObj: any) => {
+export const formatLocation = (locObj: { city?: string; country?: string }) => {
   if (!locObj) return CONFIG.FALLBACKS.UNKNOWN_LOCATION;
 
   let city: string;
@@ -257,7 +257,7 @@ export const formatLocation = (locObj: any) => {
   return parts.filter(Boolean).join(", ");
 };
 
-export const cleanNumeric = (v: any) => {
+export const cleanNumeric = (v: string | number | null | undefined) => {
   if (typeof v === "number") return isNaN(v) ? null : v;
   if (v === undefined || v === null || v === "") return null;
   const str = String(v);
@@ -306,7 +306,7 @@ export const parseLine = (line: string = "") => {
 
 export const csvToObjects = (
   csv: string,
-  mapping: any,
+  mapping: Record<string, string[]>,
   headerRowIndex: number = 0,
 ) => {
   if (!csv) return [];
@@ -317,9 +317,9 @@ export const csvToObjects = (
   if (lines.length <= headerRowIndex) return [];
 
   const headers = parseLine(lines[headerRowIndex]);
-  const colMap: any = {};
+  const colMap: Record<string, number> = {};
 
-  Object.entries(mapping).forEach(([field, searchTerms]: [string, any]) => {
+  Object.entries(mapping).forEach(([field, searchTerms]: [string, string[]]) => {
     colMap[field] = headers.findIndex((h) =>
       searchTerms.some((term: string) =>
         h.toLowerCase().trim().includes(term.toLowerCase()),
@@ -329,7 +329,7 @@ export const csvToObjects = (
 
   return lines.slice(headerRowIndex + 1).map((line) => {
     const vals = parseLine(line);
-    const obj: any = {};
+    const obj: Record<string, string | number> = {};
     Object.keys(mapping).forEach((field) => {
       const idx = colMap[field];
       obj[field] = idx !== -1 ? vals[idx] : undefined;
@@ -364,7 +364,7 @@ export const getFireCountForRun = (time: number, gender: string) => {
 };
 
 export const getContinentData = (country: string) => {
-  const continents: any = {
+  const continents: Record<string, string[]> = {
     eu: [
       "ALBANIA",
       "ANDORRA",
@@ -576,7 +576,7 @@ export const getContinentData = (country: string) => {
     ],
   };
   const c = normalizeCountryName(country);
-  const regionMap: any = {
+  const regionMap: Record<string, { lat: number; lng: number; zoom: number; abbr: string; full: string }> = {
     eu: { name: "EUROPE", flag: "🌍" },
     na: { name: "NORTH AMERICA", flag: "🌎" },
     sa: { name: "SOUTH AMERICA", flag: "🌎" },
@@ -602,25 +602,31 @@ export const isPlaceholderPlayer = (name: string) => {
   );
 };
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 export const trackEvent = (eventName: string, params = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, params);
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", eventName, params);
   } else {
     console.log(`[GA4 Event] ${eventName}`, params);
   }
 };
 
 export const trackPageview = (path: string) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
+  if (typeof window !== "undefined" && window.gtag) {
     const cleanPath = path.replace(/^#\/?/, "") || "players";
-    (window as any).gtag("event", "page_view", {
+    window.gtag("event", "page_view", {
       page_path: `/${cleanPath}`,
       page_title: `ASR - ${cleanPath.toUpperCase()}`,
     });
   }
 };
 
-export const robustSort = (a: any, b: any, key: string, dir: number) => {
+export const robustSort = (a: Record<string, unknown>, b: Record<string, unknown>, key: string, dir: number) => {
   const aVal = a[key];
   const bVal = b[key];
 
@@ -646,7 +652,7 @@ export const robustSort = (a: any, b: any, key: string, dir: number) => {
   return (aStr === bStr ? 0 : aStr < bStr ? -1 : 1) * dir; // Much faster than localeCompare
 };
 
-export const isQualifiedAthlete = (p: any, isAllTime = true) => {
+export const isQualifiedAthlete = (p: { runs?: number, allTimeFireCount?: number }, isAllTime = true) => {
   if (!p || isPlaceholderPlayer(p.name)) return false;
   const runs = p.runs || 0;
   return isAllTime ? (p.gender === "M" ? runs >= 4 : runs >= 3) : runs >= 3;

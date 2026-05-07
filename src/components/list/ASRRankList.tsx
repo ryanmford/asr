@@ -7,13 +7,15 @@ import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRListItem } from "../ASRListItems";
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
+import { ASRDataContext } from "../../types";
+
 interface ASRRankListProps {
  title?: string;
- athletes: any[];
+ athletes: unknown[];
  valueLabel?: string;
- dataContext?: any;
- onPlayerClick?: (meta: any) => void;
- onEntityClick: (type: string, data: any) => void;
+ dataContext?: ASRDataContext;
+ onPlayerClick?: (meta: Record<string, unknown>) => void;
+ onEntityClick: (type: string, data: Record<string, unknown> | string | { name?: string; pKey?: string }) => void;
  limit?: number | null;
  className?: string;
  hideSubtitle?: boolean;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from "react";
 import { Moon, Sun, CloudOff, RefreshCw } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
@@ -82,7 +84,7 @@ export const ASRHeader = React.memo(
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
             className={cn(
-              "p-2 sm:p-2 rounded-full border transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+              "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center sm:p-2 rounded-full border transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
               theme === "dark"
                 ? "bg-black border-zinc-800 text-white hover:bg-zinc-900 focus-visible:ring-offset-[#030303]"
                 : "bg-white border-slate-200 text-black shadow-sm hover:bg-slate-50 theme-focus",

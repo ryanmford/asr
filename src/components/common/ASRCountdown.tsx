@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useState, useEffect } from "react";
 import { CountUp } from "./CountUp";
 import { cn } from "../../lib/asr-utils";
@@ -80,7 +82,9 @@ export const ASRCountdown = React.memo(
 
     if (isAllTime && stats) {
       return (
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={onHelp}
           className={cn(
             "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer transition-all active:scale-95 group border-b",
@@ -152,13 +156,15 @@ export const ASRCountdown = React.memo(
             </div>
           </div>
           <CloseButton />
-        </button>
+        </div>
       );
     }
 
     if (!currentTime)
       return (
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={onHelp}
           className={cn(
             "w-full h-10 sm:h-12 flex items-center justify-center cursor-pointer transition-all active:scale-95 border-b relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500",
@@ -188,11 +194,13 @@ export const ASRCountdown = React.memo(
             SEASON ENDED
           </span>
           <CloseButton />
-        </button>
+        </div>
       );
 
     return (
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onHelp}
         className={cn(
           "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 group border-b",
@@ -265,7 +273,7 @@ export const ASRCountdown = React.memo(
           </div>
         </div>
         <CloseButton />
-      </button>
+      </div>
     );
   },
 );

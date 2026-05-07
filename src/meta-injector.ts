@@ -1,14 +1,15 @@
 import { CONFIG } from "./lib/asr-utils.ts";
 import { normalizeName } from "./lib/asr-utils.ts";
 import { computeAllState } from "./lib/asr-data-compute.ts";
+import type { ASRDataContext, PlayerProfile } from "./types.ts";
 
 export interface MetaData {
   title: string;
   description: string;
-  initialData?: any;
+  initialData?: ASRDataContext;
 }
 
-let cachedData: any = null;
+let cachedData: ASRDataContext | null = null;
 let lastFetchTime = 0;
 
 async function fetchSheets() {
@@ -73,7 +74,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
       const isAllTime = eventType === "all-time";
       
       const rankData = isAllTime ? (cachedData.data || []) : (cachedData.openData || []);
-      const player = rankData.find((p: any) => normalizeName(p.name || "") === slug);
+      const player = rankData.find((p: PlayerProfile) => normalizeName(p.name || "") === slug);
       
       if (player) {
          title = `${player.name.toUpperCase()} | ASR Player Profile`;

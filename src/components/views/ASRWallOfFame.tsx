@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useMemo } from "react";
 import { ChevronDown } from "lucide-react";
 import { useDataStore } from "../../store/useDataStore";

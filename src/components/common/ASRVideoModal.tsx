@@ -13,7 +13,8 @@ function getYouTubeId(url: string | null) {
 }
 
 export const ASRVideoModal = () => {
-  const { playingVideoUrl, setPlayingVideoUrl } = useAppStore();
+  const playingVideoUrl = useAppStore(s => s.playingVideoUrl);
+  const setPlayingVideoUrl = useAppStore(s => s.setPlayingVideoUrl);
   const [internalUrl, setInternalUrl] = useState(playingVideoUrl);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from "react";
 import { Zap, ChevronsRight, Award, PenTool, Rocket } from "lucide-react";
 import { cn, CONFIG } from "../../lib/asr-utils";

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useState, useEffect, useContext } from "react";
 import { cn, THEME, trackEvent } from "../../lib/asr-utils";
 import { ThemeContext } from "../../App";

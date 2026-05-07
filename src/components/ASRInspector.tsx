@@ -10,13 +10,13 @@ interface ASRInspectorProps {
   onClose: () => void;
   activeItem: {
     type: string;
-    data: any;
+    data: Record<string, unknown>;
     initialMode?: "open" | "all-time";
   } | null;
-  dataContext: any;
-  onEntityClick: (type: string, data: any) => void;
+  dataContext: Record<string, unknown>;
+  onEntityClick: (type: string, data: Record<string, unknown>) => void;
   theme: "light" | "dark";
-  history: any[];
+  history: Record<string, unknown>[];
   historyIndex: number;
   onBack: () => void;
   onForward: () => void;

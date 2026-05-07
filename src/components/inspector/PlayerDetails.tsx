@@ -92,7 +92,7 @@ export const PlayerDetails = React.memo(
       [setSearchParams, location.state],
     );
 
-    const [selectedItem, setSelectedItem] = useState<{ type: string; item: any } | null>(null);
+    const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);
 
     const randomRunsPromo = useMemo(() => {
       const types: PromoType[] = ["coach"];
@@ -452,7 +452,7 @@ export const PlayerDetails = React.memo(
                     />
                   )}
                   {meta.teams && meta.teams.length > 0
-                    ? meta.teams.map((t: Record<string, any> | string, i: number) => (
+                    ? meta.teams.map((t: Record<string, unknown> | string, i: number) => (
                         <BioRow
                           key={i}
                           theme={theme}

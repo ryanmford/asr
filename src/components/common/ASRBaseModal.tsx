@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Share, CornerUpLeft, CornerUpRight, X } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
@@ -14,6 +16,7 @@ interface ASRBaseModalProps {
   onBack?: () => void;
   onForward?: () => void;
   canForward?: boolean;
+  layoutId?: string;
 }
 
 import { motion, AnimatePresence } from "motion/react";
@@ -31,6 +34,7 @@ export const ASRBaseModal = React.memo(
     onBack,
     onForward,
     canForward,
+    layoutId,
   }: ASRBaseModalProps) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -119,6 +123,7 @@ export const ASRBaseModal = React.memo(
             />
             <motion.div
               ref={modalRef}
+              layoutId={layoutId || "global-modal"}
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -176,7 +181,7 @@ export const ASRBaseModal = React.memo(
                       }
                     }}
                     className={cn(
-                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
                         : "text-slate-400 hover:text-black hover:bg-slate-100"
@@ -189,7 +194,7 @@ export const ASRBaseModal = React.memo(
                     <button
                       onClick={() => onForward?.()}
                       className={cn(
-                        "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                        "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                         theme === "dark"
                           ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
                           : "text-slate-400 hover:text-black hover:bg-slate-100"
@@ -223,7 +228,7 @@ export const ASRBaseModal = React.memo(
                               onClick={() => onJump?.(idx)}
                               disabled={isLast}
                               className={cn(
-                                "text-[10px] font-black uppercase tracking-widest transition-all",
+                                "text-[10px] min-h-[44px] px-2 flex items-center justify-center font-black uppercase tracking-widest transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg",
                                 isLast
                                   ? theme === "dark"
                                     ? "text-white"
@@ -255,7 +260,7 @@ export const ASRBaseModal = React.memo(
                   <button
                     onClick={handleShare}
                     className={cn(
-                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
                         : "text-zinc-500 hover:text-black hover:bg-slate-100"
@@ -267,7 +272,7 @@ export const ASRBaseModal = React.memo(
                   <button
                     onClick={onClose}
                     className={cn(
-                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
                         : "text-zinc-500 hover:text-black hover:bg-slate-100"

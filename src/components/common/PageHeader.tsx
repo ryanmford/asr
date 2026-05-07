@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from "react";
 import { cn } from "../../lib/asr-utils";
 

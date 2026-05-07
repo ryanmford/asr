@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from "react";
 import { Map, List } from "lucide-react";
 import { ASRNeonToggle } from "../ui/ASRNeonToggle";

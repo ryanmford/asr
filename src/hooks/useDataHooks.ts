@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { robustSort } from "../lib/asr-utils";
 
-export const useDebounce = (value: any, delay: number) => {
+export const useDebounce = <T,>(value: T, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedValue(value), delay);
@@ -10,11 +10,11 @@ export const useDebounce = (value: any, delay: number) => {
   return debouncedValue;
 };
 
-export const useFilteredData = (
-  source: any[],
+export const useFilteredData = <T extends Record<string, unknown> & { searchKey?: string }>(
+  source: T[],
   searchTerm: string,
-  sortConfig: any,
-  predicate: any = null,
+  sortConfig: { key: string; direction: "ascending" | "descending" } | null,
+  predicate: ((item: T) => boolean) | null = null,
 ) => {
   return useMemo(() => {
     if (!source) return [];

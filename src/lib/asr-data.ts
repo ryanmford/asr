@@ -96,7 +96,7 @@ export const processRankingData = (csv: string, gender: string) => {
         CONFIG.FALLBACKS.UNAFFILIATED;
       const pTeamLocation = (vals.__raw ? vals.__raw[21] || "" : "").trim();
 
-      const pTeams: any[] = [];
+      const pTeams: TeamProfile[] = [];
       if (vals.__raw) {
         // Check for team slots: (X,Y,Z), (AA,AB,AC), (AD,AE,AF)
         for (let j = 23; j <= 31; j += 3) {
@@ -150,7 +150,7 @@ export const processRankingData = (csv: string, gender: string) => {
 
 export const processSetListData = (csv: string) => {
   const dataRows = csvToObjects(csv, SET_LIST_MAPPING);
-  const map: any = {};
+  const map: Record<string, CourseData> = {};
   dataRows.forEach((vals) => {
     const course = (vals.course || "").trim().toUpperCase();
     if (course) {
@@ -220,7 +220,7 @@ export const processSettersData = (csv: string) => {
       const townEntity = fixCountryEntity("", townFlagRaw);
       const gymEntity = fixCountryEntity("", gymFlagRaw);
 
-      const pTeams: any[] = [];
+      const pTeams: TeamProfile[] = [];
       if (vals.__raw) {
         for (let j = 23; j <= 31; j += 3) {
           const tName = (vals.__raw[j] || "").trim();
@@ -261,10 +261,10 @@ export const processSettersData = (csv: string) => {
 
 export const processLiveFeedData = (
   csv: string,
-  athleteMetadata: any = {},
-  courseSetMap: any = {},
+  athleteMetadata: Record<string, PlayerProfile> = {},
+  courseSetMap: Record<string, string[]> = {},
 ) => {
-  const result: any = {
+  const result: Record<string, unknown> = {
     allTimePerformances: {},
     openPerformances: {},
     openRankings: [],
@@ -295,14 +295,14 @@ export const processLiveFeedData = (
   const dataRows = csvToObjects(csv, LIVE_FEED_MAPPING, hIdx);
   const OPEN_START = new Date(CONFIG.DATES.OPEN_START);
   const OPEN_END = new Date(CONFIG.DATES.OPEN_END);
-  const allTimeAthleteBestTimes: any = {};
-  const allTimeCourseLeaderboards: any = { M: {}, F: {} };
-  const openAthleteBestTimes: any = {};
-  const openCourseLeaderboards: any = { M: {}, F: {} };
-  const openAthleteTotalSubmissions: any = {};
-  const athleteDisplayNameMap: any = {};
-  const filmerCreditsCount: any = {};
-  const courseRunsHistory: any = {};
+  const allTimeAthleteBestTimes: Record<string, { [loc: string]: number }> = {};
+  const allTimeCourseLeaderboards: { M: Record<string, unknown>; F: Record<string, unknown> } = { M: {}, F: {} };
+  const openAthleteBestTimes: Record<string, { [loc: string]: number }> = {};
+  const openCourseLeaderboards: { M: Record<string, unknown>; F: Record<string, unknown> } = { M: {}, F: {} };
+  const openAthleteTotalSubmissions: Record<string, number> = {};
+  const athleteDisplayNameMap: Record<string, string> = {};
+  const filmerCreditsCount: Record<string, number> = {};
+  const courseRunsHistory: Record<string, unknown[]> = {};
 
   dataRows.forEach((vals) => {
     const pName = (vals.athlete || "").trim();
@@ -424,8 +424,8 @@ export const processLiveFeedData = (
     }
   });
 
-  const buildPerfs = (source: any, isAllTimeBuild = false) => {
-    const res: any = {};
+  const buildPerfs = (source: Record<string, { [loc: string]: { label: string, value: string, num: number, videoUrl: string, date: string | null } }>, isAllTimeBuild = false) => {
+    const res: Record<string, unknown[]> = {};
     const memoizedBoards: Record<
       string,
       { record: number; rankMap: Map<string, number> }
@@ -435,7 +435,7 @@ export const processLiveFeedData = (
       const pGender = athleteMetadata[pKey]?.gender || "M";
       let fireTotal = 0;
       res[pKey] = Object.entries(source[pKey]).map(
-        ([normL, data]: [string, any]) => {
+        ([normL, data]: [string, { label: string, value: string, num: number, videoUrl: string, date: string | null }]) => {
           const boardKey = `${pGender}-${normL}`;
           if (!memoizedBoards[boardKey]) {
             const board =
@@ -443,7 +443,7 @@ export const processLiveFeedData = (
             const vals = Object.values(board) as number[];
             const record = vals.length ? Math.min(...vals) : 0;
             const sorted = Object.entries(board).sort(
-              (a: any, b: any) => a[1] - b[1],
+              (a: [string, unknown], b: [string, unknown]) => (a[1] as number) - (b[1] as number),
             );
             const rankMap = new Map<string, number>();
             sorted.forEach((e, idx) => rankMap.set(e[0], idx + 1));
@@ -499,15 +499,15 @@ export const processLiveFeedData = (
   result.filmerCredits = filmerCreditsCount;
 
   const chronologicalRuns = [...dataRows]
-    .filter((run: any) => !isPlaceholderPlayer((run.athlete || "").trim()))
-    .sort((a: any, b: any) => {
+    .filter((run: Record<string, unknown>) => !isPlaceholderPlayer((String(run.athlete) || "").trim()))
+    .sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
       const dateA = a.date ? new Date(a.date).getTime() : 0;
       const dateB = b.date ? new Date(b.date).getTime() : 0;
       return dateB - dateA;
     })
     .slice(0, 100);
 
-  const recentFeedMemoBoards: Record<string, any[]> = {};
+  const recentFeedMemoBoards: Record<string, [string, unknown][]> = {};
   result.recentFeed = chronologicalRuns.map((run, i) => {
     const pName = (run.athlete || "").trim();
     const normC = (run.course || "").trim().toUpperCase();
@@ -522,7 +522,7 @@ export const processLiveFeedData = (
       const courseRecords =
         (allTimeCourseLeaderboards[pGender] || {})[normC] || {};
       sortedResults = Object.entries(courseRecords).sort(
-        (a: any, b: any) => a[1] - b[1],
+        (a: [string, unknown], b: [string, unknown]) => (a[1] as number) - (b[1] as number),
       );
       recentFeedMemoBoards[boardKey] = sortedResults;
     }
@@ -554,31 +554,31 @@ export const processLiveFeedData = (
     .map((pKey) => {
       const meta = athleteMetadata[pKey];
       const perfs = result.openPerformances[pKey] || [];
-      const totalPts = perfs.reduce((sum: number, p: any) => sum + p.points, 0);
+      const totalPts = perfs.reduce((sum: number, p: { points?: number }) => sum + (p.points || 0), 0);
       return {
         ...meta,
         id: `open-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
         runs: perfs.length,
-        wins: perfs.filter((p: any) => p.rank === 1).length,
+        wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
         sets: openAthleteTotalSubmissions[pKey] || 0,
         openFireCount: perfs.reduce(
-          (sum: number, p: any) => sum + (p.fireCount || 0),
+          (sum: number, p: { fireCount?: number }) => sum + (p.fireCount || 0),
           0,
         ),
       };
     })
-    .sort((a: any, b: any) => b.rating - a.rating);
+    .sort((a: PlayerProfile & { rating?: number }, b: PlayerProfile & { rating?: number }) => (b.rating || 0) - (a.rating || 0));
   return result;
 };
 
 export const getAggregatedStats = (
-  rawCourseList: any[],
+  rawCourseList: CourseData[],
   groupBy: string,
-  dnMap: any = {},
+  dnMap: Record<string, string> = {},
 ) => {
-  const map: any = {};
+  const map: Record<string, { key: string; name: string; flag: string; courses: number; runs: number; playersSet: Set<string>; players?: number }> = {};
   (rawCourseList || []).forEach((c) => {
     let name = c[groupBy];
     let flag = c.flag;
@@ -612,25 +612,27 @@ export const getAggregatedStats = (
     const entry = map[key];
     entry.courses++;
     entry.runs += c.totalRuns || 0;
-    (c.athletesMAll || []).forEach((a: any) => {
-      if (!isPlaceholderPlayer(dnMap[a[0]] || a[0])) entry.playersSet.add(a[0]);
+    (c.athletesMAll || []).forEach((a: string | [string, number]) => {
+      const pId = Array.isArray(a) ? a[0] : a;
+      if (!isPlaceholderPlayer(dnMap[pId] || pId)) entry.playersSet.add(pId);
     });
-    (c.athletesFAll || []).forEach((a: any) => {
-      if (!isPlaceholderPlayer(dnMap[a[0]] || a[0])) entry.playersSet.add(a[0]);
+    (c.athletesFAll || []).forEach((a: string | [string, number]) => {
+      const pId = Array.isArray(a) ? a[0] : a;
+      if (!isPlaceholderPlayer(dnMap[pId] || pId)) entry.playersSet.add(pId);
     });
   });
   return Object.values(map)
-    .map((item: any) => ({ ...item, players: item.playersSet.size }))
+    .map((item) => ({ ...item, players: item.playersSet.size }))
     .sort((a, b) => b.courses - a.courses);
 };
 
 export const calculateWofStats = (
-  data: any[],
-  atPerfs: any,
-  lbAT: any,
-  atMet: any,
-  medalSort: any,
-  settersWithImpact: any,
+  data: PlayerProfile[],
+  atPerfs: Record<string, { fireCount?: number }[]>,
+  lbAT: { M: Record<string, unknown>; F: Record<string, unknown> },
+  atMet: Record<string, PlayerProfile>,
+  medalSort: string,
+  settersWithImpact: SetterProfile[],
 ) => {
   try {
     if (!data || !data.length) return null;
@@ -639,7 +641,7 @@ export const calculateWofStats = (
       .map((p) => {
         const performances = atPerfs?.[p.pKey] || [];
         const calculatedFires = performances.reduce(
-          (sum: number, run: any) => sum + (run.fireCount || 0),
+          (sum: number, run: { fireCount?: number }) => sum + (run.fireCount || 0),
           0,
         );
         return {
@@ -648,16 +650,17 @@ export const calculateWofStats = (
           winPercentage: p.runs > 0 ? (p.wins / p.runs) * 100 : 0,
         };
       });
-    const medalsBase: any = {};
-    const processMedals = (lb: any) => {
+    const medalsBase: Record<string, { gold: number; silver: number; bronze: number; points: number }> = {};
+    const processMedals = (lb: Record<string, unknown>) => {
       if (!lb) return;
-      Object.entries(lb).forEach(([_courseName, athletes]: [string, any]) => {
+      Object.entries(lb).forEach(([_courseName, athletes]: [string, unknown]) => {
         if (!athletes) return;
-        const filteredEntries = Object.entries(athletes).filter(([pKey]) => {
+        const athletesRec = athletes as Record<string, number>;
+        const filteredEntries = Object.entries(athletesRec).filter(([pKey]) => {
           const name = atMet[pKey]?.name || pKey;
           return !isPlaceholderPlayer(name);
         });
-        const sorted = filteredEntries.sort((a: any, b: any) => a[1] - b[1]);
+        const sorted = filteredEntries.sort((a, b) => a[1] - b[1]);
         sorted.slice(0, 3).forEach(([pKey, _time], rankIdx) => {
           const athlete = atMet[pKey] || {};
           const names = String(athlete.countryName || "")
@@ -691,10 +694,10 @@ export const calculateWofStats = (
     processMedals(lbAT?.F);
     const sortedMedalCount = Object.values(medalsBase)
       .sort(
-        (a: any, b: any) =>
+        (a: { gold: number, silver: number, bronze: number }, b: { gold: number, silver: number, bronze: number }) =>
           b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze,
       )
-      .map((c: any, i) => ({ ...c, displayRank: i + 1 }));
+      .map((c, i) => ({ ...c, displayRank: i + 1 }));
     if (medalSort && medalSort.key) {
       const dir = medalSort.direction === "ascending" ? 1 : -1;
       sortedMedalCount.sort((a, b) => robustSort(a, b, medalSort.key, dir));

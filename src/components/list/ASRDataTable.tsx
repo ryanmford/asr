@@ -7,11 +7,21 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useDataStore } from "../../store/useDataStore";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 
-interface ASRDataTableProps {
- data: any[];
- columns: any[];
+interface ColumnDef<T> {
+  key: keyof T | string;
+  label: string;
+  type?: string;
+  isRank?: boolean;
+  color?: string;
+  width?: string;
+  getValue?: (item: T) => React.ReactNode;
+}
+
+interface ASRDataTableProps<T = Record<string, unknown>> {
+ data: T[];
+ columns: ColumnDef<T>[];
  viewType?: "table" | "card";
- onItemClick?: (item: any) => void;
+ onItemClick?: (item: T) => void;
  emptyMessage?: string;
  isLoading?: boolean;
  visibleCount?: number;
@@ -20,6 +30,18 @@ interface ASRDataTableProps {
  hideSubtitle?: boolean;
  middleLabel?: string;
  showVideoColumn?: boolean;
+}
+
+interface MemoizedVirtualRowProps<T> {
+  virtualRow: import("@tanstack/react-virtual").VirtualItem;
+  item: T & { isDivider?: boolean; rank?: number; name?: string; pKey?: string; id?: string };
+  viewType: "table" | "card";
+  statColumns: ColumnDef<T>[];
+  columns: ColumnDef<T>[];
+  showVideoColumn: boolean;
+  onItemClick?: (item: T) => void;
+  onItemHover?: () => void;
+  measureElement: (node: Element | null) => void;
 }
 
 const MemoizedVirtualRow = React.memo(({
@@ -32,12 +54,12 @@ const MemoizedVirtualRow = React.memo(({
   onItemClick,
   onItemHover,
   measureElement
-}: any) => {
+}: MemoizedVirtualRowProps<Record<string, unknown>>) => {
   const absoluteTransform = `translateY(${virtualRow.start}px)`;
 
   const stats = React.useMemo(() => {
-    return statColumns.map((c: any) => ({
-      value: typeof c.getValue === "function" ? c.getValue(item) : item[c.key],
+    return statColumns.map((c) => ({
+      value: typeof c.getValue === "function" ? c.getValue(item) : item[c.key as keyof typeof item],
       color: c.color,
       label: c.label,
     }));
@@ -81,6 +103,7 @@ const MemoizedVirtualRow = React.memo(({
       className={cn("w-full px-4", viewType === "card" && "pb-3")}
     >
       <ASRListItem
+        layoutId={`card-${item.id || item.name || virtualRow.key}`}
         variant={viewType}
         rank={item.currentRank}
         title={item.name}
@@ -125,9 +148,10 @@ export const ASRDataTable = React.memo(
  count: data?.length || 0,
  estimateSize,
  overscan: 5,
+ getItemKey: (index) => data[index]?.id || data[index]?.pKey || data[index]?.name || index,
  });
 
- const statColumns = React.useMemo(() => columns.filter((c: any) => !c.isRank && c.type !== "profile"), [columns]);
+ const statColumns = React.useMemo(() => columns.filter((c) => !c.isRank && c.type !== "profile"), [columns]);
 
  if (isLoading) {
   return (
@@ -283,7 +307,7 @@ export const ASRDataTable = React.memo(
  viewType === "card" ? "gap-2 sm:gap-4" : "gap-0",
  )}
  >
- {statColumns.map((c: any, i: number) => (
+ {statColumns.map((c, i: number) => (
  <div
  key={i}
  className={`${c.width || "w-20 sm:w-24 lg:w-32"} px-1 sm:px-4 lg:px-6 text-right shrink-0`}

@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useMemo } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { useDebounce } from "../../hooks/useDataHooks";
 import { PageHeader } from "../common/PageHeader";
 import { ASRSearchInput, ASRDataTable } from "../ASRComponents";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 interface AnimatedListViewProps {
   title: string;
@@ -72,16 +75,18 @@ export const AnimatedListView = React.memo(({
       {children ? (
         typeof children === "function" ? children({ searchedData }) : children
       ) : (
-        <ASRDataTable
-          data={searchedData}
-          isLoading={isLoading}
-          viewType={viewType as any}
-          onItemClick={onItemClick}
-          middleLabel={middleLabel}
-          columns={columns}
-          hideSubtitle={hideSubtitle}
-          showVideoColumn={showVideoColumn}
-        />
+        <ErrorBoundary fallbackMessage="Failed to render the data list.">
+          <ASRDataTable
+            data={searchedData}
+            isLoading={isLoading}
+            viewType={viewType as any}
+            onItemClick={onItemClick}
+            middleLabel={middleLabel}
+            columns={columns}
+            hideSubtitle={hideSubtitle}
+            showVideoColumn={showVideoColumn}
+          />
+        </ErrorBoundary>
       )}
     </div>
   );

@@ -21,9 +21,9 @@ export const useFetchASRData = () => {
       setFetchStatus({ isSyncing: true, hasError: false });
       
       if (isInitialFetch && !initialDataConsumed.current) {
-        if (typeof window !== 'undefined' && (window as any).__INITIAL_DATA__) {
+        if (typeof window !== 'undefined' && 'window' in globalThis && (window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__) {
            console.log("Hydrating from __INITIAL_DATA__");
-           setData((window as any).__INITIAL_DATA__);
+           setData((window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__!);
            initialDataConsumed.current = true;
            setFetchStatus({ isSyncing: false, hasError: false });
            return;
@@ -34,12 +34,12 @@ export const useFetchASRData = () => {
         try {
           const cached = await localforage.getItem(CONFIG.SNAPSHOT_KEY);
           if (cached) {
-            setData(cached as any);
+            setData({ ...(cached as ASRDataContext), isLoading: false });
           } else {
             const localCached = localStorage.getItem(CONFIG.SNAPSHOT_KEY);
             if (localCached) {
               const parsedLocal = JSON.parse(localCached);
-              setData(parsedLocal);
+              setData({ ...parsedLocal, isLoading: false });
               try {
                 await localforage.setItem(CONFIG.SNAPSHOT_KEY, parsedLocal);
               } catch (e) {
@@ -127,10 +127,13 @@ export const useFetchASRData = () => {
             payload: { rM, rF, rLive, rSet, hasTotalError, hasPartialError },
           });
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
+        let errorMessage = "Unknown Error";
+        if (e instanceof Error) errorMessage = e.message;
+        
         trackEvent("exception", {
           description: "sheet_fetch_failed",
-          error: e.message,
+          error: errorMessage,
           fatal: true,
         });
         setFetchStatus({ isLoading: false, isSyncing: false, hasError: true });

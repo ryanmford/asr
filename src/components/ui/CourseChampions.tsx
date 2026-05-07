@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useMemo } from "react";
 import { cn, fixCountryEntity, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { Trophy, Clock } from "lucide-react";

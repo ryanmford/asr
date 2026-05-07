@@ -1,42 +1,43 @@
 import { create } from 'zustand';
+import type { PlayerProfile, CourseData, SetterProfile, TeamProfile } from '../types';
 
 interface ASRDataState {
-  data: unknown[];
-  openData: unknown[];
-  atPerfs: unknown;
-  opPerfs: unknown;
-  lbAT: { M: unknown; F: unknown };
-  lbOpen: { M: unknown; F: unknown };
-  atMet: unknown;
-  dnMap: unknown;
-  cMet: unknown;
-  settersData: unknown[];
-  atRawBest: unknown;
-  opRawBest: unknown;
+  data: PlayerProfile[];
+  openData: PlayerProfile[];
+  atPerfs: Record<string, unknown>;
+  opPerfs: Record<string, unknown>;
+  lbAT: { M: Record<string, unknown>; F: Record<string, unknown> };
+  lbOpen: { M: Record<string, unknown>; F: Record<string, unknown> };
+  atMet: Record<string, unknown>;
+  dnMap: Record<string, string>;
+  cMet: Record<string, unknown>;
+  settersData: SetterProfile[];
+  atRawBest: Record<string, unknown>;
+  opRawBest: Record<string, unknown>;
   recentFeed: unknown[];
   courseRunsHistory: Record<string, unknown[]>;
   
   // Computed Data
-  masterCourseList: unknown[];
-  kpiStats: unknown;
-  settersWithImpact: unknown[];
-  setterMet: unknown;
-  teamsAggregated: unknown[];
-  playerLB_AT: { M: unknown; F: unknown };
-  playerLB_OP: { M: unknown; F: unknown };
+  masterCourseList: CourseData[];
+  kpiStats: Record<string, unknown> | null;
+  settersWithImpact: SetterProfile[];
+  setterMet: Record<string, unknown>;
+  teamsAggregated: TeamProfile[];
+  playerLB_AT: { M: PlayerProfile[]; F: PlayerProfile[] };
+  playerLB_OP: { M: PlayerProfile[]; F: PlayerProfile[] };
 
   // Pre-computed lists
-  playerList_M_AT: unknown[];
-  playerList_F_AT: unknown[];
-  playerList_M_OP: unknown[];
-  playerList_F_OP: unknown[];
-  courseList_AT: unknown[];
-  courseList_OP: unknown[];
-  settersList: unknown[];
-  teamList_gyms_AT: unknown[];
-  teamList_teams_AT: unknown[];
-  teamList_gyms_OP: unknown[];
-  teamList_teams_OP: unknown[];
+  playerList_M_AT: PlayerProfile[];
+  playerList_F_AT: PlayerProfile[];
+  playerList_M_OP: PlayerProfile[];
+  playerList_F_OP: PlayerProfile[];
+  courseList_AT: CourseData[];
+  courseList_OP: CourseData[];
+  settersList: SetterProfile[];
+  teamList_gyms_AT: TeamProfile[];
+  teamList_teams_AT: TeamProfile[];
+  teamList_gyms_OP: TeamProfile[];
+  teamList_teams_OP: TeamProfile[];
 
   isLoading: boolean;
   isSyncing: boolean;

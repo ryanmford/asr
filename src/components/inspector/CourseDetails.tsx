@@ -42,7 +42,7 @@ import { ASRNeonToggle } from "../ui/ASRNeonToggle";
 import { CourseData, ASRDataContext } from "../../types";
 
 interface CourseDetailsProps {
-  course: CourseData & Record<string, any>;
+  course: CourseData;
   dataContext: ASRDataContext;
   onEntityClick: (type: string, data: Record<string, unknown>) => void;
   theme: "light" | "dark";
@@ -161,13 +161,13 @@ export const CourseDetails = React.memo(
       pRaw = {},
       courseRunsHistory = {},
     } = dataContext || {};
-    const { setPlayingVideoUrl } = useAppStore();
+    const setPlayingVideoUrl = useAppStore(s => s.setPlayingVideoUrl);
     const cName = (course?.name || "").toUpperCase();
     const meta = cMet[cName] || course || {};
 
     const allCourseRuns = useMemo(() => {
       if (courseRunsHistory[cName]) {
-        return courseRunsHistory[cName].map((r: Record<string, any>) => ({
+        return courseRunsHistory[cName].map((r: Record<string, unknown>) => ({
           ...r,
           athlete: atMet[r.pKey]?.name || r.athlete || r.pKey,
           gender: atMet[r.pKey]?.gender || r.gender || "M",
@@ -177,7 +177,7 @@ export const CourseDetails = React.memo(
         }));
       }
 
-      const allRuns: Record<string, any>[] = [];
+      const allRuns: Record<string, unknown>[] = [];
       const allTimePlayers = pRaw["all-time"] || {};
       Object.entries(allTimePlayers).forEach(
         ([pKey, playerRuns]: [string, unknown]) => {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from "react";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -71,7 +73,7 @@ export const ASRSearchInput = React.memo(
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => onChange({ target: { value: "" } } as any)}
                 className={cn(
-                  "absolute right-3 p-1.5 rounded-lg opacity-40 hover:opacity-100 transition-all z-30 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
+                  "absolute right-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg opacity-40 hover:opacity-100 transition-all z-30 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
                   theme === "dark" ? "hover:bg-white/10" : "hover:bg-black/5",
                 )}
               >

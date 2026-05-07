@@ -1,3 +1,6 @@
+ 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { PlayerProfile, CourseData, SetterProfile, TeamProfile, ASRDataContext } from "../types";
 import { CONFIG, getContinentData, isPlaceholderPlayer, normalizeName, isQualifiedAthlete } from "./asr-utils.ts";
 import {
   processRankingData,
@@ -6,15 +9,15 @@ import {
   processSettersData,
 } from "./asr-data.ts";
 
-export function computeAllState(payload: any) {
+export function computeAllState(payload: { rM: string; rF: string; rLive: string; rSet: string; hasTotalError: boolean; hasPartialError: boolean }) {
   const { rM, rF, rLive, rSet, hasTotalError, hasPartialError } = payload;
 
   const pM = processRankingData(rM || "", "M");
   const pF = processRankingData(rF || "", "F");
-  const initialMetadata: any = {};
+  const initialMetadata: Record<string, PlayerProfile & { allTimeRank?: number | "UR", openRank?: number | "UR" }> = {};
 
   const assignRanks = (
-    arr: any[],
+    arr: PlayerProfile[],
     gender: string,
     isAllTime: boolean = true,
   ) => {
@@ -45,10 +48,10 @@ export function computeAllState(payload: any) {
 
   // Calculate Open Ranks after processing live feed
   const openM = processed.openRankings.filter(
-    (p: any) => p.gender === "M",
+    (p: PlayerProfile) => p.gender === "M",
   );
   const openF = processed.openRankings.filter(
-    (p: any) => p.gender === "F",
+    (p: PlayerProfile) => p.gender === "F",
   );
   assignRanks(openM, "M", false);
   assignRanks(openF, "F", false);
@@ -158,27 +161,27 @@ export function computeAllState(payload: any) {
 
   // KPI STATS
   const kpiStats = {
-      players: (data || []).filter((p: any) => !isPlaceholderPlayer(p.name)).length,
+      players: (data || []).filter((p: PlayerProfile) => !isPlaceholderPlayer(p.name)).length,
       courses: masterCourseList.length,
       cities: new Set(
-        masterCourseList.map((c: any) => c.city).filter((v: any) => v && v !== "UNKNOWN"),
+        masterCourseList.map((c: CourseData) => c.city).filter((v: string | undefined) => v && v !== "UNKNOWN"),
       ).size,
       countries: new Set(
         masterCourseList
-          .map((c: any) => c.country)
-          .filter((v: any) => v && v !== "UNKNOWN"),
+          .map((c: CourseData) => c.country)
+          .filter((v: string | undefined) => v && v !== "UNKNOWN"),
       ).size,
       runs: masterCourseList.reduce(
-        (acc: number, c: any) => acc + (c.totalAllTimeRuns || 0),
+        (acc: number, c: CourseData) => acc + (c.totalAllTimeRuns || 0),
         0,
       ),
   };
 
   // SETTER STATS
-  const leadMap: Record<string, any[]> = {};
-  const assistMap: Record<string, any[]> = {};
+  const leadMap: Record<string, string[]> = {};
+  const assistMap: Record<string, string[]> = {};
 
-  masterCourseList.forEach((c: any) => {
+  masterCourseList.forEach((c: CourseData) => {
     const leads = c.leadSettersNormalized || (Array.isArray(c.leadSetters) ? c.leadSetters : [c.leadSetters]);
     leads?.forEach((name: string) => {
       if (!name) return;
@@ -197,7 +200,7 @@ export function computeAllState(payload: any) {
   });
 
   const settersWithImpact = (settersData || [])
-    .map((s: any) => {
+    .map((s: string) => {
       const sName = s.name ? String(s.name).trim() : "";
       if (!sName) return null;
 
@@ -229,19 +232,19 @@ export function computeAllState(payload: any) {
     })
     .filter(Boolean);
 
-  const setterMet: Record<string, any> = {};
-  settersWithImpact.forEach((s: any) => {
+  const setterMet: Record<string, SetterProfile> = {};
+  settersWithImpact.forEach((s: SetterProfile) => {
     setterMet[normalizeName(s.name)] = s;
   });
 
   // TEAM STATS (Gyms and Countries)
   const computeTeamStats = (teamCategory: string, isAllTime: boolean) => {
-    const aggregated: any = {};
+    const aggregated: Record<string, TeamProfile & { pts: number; players: (PlayerProfile & { contribution: number })[], playersCount: number }> = {};
     const sourcePlayers = isAllTime
       ? Object.values(atMet || {})
       : openData;
 
-    (sourcePlayers || []).forEach((p: any) => {
+    (sourcePlayers || []).forEach((p: PlayerProfile) => {
       const pKey = p.pKey || normalizeName(p.name);
       if (!pKey) return;
 
@@ -264,7 +267,7 @@ export function computeAllState(payload: any) {
         }
       } else {
         if (p.teams && p.teams.length > 0) {
-          p.teams.forEach((t: any) => {
+          p.teams.forEach((t: { name: string, location?: string, flag?: string }) => {
             if (t && t.name) {
               itemsToProcess.push({
                 name: t.name,
@@ -306,7 +309,7 @@ export function computeAllState(payload: any) {
         }
         let playerPts = p.pts || p.contributionScore || 0;
         if ((!playerPts || playerPts === 0) && isAllTime && atPerfs?.[pKey]) {
-           playerPts = atPerfs[pKey].reduce((sum: number, perf: any) => sum + (perf.points || 0), 0);
+           playerPts = atPerfs[pKey].reduce((sum: number, perf: { points?: number }) => sum + (perf.points || 0), 0);
         }
         
         aggregated[normName].pts += playerPts;
@@ -318,9 +321,9 @@ export function computeAllState(payload: any) {
       });
     });
 
-    Object.values(aggregated).forEach((t: any) => {
+    Object.values(aggregated).forEach((t: TeamProfile & { players: (PlayerProfile & { contribution: number })[], playersCount: number, bestPlayers: PlayerProfile[] }) => {
       t.playersCount = t.players.length;
-      t.players.sort((a: any, b: any) => b.contribution - a.contribution);
+      t.players.sort((a, b) => b.contribution - a.contribution);
       t.bestPlayers = t.players.slice(0, 5);
       if (t.playersCount > 0) {
         let majorityFlag = t.players[0].gymFlag || t.players[0].townFlag;
@@ -336,7 +339,7 @@ export function computeAllState(payload: any) {
       }
     });
 
-    return Object.values(aggregated).sort((a: any, b: any) => b.pts - a.pts);
+    return Object.values(aggregated).sort((a: TeamProfile & { pts: number }, b: TeamProfile & { pts: number }) => b.pts - a.pts);
   };
 
   const teamsAggregated = {
@@ -351,20 +354,20 @@ export function computeAllState(payload: any) {
   };
 
   // LEADERBOARDS
-  const calculateLeaderboard = (sourceData: any[], isAllTime: boolean) => {
+  const calculateLeaderboard = (sourceData: PlayerProfile[], isAllTime: boolean) => {
     const qualifiedM = (sourceData || [])
-      .filter((p: any) => p.gender === "M" && isQualifiedAthlete(p, isAllTime))
-      .sort((a: any, b: any) => b.rating - a.rating);
+      .filter((p: PlayerProfile) => p.gender === "M" && isQualifiedAthlete(p, isAllTime))
+      .sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
     const qualifiedF = (sourceData || [])
-      .filter((p: any) => p.gender === "F" && isQualifiedAthlete(p, isAllTime))
-      .sort((a: any, b: any) => b.rating - a.rating);
+      .filter((p: PlayerProfile) => p.gender === "F" && isQualifiedAthlete(p, isAllTime))
+      .sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
       
-    const rankMapM = new Map<string, number>(qualifiedM.map((q: any, i: number) => [q.pKey, i + 1]));
-    const rankMapF = new Map<string, number>(qualifiedF.map((q: any, i: number) => [q.pKey, i + 1]));
+    const rankMapM = new Map<string, number>(qualifiedM.map((q: PlayerProfile, i: number) => [q.pKey, i + 1]));
+    const rankMapF = new Map<string, number>(qualifiedF.map((q: PlayerProfile, i: number) => [q.pKey, i + 1]));
 
-    const mapM: Record<string, any> = {};
-    const mapF: Record<string, any> = {};
-    (sourceData || []).forEach((p: any) => {
+    const mapM: Record<string, PlayerProfile> = {};
+    const mapF: Record<string, PlayerProfile> = {};
+    (sourceData || []).forEach((p: PlayerProfile) => {
       const rank = p.gender === "M" 
         ? rankMapM.get(p.pKey) || "UR" 
         : rankMapF.get(p.pKey) || "UR";
@@ -388,14 +391,14 @@ export function computeAllState(payload: any) {
 
   const computePlayerList = (isAllTime: boolean, gen: string) => {
     const athletePool = isAllTime ? data : openData;
-    const allTimeRankedKeys = new Set((data || []).map((p: any) => p.pKey));
-    const filtered = athletePool.filter((p: any) => p && p.gender === gen && !isPlaceholderPlayer(p.name) && (p.runs || 0) > 0);
+    const allTimeRankedKeys = new Set((data || []).map((p: PlayerProfile) => p.pKey));
+    const filtered = athletePool.filter((p: PlayerProfile) => p && p.gender === gen && !isPlaceholderPlayer(p.name) && (p.runs || 0) > 0);
     
-    filtered.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
+    filtered.sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
 
-    const qual: any[] = [];
-    const unranked: any[] = [];
-    filtered.forEach((p: any) => {
+    const qual: PlayerProfile[] = [];
+    const unranked: PlayerProfile[] = [];
+    filtered.forEach((p: PlayerProfile) => {
       if (isQualifiedAthlete(p, isAllTime)) {
         qual.push(p);
       } else {
@@ -416,14 +419,14 @@ export function computeAllState(payload: any) {
 
   const computeTeamList = (cat: string, isAllTime: boolean) => {
     const contextStr = isAllTime ? "allTime" : "open";
-    let arr = (teamsAggregated as any)?.[cat]?.[contextStr] || [];
-    arr = [...arr].sort((a: any, b: any) => (b.pts || 0) - (a.pts || 0));
-    return arr.map((t: any, i: number) => ({ ...t, currentRank: i + 1, category: cat }));
+    let arr = ((teamsAggregated as Record<string, Record<string, (TeamProfile & { pts: number })[]>>)?.[cat]?.[contextStr] || []) as (TeamProfile & { pts: number })[];
+    arr = [...arr].sort((a: TeamProfile & { pts: number }, b: TeamProfile & { pts: number }) => (b.pts || 0) - (a.pts || 0));
+    return arr.map((t: TeamProfile & { pts: number }, i: number) => ({ ...t, currentRank: i + 1, category: cat }));
   };
 
-  const cListAT = [...masterCourseList].sort((a: any, b: any) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
-  const cListOP = masterCourseList.filter((c: any) => c.is2026).sort((a: any, b: any) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
-  const sList = [...settersWithImpact].sort((a: any, b: any) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
+  const cListAT = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
+  const cListOP = masterCourseList.filter((c: CourseData) => c.is2026).sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
+  const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
 
   return {
     ...nextState,

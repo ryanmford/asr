@@ -3,9 +3,10 @@ import { Play, MapPin } from "lucide-react";
 import { THEME, cn, trackEvent, formatFlagsWithSpace } from "../lib/asr-utils";
 import { ThemeContext } from "../App";
 import { useAppStore } from "../store/useAppStore";
+import { motion } from "motion/react";
 
 export const ASRRankBadge = React.memo(
- ({ rank, size = "md", scale = 1 }: any) => {
+ ({ rank, size = "md", scale = 1 }: { rank?: string | number | null; size?: "sm" | "md" | "lg"; scale?: number }) => {
  const theme = useContext(ThemeContext);
  const isUnranked = String(rank || "").trim() === "UR";
  const rankNum = isUnranked ? "UR" : rank === "-" ? "?" : rank;
@@ -22,7 +23,7 @@ export const ASRRankBadge = React.memo(
       ? "text-[8px] sm:text-[9px]"
       : "text-[10px] sm:text-xs ";
  const isPodium = rank === 1 || rank === 2 || rank === 3;
- const styles: any = {
+ const styles: Record<string, { border: string; text: string; glow: string }> = {
  1: {
  border: "border-amber-500",
  text: "text-amber-500",
@@ -63,9 +64,9 @@ export const ASRRankBadge = React.memo(
  },
 );
 
-export const ASRPerformanceBadge = React.memo(({ type, count = 1 }: any) => {
- const badges: any = { 1: "🥇", 2: "🥈", 3: "🥉", fire: "🔥" };
- const glows: any = {
+export const ASRPerformanceBadge = React.memo(({ type, count = 1 }: { type: 1 | 2 | 3 | "fire" | string | number; count?: number }) => {
+ const badges: Record<string, string> = { 1: "🥇", 2: "🥈", 3: "🥉", fire: "🔥" };
+ const glows: Record<string, string> = {
  1: "glow-gold",
  2: "glow-silver",
  3: "glow-bronze",
@@ -102,9 +103,28 @@ export const ASRListItem = React.memo(
  mapUrl,
  showVideoIcon = false,
  isUnclaimed = false,
- isCompact = false, onHover,
- }: any) => {
- const { setPlayingVideoUrl } = useAppStore();
+ layoutId, isCompact = false, onHover,
+ }: {
+   rank?: string | number | null;
+   title?: React.ReactNode;
+   subtitle?: React.ReactNode;
+   variant?: "table" | "card" | "hero";
+   stats?: { value?: React.ReactNode }[];
+   columns?: { isRank?: boolean; type?: string }[];
+   videoUrl?: string | null;
+   icon?: React.ReactNode;
+   onClick?: (e?: React.MouseEvent | React.KeyboardEvent) => void;
+   badgeContent?: React.ReactNode;
+   shouldFade?: boolean;
+   flag?: string | null;
+   mapUrl?: string | null;
+   showVideoIcon?: boolean;
+   isUnclaimed?: boolean;
+   layoutId?: string;
+   isCompact?: boolean;
+   onHover?: () => void;
+ }) => {
+ const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
  const theme = useContext(ThemeContext);
  const accentColor = theme === "dark" ? "text-white" : "text-zinc-900";
  const tableHover =
@@ -112,9 +132,11 @@ export const ASRListItem = React.memo(
  const cardHover =
  theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-blue-50";
 
+ const ItemWrapper: React.ElementType = layoutId ? motion.div : 'div';
+
  if (variant === "table") {
  return (
- <div
+ <ItemWrapper {...(layoutId ? { layoutId } : {})}
  onClick={onClick}
  role={onClick ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick ? 0 : undefined}
@@ -196,9 +218,9 @@ export const ASRListItem = React.memo(
  {subtitle}
  </div>
  </div>
- {(stats || []).map((s: any, idx: number) => {
- const colDef = columns.filter(
- (c: any) => !c.isRank && c.type !== "profile",
+ {(stats || []).map((s: { value?: React.ReactNode }, idx: number) => {
+ const colDef = columns?.filter(
+ (c: { isRank?: boolean; type?: string }) => !c.isRank && c.type !== "profile",
  )[idx];
  return (
  <div
@@ -260,14 +282,14 @@ export const ASRListItem = React.memo(
  )}
  </div>
  )}
- </div>
+ </ItemWrapper>
  );
  }
 
  // Use the prop passed from ASRRankList
 
  return (
- <div
+ <ItemWrapper {...(layoutId ? { layoutId } : {})}
  onClick={isUnclaimed ? undefined : onClick}
  role={onClick && !isUnclaimed ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick && !isUnclaimed ? 0 : undefined}
@@ -391,7 +413,7 @@ export const ASRListItem = React.memo(
  isCompact ? "min-w-[50px]" : "min-w-[50px] sm:min-w-[80px] lg:min-w-[120px]",
  )}
  >
- {(stats || []).map((s: any, idx: number) => (
+ {(stats || []).map((s: { value?: React.ReactNode }, idx: number) => (
  <span
  key={idx}
  className={cn(
@@ -459,10 +481,10 @@ export const ASRListItem = React.memo(
  </div>
  )}
  </div>
- </div>
+ </ItemWrapper>
  );
  },
- (prev: any, next: any) => {
+ (prev: Record<string, unknown>, next: Record<string, unknown>) => {
  if (prev.rank !== next.rank) return false;
  if (prev.title !== next.title) return false;
  if (prev.subtitle !== next.subtitle) return false;

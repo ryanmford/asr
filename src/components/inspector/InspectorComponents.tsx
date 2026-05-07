@@ -149,7 +149,7 @@ export const TabButton = React.memo(
   ),
 );
 
-export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: Record<string, any>; theme: "light" | "dark"; isBanner?: boolean }) => {
+export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: Record<string, unknown> & { asrPatron?: string }; theme: "light" | "dark"; isBanner?: boolean }) => {
   const hasSponsor = !!course.sponsorName;
   const sponsorName = course.sponsorName;
   const sponsorLink =

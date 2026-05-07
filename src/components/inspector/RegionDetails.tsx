@@ -11,9 +11,9 @@ import { ASRNeonToggle } from "../ui/ASRNeonToggle";
 import { ASRDataContext, PlayerProfile } from "../../types";
 
 interface RegionDetailsProps {
-  region: { name: string; flag?: string } & Record<string, any>;
+  region: { name: string; flag?: string };
   dataContext: ASRDataContext;
-  onEntityClick: (type: string, data: any) => void;
+  onEntityClick: (type: string, data: Record<string, unknown> | string | { name?: string; pKey?: string }) => void;
   theme: "light" | "dark";
 }
 
@@ -37,10 +37,10 @@ export const RegionDetails = React.memo(
     const regionalPlayers = useMemo(() => {
       return Object.values(atMet)
         .filter(
-          (p: PlayerProfile & Record<string, any>) => p.countryName === region.name || p.region === region.name,
+          (p: PlayerProfile) => p.countryName === region.name || p.region === region.name,
         )
         .sort(
-          (a: PlayerProfile & Record<string, any>, b: PlayerProfile & Record<string, any>) =>
+          (a: PlayerProfile, b: PlayerProfile) =>
             (b.pts || b.rating || 0) - (a.pts || a.rating || 0),
         );
     }, [atMet, region.name]);
@@ -109,7 +109,7 @@ export const RegionDetails = React.memo(
                   label="REGIONAL WINS"
                   value={
                     regionalPlayers.reduce(
-                      (sum: number, p: PlayerProfile & Record<string, any>) => sum + (p.wins || 0),
+                      (sum: number, p: PlayerProfile) => sum + (p.wins || 0),
                       0,
                     ) as number
                   }
@@ -117,14 +117,14 @@ export const RegionDetails = React.memo(
                 <ASRStatCard
                   label="PEAK RATING"
                   value={Math.max(
-                    ...regionalPlayers.map((p: PlayerProfile & Record<string, any>) => p.rating || 0),
+                    ...regionalPlayers.map((p: PlayerProfile) => p.rating || 0),
                     0,
                   ).toFixed(2)}
                 />
               </div>
 
               <ASRRankList
-                athletes={regionalPlayers.map((p: PlayerProfile & Record<string, any>) => [
+                athletes={regionalPlayers.map((p: PlayerProfile) => [
                   p.pKey || normalizeName(p.name),
                   p.pts,
                 ])}

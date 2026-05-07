@@ -74,7 +74,7 @@ class GlobalErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ASR Core Crash:", error, errorInfo);
   }
 
@@ -150,7 +150,7 @@ export default function App() {
   );
 }
 
-function MainAppContent({ theme, setTheme }: any) {
+function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme: (theme: "light" | "dark") => void }) {
   const isLoading = useDataStore((s) => s.isLoading);
 
   const { eventType, isAllTimeContext, setEventType } = useURLState();
@@ -200,10 +200,15 @@ function MainAppContent({ theme, setTheme }: any) {
   const activeLocation = useLocation();
   const navigate = useNavigate();
 
+  let backgroundLocation = activeLocation;
+  while (backgroundLocation.state && (backgroundLocation.state as { backgroundLocation?: typeof activeLocation }).backgroundLocation) {
+    backgroundLocation = (backgroundLocation.state as { backgroundLocation: typeof activeLocation }).backgroundLocation;
+  }
+
   const inspectorDataObj = useInspectorData() || { current: null, history: [], historyIndex: -1 };
   const inspectorData = inspectorDataObj.current;
 
-  const view = activeLocation.pathname.split("/")[1] || "players";
+  const view = backgroundLocation.pathname.split("/")[1] || "players";
 
   const handleHome = useCallback(() => {
     navigate("/players");
@@ -212,6 +217,11 @@ function MainAppContent({ theme, setTheme }: any) {
   const handleViewChange = useCallback((v: string) => {
     navigate(`/${v}`);
   }, [navigate]);
+
+  const lastInspectorLayoutId = React.useRef<string | null>(null);
+  if (inspectorData?.data) {
+    lastInspectorLayoutId.current = `card-${inspectorData.data.id || inspectorData.data.name || 'empty'}`;
+  }
 
   return (
     <div
@@ -301,7 +311,7 @@ function MainAppContent({ theme, setTheme }: any) {
               </div>
             }>
             <AnimatePresence mode="wait">
-              <Routes location={activeLocation} key={activeLocation.pathname}>
+              <Routes location={backgroundLocation} key={backgroundLocation.pathname}>
                 <Route path="/" element={<Navigate to="/players" replace />} />
                 <Route path="/players/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
@@ -330,7 +340,7 @@ function MainAppContent({ theme, setTheme }: any) {
                     <ASRWallOfFame
                       theme={theme}
                       onEntityClick={navigateToEntity}
-                      medalSort={medalSort as any}
+                      medalSort={medalSort as "copper" | "silver" | "gold"}
                       onMedalSort={handleReqSort}
                     />
                   </motion.div>
@@ -370,6 +380,7 @@ function MainAppContent({ theme, setTheme }: any) {
 
       {/* Details Modal */}
       <ASRBaseModal
+        layoutId={lastInspectorLayoutId.current || undefined}
         isOpen={Boolean(inspectorData)}
         onClose={closeModals}
         onBack={goBackOne}
@@ -414,10 +425,10 @@ function MainAppContent({ theme, setTheme }: any) {
             }
             item={inspectorData?.data}
             type={inspectorData?.type}
-            options={(inspectorData as any)?.options}
+            options={(inspectorData as { options?: Record<string, unknown> })?.options}
             onEntityClick={navigateToEntity}
-            theme={theme as any}
-            initialMode={(inspectorData as any)?.options?.initialMode}
+            theme={theme}
+            initialMode={(inspectorData as { options?: { initialMode?: "open" | "all-time" } })?.options?.initialMode}
           />
         </React.Suspense>
         </RouteErrorBoundary>
