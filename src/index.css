@@ -133,16 +133,17 @@ body {
 
 @keyframes marquee {
   0% {
-    transform: translateX(0);
+    transform: translateX(0) translateZ(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0);
   }
 }
 .animate-marquee {
   display: flex;
   width: max-content;
   animation: marquee 400s linear infinite;
+  will-change: transform;
 }
 .animate-marquee:hover {
   animation-play-state: paused;

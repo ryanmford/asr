@@ -27,7 +27,7 @@ export const ASRHeader = React.memo(
     return (
       <header
         className={cn(
-          "z-[60] w-full px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between border-b backdrop-blur-xl pointer-events-auto transition-all gap-2",
+          "z-[60] w-full px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between border-b backdrop-blur-xl pointer-events-auto transition-all gap-2 select-none",
           theme === "dark"
             ? "bg-zinc-950/70 border-white/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             : "bg-white/70 border-black/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.02)]",

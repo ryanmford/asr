@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { useDataStore } from "../../store/useDataStore";
 
@@ -10,7 +10,6 @@ interface ASRLiveTickerProps {
 export const ASRLiveTicker = React.memo(
   ({ onEntityClick, theme }: ASRLiveTickerProps) => {
     const feed = useDataStore((s) => s.recentFeed);
-    const [isHovered, setIsHovered] = useState(false);
 
     if (!feed || feed.length === 0) {
       return (
@@ -49,18 +48,11 @@ export const ASRLiveTicker = React.memo(
             ? "bg-zinc-950/80 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             : "bg-white/80 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
         )}
-        onPointerEnter={(e) => {
-          if (e.pointerType === "mouse") setIsHovered(true);
-        }}
-        onPointerLeave={(e) => {
-          if (e.pointerType === "mouse") setIsHovered(false);
-        }}
       >
         <div
           className="flex items-center shrink-0 whitespace-nowrap gap-12 sm:gap-20 px-8 animate-marquee"
           style={{ 
             animationDuration: `${animationDurationSeconds}s`,
-            animationPlayState: isHovered ? "paused" : "running" 
           }}
         >
           {duplicatedFeed.map((item: any, idx: number) => {

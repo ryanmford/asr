@@ -266,21 +266,13 @@ export const ASRBaseModal = React.memo(
                 ref={scrollContainerRef}
                 className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain [-webkit-overflow-scrolling:touch] touch-pan-y flex flex-col relative pb-[env(safe-area-inset-bottom)]"
               >
-                <AnimatePresence
-                  mode="popLayout"
-                  initial={false}
-                  custom={historyIndex > prevIndexRef.current ? 1 : -1}
-                >
+                <AnimatePresence mode="wait">
                   <motion.div
                     key={historyIndex}
-                    custom={historyIndex > prevIndexRef.current ? 1 : -1}
-                    initial={((d: number) => ({
-                      x: d > 0 ? 50 : -50,
-                      opacity: 0,
-                    })) as any}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={((d: number) => ({ x: d > 0 ? -50 : 50, opacity: 0 })) as any}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
                     className="flex-1 shrink-0 w-full flex flex-col h-fit"
                   >
                     {children}

@@ -1,21 +1,21 @@
 {
-  "short_name": "ASR",
+  "short_name": "Apex",
   "name": "Apex Speed Run",
   "icons": [
     {
-      "src": "asr.png",
+      "src": "/apexspeedrun.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "asr.png",
+      "src": "/apexspeedrun.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#09090b",
   "background_color": "#09090b"

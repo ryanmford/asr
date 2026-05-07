@@ -36,7 +36,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { RouteScrollRestoration } from "./components/common/RouteScrollRestoration";
 
 import { PageHeader } from "./components/common/PageHeader";
-import { ViewSkeleton } from "./components/common/Skeletons";
 import {
   CONFIG,
   cn,
@@ -217,7 +216,7 @@ function MainAppContent({ theme, setTheme }: any) {
   return (
     <div
       className={cn(
-        "min-h-[100dvh] flex flex-col transition-colors duration-500",
+        "min-h-[100dvh] flex flex-col transition-colors duration-500 pt-[env(safe-area-inset-top)]",
         theme === "dark" 
           ? "dark theme-bg-secondary text-zinc-100 selection:bg-blue-500/30" 
           : "theme-bg-secondary text-zinc-900 selection:bg-blue-500/20",
@@ -270,7 +269,10 @@ function MainAppContent({ theme, setTheme }: any) {
         )}
       </div>
 
-      <div className="sticky top-0 z-[70] w-full flex flex-col pointer-events-auto transition-all duration-300">
+      <div 
+        className="sticky z-[70] w-full flex flex-col pointer-events-auto transition-all duration-300"
+        style={{ top: 'env(safe-area-inset-top, 0px)' }}
+      >
           <ASRHeader
           theme={theme as "light" | "dark"}
           setTheme={setTheme}
@@ -291,32 +293,32 @@ function MainAppContent({ theme, setTheme }: any) {
                 <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               </div>
             }>
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <Routes location={activeLocation} key={activeLocation.pathname}>
                 <Route path="/" element={<Navigate to="/players" replace />} />
                 <Route path="/players/:id?" element={
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <PlayersView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/teams/:id?" element={
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <TeamsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/setters/:id?" element={
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <SettersView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/map/:id?" element={<Navigate to="/courses" replace />} />
                 <Route path="/courses/:id?" element={
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <MapCoursesView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/wof" element={
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex flex-col">
                     <PageHeader title="WALL OF FAME" theme={theme} />
                     <ASRWallOfFame
                       theme={theme}

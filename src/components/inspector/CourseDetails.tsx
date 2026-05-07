@@ -28,7 +28,6 @@ import {
   InspectorTabContainer,
 } from "./InspectorComponents";
 import { FallbackAvatar } from "../ui/FallbackAvatar";
-import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRPromotionBanner } from "../ui/ASRPromotionBanner";
 import { ASRRankList } from "../list/ASRRankList";
 import { ASRPremiumButton } from "../ui/ASRPremiumButton";
