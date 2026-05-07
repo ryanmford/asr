@@ -47,7 +47,12 @@ export const ASRBaseModal = React.memo(
 
     // Handle scroll restoration within modal history
     useLayoutEffect(() => {
-      if (!isOpen) return;
+      if (!isOpen) {
+        // Reset when closed
+        historyScrollPositions.current = {};
+        prevIndexRef.current = -1;
+        return;
+      }
 
       // Save current scroll before index changes
       if (prevIndexRef.current !== -1 && scrollContainerRef.current) {
@@ -58,9 +63,21 @@ export const ASRBaseModal = React.memo(
       // Restore or reset scroll for the new index
       if (scrollContainerRef.current) {
         const savedPos = historyScrollPositions.current[historyIndex];
-        scrollContainerRef.current.scrollTo({
-          top: savedPos !== undefined ? savedPos : 0,
-          behavior: "instant",
+        const targetY = savedPos !== undefined ? savedPos : 0;
+        
+        const attemptScroll = () => {
+           if (scrollContainerRef.current) {
+             scrollContainerRef.current.scrollTo({
+                top: targetY,
+                behavior: "instant",
+             });
+           }
+        };
+
+        attemptScroll();
+        requestAnimationFrame(() => {
+           attemptScroll();
+           setTimeout(attemptScroll, 100);
         });
       }
 

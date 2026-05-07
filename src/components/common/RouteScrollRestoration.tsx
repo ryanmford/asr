@@ -19,14 +19,26 @@ export function RouteScrollRestoration() {
     if (navType === "POP") {
        const savedScroll = sessionStorage.getItem(`scroll-${activeLoc.key}`);
        if (savedScroll) {
-          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: "instant" });
+          const targetY = parseInt(savedScroll, 10);
+          
+          const attemptScroll = () => {
+             window.scrollTo({ top: targetY, behavior: "instant" });
+          };
+          
+          attemptScroll();
+          // Retry slightly later to accommodate Suspense/images loading
+          requestAnimationFrame(() => {
+             attemptScroll();
+             setTimeout(attemptScroll, 100);
+          });
        }
     } else {
-       // Only reset scroll explicitly if the active path+search really changed,
-       // and we haven't already restored it. Wait - if we click a top tab, we should scroll up.
-       // Actually, react-router doesn't normally scroll up on PUSH. We want to.
        if (locStr !== prevActiveLocStr.current) {
+          // New page, scroll to top
           window.scrollTo({ top: 0, behavior: "instant" });
+          requestAnimationFrame(() => {
+             window.scrollTo({ top: 0, behavior: "instant" });
+          });
        }
     }
     
