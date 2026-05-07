@@ -12,6 +12,21 @@ interface ASRNavDockProps {
 export const ASRNavDock = React.memo(
   ({ currentView, setView, theme }: ASRNavDockProps) => {
     const [isCompact, setIsCompact] = useState(false);
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    useEffect(() => {
+      const handleResize = () => {
+        if (!window.visualViewport) return;
+        setIsKeyboardOpen(window.visualViewport.height < window.innerHeight - 100);
+      };
+      
+      window.visualViewport?.addEventListener('resize', handleResize);
+      window.visualViewport?.addEventListener('scroll', handleResize);
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleResize);
+        window.visualViewport?.removeEventListener('scroll', handleResize);
+      }
+    }, []);
 
     useEffect(() => {
       let lastScrollY = window.scrollY;
@@ -52,7 +67,8 @@ export const ASRNavDock = React.memo(
       <div 
         className={cn(
           "fixed left-1/2 -translate-x-1/2 z-[100] px-4 w-full pointer-events-none transition-all duration-500 ease-in-out",
-          isCompact ? "max-w-[320px]" : "max-w-[400px]"
+          isCompact ? "max-w-[320px]" : "max-w-[400px]",
+          isKeyboardOpen ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
         )}
         style={{ bottom: `calc(${isCompact ? '16px' : '24px'} + env(safe-area-inset-bottom, 0px))` }}
       >

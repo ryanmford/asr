@@ -127,13 +127,22 @@ export const ASRMap = ({
     const lightTile = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
     const darkTile = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
-    tileLayerRef.current = window.L.tileLayer(
-      isDark ? darkTile : lightTile,
-      {
-        subdomains: "abcd",
-        maxZoom: 20,
-      }
-    ).addTo(map);
+    const lightLayer = window.L.tileLayer(lightTile, {
+      subdomains: "abcd",
+      maxZoom: 20,
+      className: "transition-opacity duration-[1000ms] ease-in-out",
+    }).addTo(map);
+
+    const darkLayer = window.L.tileLayer(darkTile, {
+      subdomains: "abcd",
+      maxZoom: 20,
+      className: "transition-opacity duration-[1000ms] ease-in-out",
+    }).addTo(map);
+
+    lightLayer.setOpacity(isDark ? 0 : 1);
+    darkLayer.setOpacity(isDark ? 1 : 0);
+
+    tileLayerRef.current = { light: lightLayer, dark: darkLayer };
 
     if (window.L.markerClusterGroup) {
       clusterGroupRef.current = window.L.markerClusterGroup({
@@ -180,7 +189,7 @@ export const ASRMap = ({
               </div>
             `,
             className: "bg-transparent",
-            iconSize: [42, 42],
+            iconSize: [50, 50],
           });
         },
       });
@@ -251,9 +260,16 @@ export const ASRMap = ({
   // Update tiles on theme switch
   useEffect(() => {
     if (!mapRef.current || !tileLayerRef.current) return;
-    const lightTile = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-    const darkTile = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-    tileLayerRef.current.setUrl(isDark ? darkTile : lightTile);
+    const { light, dark } = tileLayerRef.current;
+    if (light && dark) {
+      if (isDark) {
+        dark.setOpacity(1);
+        light.setOpacity(0);
+      } else {
+        light.setOpacity(1);
+        dark.setOpacity(0);
+      }
+    }
   }, [isDark]);
 
   // Marker Management
@@ -273,22 +289,25 @@ export const ASRMap = ({
       const marker = window.L.marker(c.parsedCoords, {
         icon: window.L.divIcon({
           html: `
-            <div class="relative flex flex-col items-center group transition-transform duration-300 cursor-pointer hover:scale-[1.15] active:scale-95 drop-shadow-lg" style="width: 24px; height: 32px;">
-              <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
-                <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                  <div class="absolute inset-[-200%] neon-border-rotate z-0 opacity-100 transition-opacity">
-                    <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]"></div>
+            <div class="relative flex flex-col items-center justify-center group transition-transform duration-300 cursor-pointer hover:scale-[1.15] active:scale-95 drop-shadow-lg" style="width: 44px; height: 44px;">
+              <div class="absolute inset-0 bg-transparent"></div>
+              <div class="relative flex flex-col items-center mt-2">
+                <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
+                  <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                    <div class="absolute inset-[-200%] neon-border-rotate z-0 opacity-100 transition-opacity">
+                      <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]"></div>
+                    </div>
+                    <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
                   </div>
-                  <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
+                  <div class="relative z-20 w-1.5 h-1.5 ${currentIsDark ? 'bg-blue-400' : 'bg-blue-500'} rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] group-hover:scale-125 transition-all"></div>
                 </div>
-                <div class="relative z-20 w-1.5 h-1.5 ${currentIsDark ? 'bg-blue-400' : 'bg-blue-500'} rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] group-hover:scale-125 transition-all"></div>
+                <div class="w-[2px] h-[8px] ${currentIsDark ? 'bg-gradient-to-b from-blue-400/80 to-transparent' : 'bg-gradient-to-b from-blue-500/80 to-transparent'} rounded-b-full"></div>
               </div>
-              <div class="w-[2px] h-[8px] ${currentIsDark ? 'bg-gradient-to-b from-blue-400/80 to-transparent' : 'bg-gradient-to-b from-blue-500/80 to-transparent'} rounded-b-full"></div>
             </div>
           `,
           className: "bg-transparent",
-          iconSize: [24, 32],
-          iconAnchor: [12, 32],
+          iconSize: [44, 44],
+          iconAnchor: [22, 38],
         }),
       });
 

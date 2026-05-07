@@ -17,11 +17,20 @@ import { useKpiStats } from "../../hooks/useAppCalculations";
 export const ASRCountdown = React.memo(
   ({ targetDate, eventType, onHelp, theme }: ASRCountdownProps) => {
     const [currentTime, setCurrentTime] = useState<any>(null);
-    const [isDismissed, setIsDismissed] = useState(false);
+    const [isDismissed, setIsDismissed] = useState(() => {
+      if (typeof sessionStorage !== "undefined") {
+        return sessionStorage.getItem("asr_countdown_dismissed") === "true";
+      }
+      return false;
+    });
 
     const handleDismiss = React.useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       setIsDismissed(true);
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.setItem("asr_countdown_dismissed", "true");
+      }
     }, []);
 
     const isAllTime = eventType === "all-time";
@@ -30,7 +39,7 @@ export const ASRCountdown = React.memo(
     const CloseButton = () => (
       <div 
         className={cn(
-          "absolute right-0 top-[1.2px] bottom-[1.2px] z-30 flex items-center justify-end pl-8 pr-2 pointer-events-none sm:!bg-none sm:!bg-transparent sm:pl-0 sm:pr-0 sm:right-2 sm:top-1/2 sm:-translate-y-1/2 sm:bottom-auto",
+          "absolute right-0 top-[1.2px] bottom-[1.2px] z-30 flex items-center justify-end pl-12 pr-1 pointer-events-none sm:!bg-none sm:!bg-transparent sm:pl-0 sm:pr-0 sm:right-2 sm:top-1/2 sm:-translate-y-1/2 sm:bottom-auto",
           theme === "dark" 
             ? "bg-gradient-to-l from-zinc-950 via-zinc-950/90 to-transparent" 
             : "bg-gradient-to-l from-white via-white/90 to-transparent"
@@ -40,9 +49,10 @@ export const ASRCountdown = React.memo(
           role="button"
           tabIndex={0}
           onClick={handleDismiss}
-          className="p-2 opacity-60 sm:opacity-30 hover:opacity-100 transition-opacity flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 pointer-events-auto"
+          onPointerDown={(e) => { e.stopPropagation(); }}
+          className="w-12 h-12 sm:w-8 sm:h-8 opacity-60 sm:opacity-30 hover:opacity-100 transition-opacity flex items-center justify-center rounded-full sm:hover:bg-black/10 sm:dark:hover:bg-white/10 pointer-events-auto"
         >
-          <X size={14} className="text-current" />
+          <X size={16} className="text-current" />
         </div>
       </div>
     );

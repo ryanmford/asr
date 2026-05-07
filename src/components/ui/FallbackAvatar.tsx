@@ -48,19 +48,30 @@ const generateAvatarSvg = (name: string, initials: string) => {
 
   const hash = stringToHash(name);
   const [c1, c2] = GRADIENTS[hash % GRADIENTS.length];
-  const scale = initials.length === 3 ? 0.8 : initials.length === 1 ? 1.2 : 1.0;
+  // Create an offset color
+  const c3 = GRADIENTS[(hash + 1) % GRADIENTS.length][1];
+  const scale = initials.length === 3 ? 0.75 : initials.length === 1 ? 1.1 : 0.9;
   
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <defs>
       <linearGradient id="g${hash}" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="${c1}" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="${c2}" stop-opacity="0.3"/>
+        <stop offset="0%" stop-color="${c1}" stop-opacity="0.85"/>
+        <stop offset="100%" stop-color="${c2}" stop-opacity="0.6"/>
       </linearGradient>
+      <radialGradient id="r${hash}" cx="80%" cy="20%" r="60%">
+         <stop offset="0%" stop-color="${c3}" stop-opacity="0.5"/>
+         <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="shadow${hash}" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+      </filter>
     </defs>
-    <rect width="100" height="100" fill="#09090b" />
+    <rect width="100" height="100" fill="#050505" />
     <rect width="100" height="100" fill="url(#g${hash})" />
-    <circle cx="20" cy="20" r="80" fill="rgba(255,255,255,0.1)" />
-    <text x="50" y="50" font-family="system-ui, sans-serif" font-weight="900" font-size="${40 * scale}" fill="#ffffff" text-anchor="middle" dominant-baseline="central" alignment-baseline="central">
+    <rect width="100" height="100" fill="url(#r${hash})" />
+    <circle cx="20" cy="20" r="80" fill="rgba(255,255,255,0.08)" />
+    <circle cx="90" cy="90" r="40" fill="rgba(0,0,0,0.15)" />
+    <text x="50" y="52" filter="url(#shadow${hash})" font-family="system-ui, sans-serif" font-weight="900" font-size="${40 * scale}" fill="#ffffff" text-anchor="middle" dominant-baseline="central" alignment-baseline="central" letter-spacing="2">
       ${initials}
     </text>
   </svg>`;

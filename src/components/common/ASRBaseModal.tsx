@@ -129,8 +129,8 @@ export const ASRBaseModal = React.memo(
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
               transition={{
                 type: "spring",
-                damping: 30,
-                stiffness: 400,
+                damping: 20,
+                stiffness: 500,
               }}
               drag="x"
               dragDirectionLock

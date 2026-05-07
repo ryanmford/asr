@@ -71,7 +71,7 @@ export const ASRVideoModal = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            transition={{ type: "spring", damping: 20, stiffness: 500 }}
             className={cn(
               "relative mx-auto overflow-hidden flex flex-col pointer-events-auto shadow-[0_0_80px_rgba(0,0,0,0.5)] bg-black",
               isVerticalOptimized

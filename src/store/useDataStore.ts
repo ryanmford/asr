@@ -49,48 +49,67 @@ interface ASRDataState {
   setFetchStatus: (status: { isLoading?: boolean; isSyncing?: boolean; hasError?: boolean; hasPartialError?: boolean }) => void;
 }
 
-export const useDataStore = create<ASRDataState>((set) => ({
-  data: [],
-  openData: [],
-  atPerfs: {},
-  opPerfs: {},
-  lbAT: { M: {}, F: {} },
-  lbOpen: { M: {}, F: {} },
-  atMet: {},
-  dnMap: {},
-  cMet: {},
-  settersData: [],
-  atRawBest: {},
-  opRawBest: {},
-  recentFeed: [],
-  courseRunsHistory: {},
+export const useDataStore = create<ASRDataState>((set) => {
+  let initialData = {};
+  let initialIsLoading = true;
 
-  masterCourseList: [],
-  kpiStats: null,
-  settersWithImpact: [],
-  setterMet: {},
-  teamsAggregated: [],
-  playerLB_AT: { M: {}, F: {} },
-  playerLB_OP: { M: {}, F: {} },
+  if (typeof window !== "undefined") {
+    try {
+      const cached = localStorage.getItem("asr_data_vault_v1_integrated_v60_teams");
+      if (cached) {
+        initialData = JSON.parse(cached);
+        initialIsLoading = false;
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
 
-  playerList_M_AT: [],
-  playerList_F_AT: [],
-  playerList_M_OP: [],
-  playerList_F_OP: [],
-  courseList_AT: [],
-  courseList_OP: [],
-  settersList: [],
-  teamList_gyms_AT: [],
-  teamList_teams_AT: [],
-  teamList_gyms_OP: [],
-  teamList_teams_OP: [],
+  return {
+    data: [],
+    openData: [],
+    atPerfs: {},
+    opPerfs: {},
+    lbAT: { M: {}, F: {} },
+    lbOpen: { M: {}, F: {} },
+    atMet: {},
+    dnMap: {},
+    cMet: {},
+    settersData: [],
+    atRawBest: {},
+    opRawBest: {},
+    recentFeed: [],
+    courseRunsHistory: {},
 
-  isLoading: true,
-  isSyncing: false,
-  hasError: false,
-  hasPartialError: false,
-  lastUpdated: null,
+    masterCourseList: [],
+    kpiStats: null,
+    settersWithImpact: [],
+    setterMet: {},
+    teamsAggregated: [],
+    playerLB_AT: { M: {}, F: {} },
+    playerLB_OP: { M: {}, F: {} },
 
-  setData: (payload) => set((state) => ({ ...state, ...payload })),
-  setFetchStatus: (status) => set((state) => ({ ...state, ...status })),
-}));
+    playerList_M_AT: [],
+    playerList_F_AT: [],
+    playerList_M_OP: [],
+    playerList_F_OP: [],
+    courseList_AT: [],
+    courseList_OP: [],
+    settersList: [],
+    teamList_gyms_AT: [],
+    teamList_teams_AT: [],
+    teamList_gyms_OP: [],
+    teamList_teams_OP: [],
+
+    ...initialData,
+
+    isLoading: initialIsLoading,
+    isSyncing: false,
+    hasError: false,
+    hasPartialError: false,
+    lastUpdated: null,
+
+    setData: (payload) => set((state) => ({ ...state, ...payload })),
+    setFetchStatus: (status) => set((state) => ({ ...state, ...status })),
+  };
+});

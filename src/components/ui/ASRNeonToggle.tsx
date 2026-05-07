@@ -41,7 +41,10 @@ export const ASRNeonToggle = ({
  return (
  <button
  key={value}
- onClick={() => onChange(value)}
+ onClick={() => {
+   if (!isActive && navigator.vibrate) navigator.vibrate(50);
+   onChange(value);
+ }}
  className={cn(
  "relative flex-1 font-black uppercase tracking-[0.1em] transition-colors z-10 flex items-center justify-center basis-0 min-w-0 rounded-full",
  "py-1.5 px-3 text-[9px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",

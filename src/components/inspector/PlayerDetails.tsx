@@ -242,18 +242,44 @@ export const PlayerDetails = React.memo(
                 <ASRWeeklyActivityChart runs={allRuns} />
               </div>
 
-              <div className="p-6 flex flex-col gap-6 pt-6">
+              <div className="p-6 flex flex-col gap-6 pt-6 relative min-h-[300px]">
                 <SectionTitle>VERIFIED RUNS</SectionTitle>
-                <ASRRankList
-                  athletes={rankListRuns}
-                  valueLabel="PTS"
-                  onEntityClick={onEntityClick}
-                  limit={100}
-                  dataContext={dataContext}
-                  hideSubtitle={true}
-                  entityType="course"
-                />
-                <div className="pt-8">
+                {rankListRuns.length > 0 ? (
+                  <ASRRankList
+                    athletes={rankListRuns}
+                    valueLabel="PTS"
+                    onEntityClick={onEntityClick}
+                    limit={100}
+                    dataContext={dataContext}
+                    hideSubtitle={true}
+                    entityType="course"
+                  />
+                ) : (
+                  <div className={cn(
+                    "flex flex-col items-center justify-center py-16 text-center rounded-[32px] border relative overflow-hidden",
+                    theme === "dark" ? "bg-zinc-900/40 border-zinc-800" : "bg-slate-50 border-slate-200"
+                  )}>
+                    <div className={cn(
+                      "absolute inset-0 opacity-[0.02] pointer-events-none",
+                      theme === "dark" 
+                        ? "bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:16px_16px]" 
+                        : "bg-[radial-gradient(circle_at_center,black_1px,transparent_1px)] [background-size:16px_16px]"
+                    )} />
+                    <div className={cn(
+                      "w-16 h-16 rounded-full flex items-center justify-center mb-4 relative z-10",
+                      theme === "dark" ? "bg-zinc-800/80 shadow-[0_0_30px_rgba(255,255,255,0.05)] text-zinc-400" : "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] text-slate-400"
+                    )}>
+                      <ShieldAlert size={28} strokeWidth={1.5} />
+                    </div>
+                    <h4 className={cn("text-base font-black tracking-widest uppercase mb-2 relative z-10", theme === "dark" ? "text-zinc-300" : "text-zinc-600")}>
+                      NO VERIFIED RUNS
+                    </h4>
+                    <p className={cn("text-xs font-medium tracking-wide max-w-[240px] leading-relaxed relative z-10", theme === "dark" ? "text-zinc-500" : "text-slate-500")}>
+                      THIS ATHLETE HAS NOT LOGGED ANY OFFICIAL RUNS IN THIS DIVISION.
+                    </p>
+                  </div>
+                )}
+                <div className="pt-8 relative z-10">
                   <ASRPromotionBanner type={randomRunsPromo} theme={theme} />
                 </div>
               </div>
@@ -321,18 +347,44 @@ export const PlayerDetails = React.memo(
                 <ASRWeeklyActivityChart runs={mappedSetsChartData} type="set" />
               </div>
 
-              <div className="p-6 overflow-visible flex flex-col gap-6">
+              <div className="p-6 flex flex-col gap-6 pt-6 relative min-h-[300px]">
                 <SectionTitle>VERIFIED SETS</SectionTitle>
-                <ASRRankList
-                  athletes={rankListSets}
-                  valueLabel="RUNS"
-                  onEntityClick={onEntityClick}
-                  limit={100}
-                  dataContext={dataContext}
-                  hideSubtitle={true}
-                  entityType="course"
-                />
-                <div className="pt-8">
+                {rankListSets.length > 0 ? (
+                  <ASRRankList
+                    athletes={rankListSets}
+                    valueLabel="RUNS"
+                    onEntityClick={onEntityClick}
+                    limit={100}
+                    dataContext={dataContext}
+                    hideSubtitle={true}
+                    entityType="course"
+                  />
+                ) : (
+                  <div className={cn(
+                    "flex flex-col items-center justify-center py-16 text-center rounded-[32px] border relative overflow-hidden",
+                    theme === "dark" ? "bg-zinc-900/40 border-zinc-800" : "bg-slate-50 border-slate-200"
+                  )}>
+                    <div className={cn(
+                      "absolute inset-0 opacity-[0.02] pointer-events-none",
+                      theme === "dark" 
+                        ? "bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:16px_16px]" 
+                        : "bg-[radial-gradient(circle_at_center,black_1px,transparent_1px)] [background-size:16px_16px]"
+                    )} />
+                    <div className={cn(
+                      "w-16 h-16 rounded-full flex items-center justify-center mb-4 relative z-10",
+                      theme === "dark" ? "bg-zinc-800/80 shadow-[0_0_30px_rgba(255,255,255,0.05)] text-zinc-400" : "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] text-slate-400"
+                    )}>
+                      <ShieldAlert size={28} strokeWidth={1.5} />
+                    </div>
+                    <h4 className={cn("text-base font-black tracking-widest uppercase mb-2 relative z-10", theme === "dark" ? "text-zinc-300" : "text-zinc-600")}>
+                      NO VERIFIED SETS
+                    </h4>
+                    <p className={cn("text-xs font-medium tracking-wide max-w-[240px] leading-relaxed relative z-10", theme === "dark" ? "text-zinc-500" : "text-slate-500")}>
+                      THIS ATHLETE HAS NOT SET ANY OFFICIAL COURSES YET.
+                    </p>
+                  </div>
+                )}
+                <div className="pt-8 relative z-10">
                   <ASRPromotionBanner type="setter" theme={theme} />
                 </div>
               </div>
