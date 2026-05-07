@@ -40,13 +40,13 @@ export const ASRNeonToggle = ({
  key={value}
  onClick={() => onChange(value)}
  className={cn(
- "relative flex-1 font-black uppercase tracking-[0.1em] transition-all z-10 flex items-center justify-center basis-0 min-w-0 rounded-full active:scale-[0.98]",
+ "relative flex-1 font-black uppercase tracking-[0.1em] transition-colors z-10 flex items-center justify-center basis-0 min-w-0 rounded-full",
  "py-1.5 px-3 text-[9px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
  theme === "dark" ? "focus-visible:ring-offset-zinc-900" : "theme-focus",
  isActive
  ? theme === "dark"
- ? "text-white scale-105"
- : "text-zinc-900 scale-105"
+ ? "text-white"
+ : "text-zinc-900"
  : theme === "dark"
  ? "text-white/30 hover:text-white"
  : "text-black/40 hover:text-black",
@@ -56,7 +56,8 @@ export const ASRNeonToggle = ({
  <motion.div
  layoutId={layoutId}
  className="absolute inset-0 z-0 rounded-full"
- transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+ style={{ borderRadius: 9999 }}
+ transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
  >
  {/* Outer Drop Shadow */}
  <div 
@@ -68,7 +69,7 @@ export const ASRNeonToggle = ({
  )} 
  />
  
- <div className="absolute inset-0 overflow-hidden rounded-full">
+ <div className="absolute inset-0 overflow-hidden rounded-full ios-gpu-fix">
  {/* The Rotating Neon Border - Long Trail */}
  <div className="absolute inset-[-200%] neon-border-rotate z-0">
  <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]" />
@@ -77,7 +78,7 @@ export const ASRNeonToggle = ({
  {/* The Inner Surface Fill (with glass effect) */}
  <div
  className={cn(
- "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md",
+ "absolute inset-[1.5px] rounded-full z-10",
  theme === "dark" 
  ? "bg-gradient-to-b from-zinc-800 to-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),inset_0_-1px_1px_rgba(0,0,0,0.5)]" 
  : "bg-gradient-to-b from-white to-zinc-50 shadow-[inset_0_2px_2px_rgba(255,255,255,0.8),inset_0_-1px_2px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.05)]",
@@ -86,7 +87,10 @@ export const ASRNeonToggle = ({
  </div>
  </motion.div>
  )}
- <span className="relative z-20 whitespace-nowrap">
+ <span className={cn(
+ "relative z-20 whitespace-nowrap transition-transform duration-300",
+ isActive && "scale-105"
+ )}>
  {typeof label === "string" ? label.toUpperCase() : label}
  </span>
  </button>

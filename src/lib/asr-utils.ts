@@ -47,8 +47,8 @@ export const THEME = {
   VALUE: "font-mono font-black tabular-nums tracking-tighter",
   BENTO_CARD: (t: string) =>
     t === "dark"
-      ? "bg-white/[0.02] border-white/10 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
-      : "bg-white/60 border-zinc-200 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.02)]",
+      ? "bg-zinc-900/20 border border-white/5 backdrop-blur-md shadow-sm"
+      : "bg-white/40 border border-zinc-200/60 backdrop-blur-md shadow-sm",
   INPUT: (t: string) =>
     t === "dark"
       ? "bg-black/40 text-white focus:bg-white/[0.03] border-white/10 focus:border-blue-500/50 shadow-inner"

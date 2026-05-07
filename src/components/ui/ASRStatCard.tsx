@@ -93,11 +93,14 @@ export const ASRStatCard = React.memo(
  "stat-card-container min-h-[4.5rem] relative group flex flex-col transition-all duration-300 w-full overflow-hidden rounded-[1.25rem] outline-none",
  description ? "cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" : "cursor-default",
         "theme-focus",
- isHeader 
- ? "bg-transparent" 
- : theme === "dark" 
- ? "bg-zinc-950/80 hover:bg-zinc-900 shadow-md hover:shadow-lg hover:shadow-zinc-900/50" 
- : "bg-white/90 hover:bg-white shadow-sm hover:shadow"
+          isHeader
+            ? "bg-transparent"
+            : cn(
+                THEME.BENTO_CARD(theme),
+                theme === "dark"
+                  ? "hover:bg-zinc-900/30"
+                  : "hover:bg-white/60",
+              ),
  )}
  >
  <div className={cn("flex flex-col flex-1 p-2 h-full", isHeader && "p-0")}>
