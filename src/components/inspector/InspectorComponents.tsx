@@ -108,10 +108,11 @@ interface TabButtonProps {
   children: React.ReactNode;
   icon?: React.ReactNode;
   theme: "light" | "dark";
+  layoutId?: string;
 }
 
 export const TabButton = React.memo(
-  ({ active, onClick, children, icon, theme }: TabButtonProps) => (
+  ({ active, onClick, children, icon, theme, layoutId = "active-tab-line" }: TabButtonProps) => (
     <button
       onClick={onClick}
       className={cn(
@@ -136,7 +137,7 @@ export const TabButton = React.memo(
       <span className="relative z-10 italic">{children}</span>
       {active && (
         <motion.div
-          layoutId="active-tab-line"
+           layoutId={layoutId}
           className={cn(
             "absolute bottom-[-1px] left-4 right-4 h-0.5 rounded-full",
             theme === "dark" ? "bg-white shadow-[0_0_15px_rgba(255,255,255,0.6)]" : "bg-black"

@@ -8,8 +8,7 @@ interface CountUpProps {
 
 export const CountUp = React.memo(
   ({ end, duration = 2000 }: CountUpProps) => {
-    const [count, setCount] = useState(0);
-    const countRef = useRef(0);
+    const nodeRef = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
       let startTimestamp: number | null = null;
@@ -20,13 +19,15 @@ export const CountUp = React.memo(
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
         const currentCount = Math.floor(progress * end);
 
-        if (currentCount !== countRef.current) {
-          setCount(currentCount);
-          countRef.current = currentCount;
+        if (nodeRef.current) {
+          nodeRef.current.textContent = currentCount.toString();
         }
 
         if (progress < 1) {
           animationFrame = window.requestAnimationFrame(step);
+        } else if (nodeRef.current) {
+          // Guarantee final value
+          nodeRef.current.textContent = end.toString();
         }
       };
 
@@ -36,12 +37,13 @@ export const CountUp = React.memo(
 
     return (
       <span
+        ref={nodeRef}
         className={cn(
           "font-black tabular-nums tracking-tighter transition-all",
           "text-current",
         )}
       >
-        {count}
+        0
       </span>
     );
   },

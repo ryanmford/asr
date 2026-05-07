@@ -173,6 +173,7 @@ body {
 }
 .neon-border-rotate {
   animation: border-rotate 4s linear infinite;
+  will-change: transform;
 }
 .neon-border-rotate-slow {
   animation: border-rotate 8s linear infinite;

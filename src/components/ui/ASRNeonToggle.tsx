@@ -19,6 +19,9 @@ export const ASRNeonToggle = ({
  theme,
  className,
 }: ASRNeonToggleProps) => {
+ const instanceId = React.useId();
+ const isolatedLayoutId = `${layoutId}-${instanceId.replace(/:/g, "")}`;
+
  return (
  <div
  className={cn(
@@ -54,7 +57,7 @@ export const ASRNeonToggle = ({
  >
  {isActive && (
  <motion.div
- layoutId={layoutId}
+ layoutId={isolatedLayoutId}
  className="absolute inset-0 z-0 rounded-full"
  style={{ borderRadius: 9999 }}
  transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
