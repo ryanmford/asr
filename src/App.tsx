@@ -136,7 +136,23 @@ import { useFetchASRData } from "./hooks/useASRData";
 import { useDataStore } from "./store/useDataStore";
 
 export default function App() {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof localStorage !== "undefined") {
+      const p = localStorage.getItem(CONFIG.PREFS_KEY);
+      if (p) {
+        try {
+          const prefs = JSON.parse(p);
+          if (prefs.theme === "light" || prefs.theme === "dark") return prefs.theme;
+        } catch (e) {
+          console.error("Failed to parse prefs", e);
+        }
+      }
+    }
+    if (typeof window !== "undefined" && window.matchMedia) {
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) return "light";
+    }
+    return "dark";
+  });
   
   // Initiate global data fetching
   useFetchASRData();
@@ -158,18 +174,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
 
   const [showIntro, setShowIntro] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-
-  useEffect(() => {
-    const p = localStorage.getItem(CONFIG.PREFS_KEY);
-    if (p) {
-      try {
-        const prefs = JSON.parse(p);
-        if (prefs.theme) setTheme(prefs.theme);
-      } catch (e) {
-        console.error("Failed to parse prefs", e);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     const p = localStorage.getItem(CONFIG.PREFS_KEY);

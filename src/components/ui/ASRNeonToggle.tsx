@@ -25,10 +25,10 @@ export const ASRNeonToggle = ({
  return (
  <div
  className={cn(
- "relative flex backdrop-blur-md rounded-full p-0.5 border transition-all shadow-xl",
+ "relative flex backdrop-blur-md rounded-full p-0.5 border transition-all lg:shadow-xl",
  theme === "dark"
  ? "bg-zinc-900 border-zinc-800 shadow-black/40"
- : "bg-white border-zinc-200 shadow-black/5",
+ : "bg-slate-100 border-slate-200 shadow-black/5",
  className,
  )}
  >
@@ -78,16 +78,16 @@ export const ASRNeonToggle = ({
  <div className="absolute inset-0 overflow-hidden rounded-full ios-gpu-fix">
  {/* The Rotating Neon Border - Long Trail */}
  <div className="absolute inset-[-200%] neon-border-rotate z-0">
- <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]" />
+ <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_15deg,#3b82f6_45deg,#3b82f6_315deg,transparent_345deg,transparent_360deg)]" />
  </div>
 
  {/* The Inner Surface Fill (with glass effect) */}
  <div
  className={cn(
- "absolute inset-[1.5px] rounded-full z-10",
+ "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md",
  theme === "dark" 
- ? "bg-gradient-to-b from-zinc-800 to-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),inset_0_-1px_1px_rgba(0,0,0,0.5)]" 
- : "bg-gradient-to-b from-white to-zinc-50 shadow-[inset_0_2px_2px_rgba(255,255,255,0.8),inset_0_-1px_2px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.05)]",
+ ? "bg-gradient-to-b from-zinc-800 to-zinc-950 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.8)]" 
+ : "bg-gradient-to-b from-white to-white shadow-[inset_0_2px_2px_rgba(255,255,255,0.9),inset_0_-1px_2px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.1)]",
  )}
  />
  </div>
