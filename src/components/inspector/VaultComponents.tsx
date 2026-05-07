@@ -14,7 +14,7 @@ export const TokenChip = React.memo(({ token, onClick, theme = "dark" }: { token
         "flex flex-row items-center justify-between p-4 px-5 rounded-3xl border transition-all group relative outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 overflow-hidden w-full min-h-[72px] gap-4",
         "theme-focus",
         Number(token.count) > 0 && onClick
-          ? theme === "dark" ? "bg-white/5 border-white/10 shadow-md cursor-pointer hover:border-blue-500/50 hover:bg-white/10 active:scale-[0.98]" : "bg-black/5 border-black/10 shadow-sm cursor-pointer hover:border-blue-500/50 hover:bg-black/10 active:scale-[0.98]"
+          ? theme === "dark" ? "bg-white/5 border-white/10 shadow-md cursor-pointer hover:border-blue-500/50 hover:bg-white/10 active:scale-95" : "bg-black/5 border-black/10 shadow-sm cursor-pointer hover:border-blue-500/50 hover:bg-black/10 active:scale-95"
           : Number(token.count) > 0
             ? theme === "dark" ? "bg-white/5 border-white/10 shadow-md cursor-default" : "bg-black/5 border-black/10 shadow-sm cursor-default"
             : theme === "dark" ? "bg-transparent opacity-30 grayscale border-zinc-800 cursor-default" : "bg-transparent opacity-30 grayscale border-slate-200 cursor-default",
@@ -66,7 +66,7 @@ export const TrophyStand = React.memo(({ trophy, onClick, theme }: { trophy: { t
   <button
     onClick={onClick}
     className={cn(
-      "flex flex-col items-center gap-4 group cursor-pointer active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-3xl p-2",
+      "flex flex-col items-center gap-4 group cursor-pointer active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-3xl p-2",
       "theme-focus"
     )}
   >
@@ -105,7 +105,7 @@ export const FlatCard = React.memo(({ card, onClick, theme }: { card: { rarity: 
   <button
     onClick={onClick}
     className={cn(
-      "flex items-center gap-4 p-5 rounded-[2rem] border transition-all active:scale-[0.98] group text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+      "flex items-center gap-4 p-5 rounded-[2rem] border transition-all active:scale-95 group text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
       "theme-focus",
       theme === "dark"
         ? "bg-white/5 border-white/10 hover:border-blue-500/40"

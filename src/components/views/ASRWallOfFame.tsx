@@ -177,7 +177,7 @@ export const ASRWallOfFame = React.memo(
  )
  }
  className={cn(
- "flex items-center justify-between py-5 px-6 transition-all group relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset active:scale-[0.98]",
+ "flex items-center justify-between py-5 px-6 transition-all group relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset active:scale-95",
  hoverClass,
  )}
  >

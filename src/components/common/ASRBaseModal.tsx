@@ -131,6 +131,7 @@ export const ASRBaseModal = React.memo(
               dragDirectionLock
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={{ left: 0, right: 0.5 }}
+              dragThreshold={20}
               onDragEnd={(e, { offset, velocity }) => {
                 if (offset.x > 100 || velocity.x > 500) {
                   if (onBack) {
@@ -175,7 +176,7 @@ export const ASRBaseModal = React.memo(
                       }
                     }}
                     className={cn(
-                      "p-2 rounded-xl active:scale-[0.98] transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
                         : "text-slate-400 hover:text-black hover:bg-slate-100"
@@ -188,7 +189,7 @@ export const ASRBaseModal = React.memo(
                     <button
                       onClick={() => onForward?.()}
                       className={cn(
-                        "p-2 rounded-xl active:scale-[0.98] transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                        "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                         theme === "dark"
                           ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
                           : "text-slate-400 hover:text-black hover:bg-slate-100"
@@ -254,7 +255,7 @@ export const ASRBaseModal = React.memo(
                   <button
                     onClick={handleShare}
                     className={cn(
-                      "p-2 rounded-xl active:scale-[0.98] transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
                         : "text-zinc-500 hover:text-black hover:bg-slate-100"
@@ -266,7 +267,7 @@ export const ASRBaseModal = React.memo(
                   <button
                     onClick={onClose}
                     className={cn(
-                      "p-2 rounded-xl active:scale-[0.98] transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                      "p-2 rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
                         : "text-zinc-500 hover:text-black hover:bg-slate-100"

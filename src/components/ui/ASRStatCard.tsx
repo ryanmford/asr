@@ -91,7 +91,7 @@ export const ASRStatCard = React.memo(
  }}
  className={cn(
  "stat-card-container min-h-[4.5rem] relative group flex flex-col transition-all duration-300 w-full overflow-hidden rounded-[1.25rem] outline-none",
- description ? "cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" : "cursor-default",
+ description ? "cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" : "cursor-default",
         "theme-focus",
           isHeader
             ? "bg-transparent"

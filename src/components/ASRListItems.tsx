@@ -102,7 +102,7 @@ export const ASRListItem = React.memo(
  mapUrl,
  showVideoIcon = false,
  isUnclaimed = false,
- isCompact = false,
+ isCompact = false, onHover,
  }: any) => {
  const { setPlayingVideoUrl } = useAppStore();
  const theme = useContext(ThemeContext);
@@ -116,7 +116,7 @@ export const ASRListItem = React.memo(
  return (
  <div
  onClick={onClick}
- role={onClick ? "button" : undefined}
+ role={onClick ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick ? 0 : undefined}
  onKeyDown={(e) => {
  if (onClick && (e.key === "Enter" || e.key === " ")) {
@@ -127,7 +127,7 @@ export const ASRListItem = React.memo(
  className={cn(
  "group flex items-center transition-all duration-300 ios-clip-fix py-5 sm:py-6 lg:py-8 px-0 outline-none w-full text-left",
  onClick
- ? `cursor-pointer active:scale-[0.98] active:bg-blue-600/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-600/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
+ ? `cursor-pointer active:scale-95 active:bg-blue-600/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-600/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
  : "cursor-default",
  shouldFade ? "opacity-40 grayscale" : "opacity-100",
  )}
@@ -269,7 +269,7 @@ export const ASRListItem = React.memo(
  return (
  <div
  onClick={isUnclaimed ? undefined : onClick}
- role={onClick && !isUnclaimed ? "button" : undefined}
+ role={onClick && !isUnclaimed ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick && !isUnclaimed ? 0 : undefined}
  onKeyDown={(e) => {
  if (onClick && !isUnclaimed && (e.key === "Enter" || e.key === " ")) {
@@ -283,7 +283,7 @@ export const ASRListItem = React.memo(
  ? "py-3 pl-3 pr-1.5 rounded-[1.25rem] border h-auto min-h-[64px]"
  : "py-3 sm:py-5 lg:py-6 pl-3 sm:pl-6 lg:pl-8 pr-1.5 sm:pr-4 rounded-[1.25rem] sm:rounded-[1.5rem] lg:rounded-[2rem] border h-auto min-h-[64px] sm:min-h-[80px] lg:min-h-[100px] ",
  onClick && !isUnclaimed
- ? `cursor-pointer active:scale-[0.98] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${"theme-focus"} ${cardHover}`
+ ? `cursor-pointer active:scale-95 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${"theme-focus"} ${cardHover}`
  : "cursor-default",
  isUnclaimed
  ? cn(

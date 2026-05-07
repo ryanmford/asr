@@ -105,7 +105,7 @@ const SetterDisplay = ({
               onSetterClick?.("setter", { name });
             }}
             className={cn(
-              "group flex flex-col relative pl-[52px] pr-5 py-3.5 rounded-[1.25rem] border transition-all text-left w-full outline-none hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+              "group flex flex-col relative pl-[52px] pr-5 py-3.5 rounded-[1.25rem] border transition-all text-left w-full outline-none hover:scale-[1.02] active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
               "theme-focus",
               theme === "dark"
                 ? "bg-zinc-900/60 border-zinc-800 hover:bg-zinc-800"

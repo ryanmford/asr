@@ -83,7 +83,7 @@ export const ASRCountdown = React.memo(
         <button
           onClick={onHelp}
           className={cn(
-            "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer transition-all active:scale-[0.98] group border-b",
+            "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer transition-all active:scale-95 group border-b",
             theme === "dark"
               ? "bg-zinc-950/40 border-white/5 shadow-xl shadow-black/40"
               : "bg-white/40 border-black/5 shadow-xl shadow-black/5",
@@ -161,7 +161,7 @@ export const ASRCountdown = React.memo(
         <button
           onClick={onHelp}
           className={cn(
-            "w-full h-10 sm:h-12 flex items-center justify-center cursor-pointer transition-all active:scale-[0.98] border-b relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500",
+            "w-full h-10 sm:h-12 flex items-center justify-center cursor-pointer transition-all active:scale-95 border-b relative overflow-hidden outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500",
             theme === "dark"
               ? "bg-zinc-950/40 border-white/5 shadow-xl shadow-black/40 text-white"
               : "bg-white/40 border-black/5 shadow-xl shadow-black/5 text-black",
@@ -195,7 +195,7 @@ export const ASRCountdown = React.memo(
       <button
         onClick={onHelp}
         className={cn(
-          "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden cursor-pointer transition-all active:scale-[0.98] outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 group border-b",
+          "w-full h-10 sm:h-12 flex items-center justify-center relative overflow-hidden cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 group border-b",
           theme === "dark"
             ? "bg-zinc-950/40 border-white/5 shadow-xl shadow-black/40"
             : "bg-white/40 border-black/5 shadow-xl shadow-black/5",

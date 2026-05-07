@@ -79,7 +79,7 @@ export const ASRNavDock = React.memo(
                   aria-label={`View ${item.label}`}
                   onClick={() => setView(item.id)}
                   className={cn(
-                    "relative flex flex-col items-center justify-center flex-1 rounded-full transition-all duration-500 group outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 active:scale-[0.98]",
+                    "relative flex flex-col items-center justify-center flex-1 rounded-full transition-all duration-500 group outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 active:scale-95",
                     isCompact ? "h-11" : "h-12",
                     isActive
                       ? "z-20"

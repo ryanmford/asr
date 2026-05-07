@@ -5,6 +5,7 @@ import { ThemeContext } from "../../App";
 import { ASRListItem } from "../ASRListItems";
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useDataStore } from "../../store/useDataStore";
+import { useAppNavigation } from "../../hooks/useDerivedData";
 
 interface ASRDataTableProps {
  data: any[];
@@ -29,6 +30,7 @@ const MemoizedVirtualRow = React.memo(({
   columns,
   showVideoColumn,
   onItemClick,
+  onItemHover,
   measureElement
 }: any) => {
   const absoluteTransform = `translateY(${virtualRow.start}px)`;
@@ -91,6 +93,7 @@ const MemoizedVirtualRow = React.memo(({
         shouldFade={item.shouldFade}
         badgeContent={item.badgeContent}
         onClick={handleClick}
+        onHover={onItemHover}
         showVideoIcon={showVideoColumn}
       />
     </div>
@@ -110,6 +113,7 @@ export const ASRDataTable = React.memo(
  }: ASRDataTableProps) => {
  const theme = useContext(ThemeContext);
  const hasError = useDataStore(s => s.hasError);
+ const { prefetchEntity } = useAppNavigation();
  
  const estimateSize = React.useCallback(() => {
    return viewType === "card" 
@@ -126,43 +130,80 @@ export const ASRDataTable = React.memo(
  const statColumns = React.useMemo(() => columns.filter((c: any) => !c.isRank && c.type !== "profile"), [columns]);
 
  if (isLoading) {
- // ... same loading stuff
- return (
- <div className="flex flex-col gap-2 p-4">
- {[1, 2, 3, 4, 5, 6].map((i) => (
- <div
- key={i}
- className={cn(
- "h-[72px] w-full rounded-2xl border flex items-center px-4 gap-4 animate-pulse",
- theme === "dark"
- ? "bg-white/[0.02] border-white/[0.05]"
- : "bg-black/[0.02] border-black/[0.05]",
- )}
- >
- <div
- className={cn(
- "w-10 h-10 rounded-full shrink-0",
- "bg-black/10 dark:bg-white/10",
- )}
- />
- <div className="flex-1 flex flex-col gap-2">
- <div
- className={cn(
- "h-3 w-32 rounded-full",
- theme === "dark" ? "bg-white/20" : "bg-black/20",
- )}
- />
- <div
- className={cn(
- "h-2 w-20 rounded-full",
- "bg-black/10 dark:bg-white/10",
- )}
- />
- </div>
- </div>
- ))}
- </div>
- );
+  return (
+    <div className="flex flex-col w-full px-4 pt-2 animate-in fade-in duration-500 pb-32">
+      <div className="flex flex-col gap-3 max-w-7xl mx-auto w-full">
+        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <div
+            key={i}
+            className={cn(
+              "h-[76px] w-full rounded-[1.5rem] border flex items-center px-4 gap-5 relative overflow-hidden isolate",
+              theme === "dark"
+                ? "bg-white/[0.02] border-white/[0.04]"
+                : "bg-black/[0.02] border-black/[0.04]"
+            )}
+          >
+            {/* Shimmer effect */}
+            <div 
+              className={cn(
+                "absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite]",
+                theme === "dark" 
+                  ? "bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" 
+                  : "bg-gradient-to-r from-transparent via-black/[0.04] to-transparent"
+              )}
+            />
+            
+            {/* Avatar Skeleton */}
+            <div className="flex items-center gap-4 w-[200px] shrink-0 opacity-80">
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full shrink-0 relative overflow-hidden",
+                  theme === "dark" ? "bg-white/[0.05]" : "bg-black/[0.05]"
+                )}
+              />
+              
+              <div className="flex flex-col gap-2 flex-1">
+                <div
+                  className={cn(
+                    "h-3 w-28 rounded-full",
+                    theme === "dark" ? "bg-white/[0.08]" : "bg-black/[0.08]"
+                  )}
+                />
+                <div
+                  className={cn(
+                    "h-2 w-16 rounded-full",
+                    theme === "dark" ? "bg-white/[0.04]" : "bg-black/[0.04]"
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Data Columns Skeletons */}
+            <div className="flex-1 flex justify-end gap-12 pr-6 hidden sm:flex opacity-60">
+              {[1, 2, 3].map((col) => (
+                <div key={col} className="flex flex-col gap-2 items-end">
+                  <div
+                    className={cn(
+                      "h-3 rounded-full",
+                      col === 1 ? "w-12" : col === 2 ? "w-16" : "w-10",
+                      theme === "dark" ? "bg-white/[0.06]" : "bg-black/[0.06]"
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      "h-2 rounded-full",
+                      col === 1 ? "w-8" : col === 2 ? "w-10" : "w-14",
+                      theme === "dark" ? "bg-white/[0.03]" : "bg-black/[0.03]"
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
  }
 
  if (!data || data.length === 0) {
@@ -271,6 +312,7 @@ export const ASRDataTable = React.memo(
      columns={columns}
      showVideoColumn={showVideoColumn}
      onItemClick={onItemClick}
+     onItemHover={prefetchEntity}
      measureElement={virtualizer.measureElement}
    />
  );

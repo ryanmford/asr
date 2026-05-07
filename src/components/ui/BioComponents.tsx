@@ -90,7 +90,7 @@ export const BioRow = React.memo(
  href={`https://instagram.com/${igHandle}`}
  target="_blank"
  rel="noopener noreferrer"
- className="block h-full transition-transform active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-[1.5rem]"
+ className="block h-full transition-transform active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-[1.5rem]"
  >
  {content}
  </a>

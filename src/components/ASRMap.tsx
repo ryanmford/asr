@@ -460,7 +460,7 @@ export const ASRMap = ({
 
           <button
             onClick={handleFindMe}
-            className="relative z-20 flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="relative z-20 flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <Navigation size={14} strokeWidth={2.5} className={cn("text-blue-500", isLocating && "animate-spin")} />
             <span className={isDark ? "text-white" : "text-zinc-900"}>Find Course Near Me</span>
@@ -491,7 +491,7 @@ export const ASRMap = ({
            <button
               onClick={handleZoomIn}
               className={cn(
-                "relative z-20 p-2.5 rounded-full transition-all active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                 isDark ? "text-white hover:bg-white/10" : "text-black hover:bg-black/5"
               )}
            >
@@ -504,7 +504,7 @@ export const ASRMap = ({
            <button
               onClick={handleZoomOut}
               className={cn(
-                "relative z-20 p-2.5 rounded-full transition-all active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                 isDark ? "text-white hover:bg-white/10" : "text-black hover:bg-black/5"
               )}
            >

@@ -120,7 +120,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  key={i}
  onClick={() => navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete })}
  className={cn(
- "group flex flex-col relative pl-[58px] pr-5 py-3.5 rounded-[1.25rem] border transition-all text-left w-full outline-none hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+ "group flex flex-col relative pl-[58px] pr-5 py-3.5 rounded-[1.25rem] border transition-all text-left w-full outline-none hover:scale-[1.02] active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
  "theme-focus",
  theme === "dark"
  ? i === 0

@@ -67,6 +67,14 @@ export const useAppNavigation = () => {
     }
   }, [navigate]);
 
+  const prefetchEntity = useCallback(() => {
+    // Zero-Latency Hover Prefetching: Eagerly load the inspector chunks
+    import("../components/inspector/InspectorBody").catch(() => {});
+    import("../components/inspector/PlayerDetails").catch(() => {});
+    import("../components/inspector/CourseDetails").catch(() => {});
+    import("../components/inspector/TeamDetails").catch(() => {});
+  }, []);
+
   const navigateToEntity = useCallback(
     (type: string, entityData: any) => {
       try {
@@ -149,6 +157,7 @@ export const useAppNavigation = () => {
     goBackOne,
     canGoForward,
     goForwardOne,
+    prefetchEntity,
   };
 };
 

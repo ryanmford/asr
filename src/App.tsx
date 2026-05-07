@@ -109,7 +109,7 @@ class GlobalErrorBoundary extends React.Component<
             <button
               onClick={() => window.location.reload()}
               className={cn(
-                "mt-4 px-6 py-2.5 rounded-full text-sm font-semibold transition-all active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+                "mt-4 px-6 py-2.5 rounded-full text-sm font-semibold transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
                 this.props.theme === "dark" ? "theme-focus" : "focus-visible:ring-offset-white",
                 this.props.theme === "light" ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-black hover:bg-zinc-100"
               )}
@@ -216,7 +216,7 @@ function MainAppContent({ theme, setTheme }: any) {
   return (
     <div
       className={cn(
-        "min-h-[100dvh] flex flex-col transition-colors duration-500 pt-[env(safe-area-inset-top)]",
+        "min-h-[100dvh] flex flex-col transition-colors duration-500",
         theme === "dark" 
           ? "dark theme-bg-secondary text-zinc-100 selection:bg-blue-500/30" 
           : "theme-bg-secondary text-zinc-900 selection:bg-blue-500/20",
@@ -248,7 +248,7 @@ function MainAppContent({ theme, setTheme }: any) {
         onClose={() => setShowOnboarding(false)}
       />
 
-      <div className="w-full flex flex-col pointer-events-auto transition-all duration-300">
+      <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)]">
         {!isLoading && (
           <div className="flex flex-col">
             <ASRLiveTicker
@@ -268,6 +268,13 @@ function MainAppContent({ theme, setTheme }: any) {
           </div>
         )}
       </div>
+
+      <div 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[100] h-[env(safe-area-inset-top)] backdrop-blur-xl border-b",
+          theme === "dark" ? "bg-zinc-950/80 border-white/5" : "bg-white/80 border-black/5"
+        )}
+      />
 
       <div 
         className="sticky z-[70] w-full flex flex-col pointer-events-auto transition-all duration-300"
@@ -344,7 +351,7 @@ function MainAppContent({ theme, setTheme }: any) {
                         onClick={() => {
                           navigate("/players", { replace: false });
                         }}
-                        className="mt-6 px-6 py-2 rounded-full border border-current text-[9px] font-black uppercase tracking-widest hover:bg-current/5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-[0.98]"
+                        className="mt-6 px-6 py-2 rounded-full border border-current text-[9px] font-black uppercase tracking-widest hover:bg-current/5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
                       >
                         RETURN HOME
                       </button>

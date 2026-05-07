@@ -172,7 +172,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             <button
               onClick={step > 0 ? prevStep : onClose}
               className={cn(
-                "absolute top-8 left-8 p-3 rounded-full transition-all z-20 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-[0.98]",
+                "absolute top-8 left-8 p-3 rounded-full transition-all z-20 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
                 theme === "dark"
                   ? "hover:bg-white/10 text-zinc-400 hover:text-white"
                   : "hover:bg-black/10 text-zinc-500 hover:text-black",
@@ -188,7 +188,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             <button
               onClick={onClose}
               className={cn(
-                "absolute top-8 right-8 p-3 rounded-full transition-all z-20 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-[0.98]",
+                "absolute top-8 right-8 p-3 rounded-full transition-all z-20 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
                 theme === "dark"
                   ? "hover:bg-white/10 text-zinc-400 hover:text-white"
                   : "hover:bg-black/10 text-zinc-500 hover:text-black",
@@ -292,7 +292,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
                     trackEvent("tutorial_skip", { step: step });
                     onClose();
                   }}
-                  className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 hover:opacity-100 transition-all p-2 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md active:scale-[0.98]"
+                  className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 hover:opacity-100 transition-all p-2 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md active:scale-95"
                 >
                   Skip
                 </button>

@@ -123,7 +123,7 @@ export const ASRPremiumButton = ({
  "relative group py-4 px-8 font-black uppercase tracking-[0.2em] transition-all overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
         "theme-focus",
  getRadiusClass(),
- !disabled && "active:scale-[0.98]",
+ !disabled && "active:scale-95",
  disabled && "opacity-50 cursor-not-allowed",
  theme === "dark"
  ? isSolid

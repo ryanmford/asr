@@ -556,7 +556,7 @@ export const PlayerDetails = React.memo(
                 <button
                   onClick={() => setSelectedItem(null)}
                   className={cn(
-                    "absolute -top-12 right-0 p-2 rounded-full transition-all active:scale-[0.98] outline-none focus-visible:ring-2",
+                    "absolute -top-12 right-0 p-2 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2",
                     theme === "dark" 
                       ? "bg-white/10 hover:bg-white/20 text-white focus-visible:ring-white" 
                       : "bg-black/10 hover:bg-black/20 text-black focus-visible:ring-black"

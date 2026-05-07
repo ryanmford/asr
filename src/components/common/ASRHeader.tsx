@@ -37,7 +37,7 @@ export const ASRHeader = React.memo(
           <button
             onClick={onHome}
             className={cn(
-              "flex items-center gap-2 group active:scale-[0.98] transition-transform text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl",
+              "flex items-center gap-2 group active:scale-95 transition-transform text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl",
               "theme-focus"
             )}
           >
@@ -82,7 +82,7 @@ export const ASRHeader = React.memo(
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
             className={cn(
-              "p-2 sm:p-2 rounded-full border transition-all active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+              "p-2 sm:p-2 rounded-full border transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
               theme === "dark"
                 ? "bg-black border-zinc-800 text-white hover:bg-zinc-900 focus-visible:ring-offset-[#030303]"
                 : "bg-white border-slate-200 text-black shadow-sm hover:bg-slate-50 theme-focus",
