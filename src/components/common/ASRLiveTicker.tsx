@@ -43,7 +43,7 @@ export const ASRLiveTicker = React.memo(
     return (
       <div
         className={cn(
-          "relative z-[40] w-full overflow-hidden border-b h-10 sm:h-12 flex items-center select-none ios-gpu-fix transition-colors duration-500 backdrop-blur-md",
+          "relative z-[40] w-full overflow-hidden border-b h-10 sm:h-12 flex items-center select-none transition-colors duration-500 backdrop-blur-md",
           theme === "dark"
             ? "bg-zinc-950/80 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             : "bg-white/80 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
