@@ -64,7 +64,7 @@ export const ASRPremiumButton = ({
  case "blue":
  return "text-blue-500";
  default:
- return "text-blue-400";
+ return "text-blue-500";
  }
  };
 
@@ -77,9 +77,9 @@ export const ASRPremiumButton = ({
  case "gold":
  return "bg-[conic-gradient(from_0deg,#f59e0b,#fbbf24,#d97706,#fbbf24,#f59e0b)] opacity-90";
  case "blue":
- return "bg-[conic-gradient(from_0deg,#60a5fa,#3b82f6,#1d4ed8,#3b82f6,#60a5fa)] opacity-90";
+ return "bg-[conic-gradient(from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6)] opacity-90";
  default:
- return "bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90";
+ return "bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90";
  }
  };
 

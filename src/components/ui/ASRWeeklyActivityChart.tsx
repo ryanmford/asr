@@ -142,14 +142,14 @@ export const ASRWeeklyActivityChart = ({
             <div
               className={cn(
                 "w-2 h-2 rounded-[1px]",
-                theme === "dark" ? "bg-blue-700/80" : "bg-blue-400",
+                theme === "dark" ? "bg-blue-700/80" : "bg-blue-500",
               )}
               title="2"
             />
             <div
               className={cn(
                 "w-2 h-2 rounded-[1px]",
-                theme === "dark" ? "bg-blue-500" : "bg-blue-600",
+                theme === "dark" ? "bg-blue-500" : "bg-blue-500",
               )}
               title="3+"
             />
@@ -183,9 +183,9 @@ export const ASRWeeklyActivityChart = ({
           if (week.count === 1) {
             levelClass = theme === "dark" ? "bg-blue-900/60" : "bg-blue-200";
           } else if (week.count === 2) {
-            levelClass = theme === "dark" ? "bg-blue-700/80" : "bg-blue-400";
+            levelClass = theme === "dark" ? "bg-blue-700/80" : "bg-blue-500";
           } else if (week.count >= 3) {
-            levelClass = theme === "dark" ? "bg-blue-500" : "bg-blue-600";
+            levelClass = theme === "dark" ? "bg-blue-500" : "bg-blue-500";
           }
 
           return (
@@ -195,8 +195,8 @@ export const ASRWeeklyActivityChart = ({
                 "w-full aspect-square rounded-[2px] transition-all duration-200 cursor-crosshair z-10",
                 "hover:ring-2 hover:ring-opacity-50 hover:scale-125 hover:z-20",
                 theme === "dark"
-                  ? "hover:ring-blue-400"
-                  : "hover:ring-blue-600",
+                  ? "hover:ring-blue-500"
+                  : "hover:ring-blue-500",
                 levelClass,
               )}
               onMouseEnter={(e) => {
@@ -246,7 +246,7 @@ export const ASRWeeklyActivityChart = ({
           >
             <div className="font-bold flex items-center gap-1.5 leading-none mb-1">
               <span
-                className={theme === "dark" ? "text-blue-400" : "text-blue-600"}
+                className={theme === "dark" ? "text-blue-500" : "text-blue-500"}
               >
                 {hoverData.count} {hoverData.count === 1 ? unit : unitPlural}
               </span>

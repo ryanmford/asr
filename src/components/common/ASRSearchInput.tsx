@@ -39,7 +39,7 @@ export const ASRSearchInput = React.memo(
           {/* Moving Neon Border Effect when focused */}
           <div className="absolute inset-0 overflow-hidden rounded-2xl z-0 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
             <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-               <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
+               <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
             </div>
             {/* Inner Surface Fill */}
             <div

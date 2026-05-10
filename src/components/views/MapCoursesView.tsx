@@ -72,7 +72,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
           <div className="px-4 animate-in fade-in duration-300">
             <React.Suspense
               fallback={
-                <div className="h-[70vh] w-full flex items-center justify-center text-sm font-bold tracking-widest text-[#2563eb] animate-pulse rounded-2xl bg-zinc-900 border border-zinc-800">
+                <div className="h-[70vh] w-full flex items-center justify-center text-sm font-bold tracking-widest text-[#3b82f6] animate-pulse rounded-2xl bg-zinc-900 border border-zinc-800">
                   LOADING ASR MAP...
                 </div>
               }

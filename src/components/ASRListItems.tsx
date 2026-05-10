@@ -132,7 +132,7 @@ export const ASRListItem = React.memo(
  className={cn(
  "group flex items-center transition-all duration-300 ios-clip-fix py-5 sm:py-6 lg:py-8 px-0 outline-none w-full text-left",
  onClick
- ? `cursor-pointer active:scale-95 active:bg-blue-600/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-600/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
+ ? `cursor-pointer active:scale-95 active:bg-blue-500/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-500/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
  : "cursor-default",
  shouldFade ? "opacity-40 grayscale" : "opacity-100",
  )}

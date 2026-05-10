@@ -253,7 +253,7 @@ export const ASRBaseModal = React.memo(
                 {/* Close & Share Buttons */}
                 <div className="flex items-center gap-1 shrink-0 relative">
                   {copied && (
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
                       COPIED!
                     </div>
                   )}

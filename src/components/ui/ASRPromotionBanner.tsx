@@ -114,8 +114,8 @@ export const ASRPromotionBanner = React.memo(
  return {
  colorClass: "text-blue-500",
  bgGradient: "#3b82f6", // blue-500
- borderFocus: "border-blue-600/20",
- borderGhost: "border-blue-600/10",
+ borderFocus: "border-blue-500/20",
+ borderGhost: "border-blue-500/10",
  icon: (
  <Award className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-blue-500" />
  ),

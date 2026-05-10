@@ -145,8 +145,8 @@ export const HomeView = React.memo(() => {
         borderHover: "hover:shadow-blue-500/20",
         bg: "bg-blue-500/10",
         hoverBg: "group-hover:bg-blue-500",
-        hoverText: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
-        gradientUrl: "conic-gradient(from 0deg, #3b82f6, #60a5fa, #2563eb, #60a5fa, #3b82f6)",
+        hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-500",
+        gradientUrl: "conic-gradient(from 0deg, #3b82f6, #3b82f6, #3b82f6, #3b82f6, #3b82f6)",
         metrics: [
           { label: "Rank", value: topPlayer._gRank },
           { label: "LQ", value: topPlayer.rating?.toFixed(2) || "0.00" },
@@ -299,7 +299,7 @@ export const HomeView = React.memo(() => {
         )}></div>
         
         {/* Animated Mesh / Orbs */}
-        <div className={cn("absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_8s_ease-in-out_infinite] pointer-events-none", theme === "dark" ? "bg-blue-600/30 mix-blend-screen" : "bg-blue-400/20 mix-blend-multiply")}></div>
+        <div className={cn("absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_8s_ease-in-out_infinite] pointer-events-none", theme === "dark" ? "bg-blue-500/30 mix-blend-screen" : "bg-blue-500/20 mix-blend-multiply")}></div>
         <div className={cn("absolute bottom-0 left-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_12s_ease-in-out_infinite] pointer-events-none", theme === "dark" ? "bg-purple-600/30 mix-blend-screen" : "bg-purple-400/20 mix-blend-multiply")} style={{ animationDelay: '2s' }}></div>
         <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none animate-[spin_120s_linear_infinite]", theme === "dark" ? "mix-blend-overlay" : "opacity-[0.03] mix-blend-darken")}></div>
         
@@ -315,13 +315,13 @@ export const HomeView = React.memo(() => {
           </p>
           <div className="flex w-full sm:max-w-xs mt-1 sm:mt-6 mx-auto">
             <button 
-              className="group relative px-6 py-4 sm:py-5 w-full bg-blue-600 overflow-hidden rounded-2xl font-bold text-lg sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]" 
+              className="group relative px-6 py-4 sm:py-5 w-full bg-blue-500 overflow-hidden rounded-2xl font-bold text-lg sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]" 
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600"></div>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_50%)]"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <span className="relative z-10 flex items-center justify-center gap-2 uppercase drop-shadow-sm">
                  Get Started
                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
@@ -574,7 +574,7 @@ export const HomeView = React.memo(() => {
              </div>
 
              <div className="mt-auto relative z-30 w-full flex flex-col">
-               <h3 className="text-[10px] font-bold text-blue-600 dark:text-blue-500 tracking-widest uppercase mb-2">Players</h3>
+               <h3 className="text-[10px] font-bold text-blue-500 dark:text-blue-500 tracking-widest uppercase mb-2">Players</h3>
                <p className="text-2xl sm:text-3xl font-black tracking-tighter mb-4 text-zinc-900 dark:text-white uppercase leading-none group-hover:text-blue-500 transition-colors duration-300">Top<br/>Players</p>
                <div className="flex items-center text-xs font-bold text-zinc-500 uppercase tracking-widest group-hover:text-blue-500 transition-colors">
                  <span>View Leaderboards</span>

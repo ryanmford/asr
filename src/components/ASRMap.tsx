@@ -153,7 +153,7 @@ export const ASRMap = ({
         zoomToBoundsOnClick: true,
         iconCreateFunction: (cluster: any) => {
           const count = cluster.getChildCount();
-          let conicGradientStr = "from_0deg,#3b82f6,#2563eb,#1d4ed8,#2563eb,#3b82f6";
+          let conicGradientStr = "from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6";
           
           if (count > 50) {
             conicGradientStr = "from_0deg,#a855f7,#7e22ce,#581c87,#7e22ce,#a855f7";
@@ -294,13 +294,13 @@ export const ASRMap = ({
                 <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
                   <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
                     <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                      <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90"></div>
+                      <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90"></div>
                     </div>
                     <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
                   </div>
-                  <div class="relative z-20 w-1.5 h-1.5 ${currentIsDark ? 'bg-blue-400' : 'bg-blue-500'} rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] group-hover:scale-125 transition-all"></div>
+                  <div class="relative z-20 w-1.5 h-1.5 ${currentIsDark ? 'bg-blue-500' : 'bg-blue-500'} rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] group-hover:scale-125 transition-all"></div>
                 </div>
-                <div class="w-[2px] h-[8px] ${currentIsDark ? 'bg-gradient-to-b from-blue-400/80 to-transparent' : 'bg-gradient-to-b from-blue-500/80 to-transparent'} rounded-b-full"></div>
+                <div class="w-[2px] h-[8px] ${currentIsDark ? 'bg-gradient-to-b from-blue-500/80 to-transparent' : 'bg-gradient-to-b from-blue-500/80 to-transparent'} rounded-b-full"></div>
               </div>
             </div>
           `,
@@ -434,7 +434,7 @@ export const ASRMap = ({
       >
         <div className="animate-spin opacity-70 mb-4">
           <ChevronsRight
-            className="w-6 h-6 text-blue-600"
+            className="w-6 h-6 text-blue-500"
             strokeWidth={2.5}
             style={{ transform: "skewX(-18deg)" }}
           />
@@ -468,7 +468,7 @@ export const ASRMap = ({
         )}>
           <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
             <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
+              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
             </div>
             <div className={cn(
               "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
@@ -482,7 +482,7 @@ export const ASRMap = ({
             onClick={handleFindMe}
             className="relative z-20 flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            <Navigation size={14} strokeWidth={2.5} className={cn("text-blue-500", isLocating && "animate-spin")} />
+            <Navigation size={14} strokeWidth={2.5} className={cn(isDark ? "text-white" : "text-zinc-900", isLocating && "animate-spin")} />
             <span className={isDark ? "text-white" : "text-zinc-900"}>Find Course Near Me</span>
           </button>
         </div>
@@ -498,7 +498,7 @@ export const ASRMap = ({
         )}>
           <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
             <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
+              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
             </div>
             <div className={cn(
               "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
@@ -512,7 +512,7 @@ export const ASRMap = ({
               onClick={handleZoomIn}
               className={cn(
                 "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-blue-400 hover:bg-white/10" : "text-blue-600 hover:bg-black/5"
+                isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
               )}
            >
               <Plus size={18} strokeWidth={2.5}/>
@@ -525,7 +525,7 @@ export const ASRMap = ({
               onClick={handleZoomOut}
               className={cn(
                 "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-blue-400 hover:bg-white/10" : "text-blue-600 hover:bg-black/5"
+                isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
               )}
            >
               <Minus size={18} strokeWidth={2.5}/>

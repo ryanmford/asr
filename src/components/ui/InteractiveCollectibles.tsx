@@ -59,7 +59,7 @@ export const InteractiveCard = React.memo(
  ? "text-amber-500"
  : isEpic
  ? "text-purple-400"
- : "text-blue-400",
+ : "text-blue-500",
  )}
  >
  {card.rarity} COLLECTIBLE

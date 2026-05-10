@@ -169,7 +169,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-600/10 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
 
             <button
               onClick={step > 0 ? prevStep : onClose}

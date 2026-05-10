@@ -166,7 +166,7 @@ export const ASRWallOfFame = React.memo(
  const hoverClass =
  theme === "dark"
  ? "hover:bg-blue-500/10"
- : "hover:bg-blue-600/5";
+ : "hover:bg-blue-500/5";
 
  return (
  <button
@@ -322,7 +322,7 @@ export const ASRWallOfFame = React.memo(
  "transition-colors duration-150 group cursor-pointer relative",
  theme === "dark"
  ? "hover:bg-blue-500/10"
- : "hover:bg-blue-600/5",
+ : "hover:bg-blue-500/5",
  )}
  >
  <td className="py-4 sm:py-6 pl-2 sm:pl-8 text-center ">

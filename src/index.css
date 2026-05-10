@@ -84,7 +84,6 @@ body {
   min-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow-x: clip;
   background-color: #000; /* Dark background matches dark theme default */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -200,7 +199,7 @@ body {
 }
 
 .btn-blue-gradient {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white !important;
 }
 
@@ -235,8 +234,8 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #2563eb;
-  box-shadow: 0 0 8px #2563eb;
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
 }
 
 .textured-surface::after {
