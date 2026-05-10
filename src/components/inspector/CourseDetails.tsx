@@ -1,5 +1,5 @@
-import React, { useMemo, startTransition } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Zap,
   Compass,
@@ -201,38 +201,19 @@ export const CourseDetails = React.memo(
       return allRuns;
     }, [pRaw, cName, atMet, courseRunsHistory]);
 
-    const [searchParams, setSearchParams] = useSearchParams();
-    const location = useLocation();
+    const [searchParams] = useSearchParams();
     const urlTab = searchParams.get("tab");
     const validTabs = ["stats", "men", "women"];
-    const activeTab = validTabs.includes(urlTab as string)
-      ? (urlTab as "stats" | "men" | "women")
-      : "stats";
-    const setActiveTab = (t: string) => {
-      startTransition(() => {
-        setSearchParams(
-          (prev) => {
-            prev.set("tab", t);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
-      });
-    };
+    
+    const [activeTab, setActiveTab] = useState<string>(
+      validTabs.includes(urlTab as string)
+        ? (urlTab as "stats" | "men" | "women")
+        : "stats"
+    );
 
-    const activeMode =
-      (searchParams.get("mode") as "open" | "all-time") || "open";
-    const setActiveMode = (m: "open" | "all-time") => {
-      startTransition(() => {
-        setSearchParams(
-          (prev) => {
-            prev.set("mode", m);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
-      });
-    };
+    const [activeMode, setActiveMode] = useState<"open" | "all-time">(
+      (searchParams.get("mode") as "open" | "all-time") || "open"
+    );
 
     const recordsM = useMemo(() => {
       const source = activeMode === "all-time" ? lbAT_Courses : lbOP_Courses;
@@ -378,7 +359,7 @@ export const CourseDetails = React.memo(
                 href={mapsUrl || undefined}
                 target="_blank"
                 rel="noreferrer"
-                variant="solid"
+                variant="premium"
                 color="blue"
                 theme={theme}
                 disabled={!mapsUrl}
@@ -394,7 +375,7 @@ export const CourseDetails = React.memo(
                 href={rulesUrl || undefined}
                 target="_blank"
                 rel="noreferrer"
-                variant="solid"
+                variant="premium"
                 color="red"
                 theme={theme}
                 disabled={!rulesUrl}

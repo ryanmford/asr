@@ -149,21 +149,6 @@ export const ASRPromotionBanner = React.memo(
  : "bg-white",
  )}
  >
- {/* The Rotating Neon Border (Only visible on group hover) */}
- <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
- <div className="w-full h-full neon-border-rotate z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)]" style={{ opacity: 0.9 }} />
- </div>
-
- {/* Inner Surface Mask to keep the border as an outline */}
- <div
- className={cn(
- "absolute inset-[1.5px] rounded-[2.45rem] z-5 pointer-events-none transition-colors",
- theme === "dark"
- ? "bg-zinc-950/95 group-hover:bg-zinc-950"
- : "bg-white group-hover:bg-zinc-50",
- )}
- />
-
  <div className="relative z-10 flex flex-col gap-3 flex-1 text-left w-full min-w-0">
  <span
  className={cn(

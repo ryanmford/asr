@@ -1,5 +1,5 @@
-import React, { useMemo, startTransition } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { cn, formatLocation, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { ASRStatCard } from "../ui/ASRStatCard";
 import { BioStat } from "../ui/BioComponents";
@@ -34,26 +34,24 @@ export const TeamDetails = React.memo(
     theme,
     initialMode,
   }: TeamDetailsProps) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const location = useLocation();
+    const [searchParams] = useSearchParams();
 
-    const mode =
+    const urlTab = searchParams.get("tab");
+    const validTabs = ["players", "athletes", "setters", "vault", "bio"];
+    
+    // Use local state so modal updates don't trigger global tree re-renders
+    const [activeTab, setActiveTab] = useState<string>(
+      validTabs.includes(urlTab as string)
+        ? urlTab === "athletes"
+          ? "players"
+          : (urlTab as string)
+        : "players"
+    );
+    
+    const [mode, setMode] = useState<"open" | "all-time">(
       (searchParams.get("mode") as "open" | "all-time") ||
       initialMode ||
-      "open";
-    const setMode = React.useCallback(
-      (m: "open" | "all-time") => {
-        startTransition(() => {
-          setSearchParams(
-            (prev) => {
-              prev.set("mode", m);
-              return prev;
-            },
-            { replace: true, state: location.state },
-          );
-        });
-      },
-      [setSearchParams, location.state],
+      "open"
     );
 
     const {
@@ -66,28 +64,6 @@ export const TeamDetails = React.memo(
       setterTuples,
       vaultItems,
     } = useTeamDetailsData(team, mode, dataContext);
-
-    const urlTab = searchParams.get("tab");
-    const validTabs = ["players", "athletes", "setters", "vault", "bio"];
-    const activeTab = validTabs.includes(urlTab as string)
-      ? urlTab === "athletes"
-        ? "players"
-        : urlTab
-      : "players";
-    const setActiveTab = React.useCallback(
-      (t: string) => {
-        startTransition(() => {
-          setSearchParams(
-            (prev) => {
-              prev.set("tab", t);
-              return prev;
-            },
-            { replace: true, state: location.state },
-          );
-        });
-      },
-      [setSearchParams, location.state],
-    );
 
     const randomPlayersPromo = useMemo(() => {
       const types: PromoType[] = ["coach"];

@@ -1,5 +1,5 @@
-import React, { useMemo, useState, startTransition } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ASRWeeklyActivityChart } from "../ui/ASRWeeklyActivityChart";
 import {
@@ -56,44 +56,17 @@ export const PlayerDetails = React.memo(
     theme,
     initialTab = "runs",
   }: PlayerDetailsProps) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const location = useLocation();
+    const [searchParams] = useSearchParams();
 
     const urlTab = searchParams.get("tab");
     const validTabs = ["runs", "sets", "vault", "bio"];
-    const activeTab = validTabs.includes(urlTab as string)
-      ? urlTab
-      : initialTab || "runs";
-    const setActiveTab = React.useCallback(
-      (t: string) => {
-        startTransition(() => {
-          setSearchParams(
-            (prev) => {
-              prev.set("tab", t);
-              return prev;
-            },
-            { replace: true, state: location.state },
-          );
-        });
-      },
-      [setSearchParams, location.state],
+    
+    // Use local state so modal updates don't trigger global tree re-renders
+    const [activeTab, setActiveTab] = useState<string>(
+      validTabs.includes(urlTab as string) ? (urlTab as string) : initialTab || "runs"
     );
-
-    const activeMode =
-      (searchParams.get("mode") as "open" | "all-time") || "open";
-    const setActiveMode = React.useCallback(
-      (m: "open" | "all-time") => {
-        startTransition(() => {
-          setSearchParams(
-            (prev) => {
-              prev.set("mode", m);
-              return prev;
-            },
-            { replace: true, state: location.state },
-          );
-        });
-      },
-      [setSearchParams, location.state],
+    const [activeMode, setActiveMode] = useState<"open" | "all-time">(
+      (searchParams.get("mode") as "open" | "all-time") || "open"
     );
 
     const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);

@@ -1,5 +1,5 @@
-import React, { useMemo, startTransition } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { cn, formatLocation, normalizeName } from "../../lib/asr-utils";
 import { ASRStatCard } from "../ui/ASRStatCard";
 import { FallbackAvatar } from "../ui/FallbackAvatar";
@@ -21,20 +21,7 @@ export const RegionDetails = React.memo(
   ({ region, dataContext, onEntityClick, theme }: RegionDetailsProps) => {
     const { atMet = {} } = dataContext || {};
 
-    const [, setSearchParams] = useSearchParams();
-    const location = useLocation();
-    const activeTab = "players"; // Only one tab anyway
-    const setActiveTab = (t: string) => {
-      startTransition(() => {
-        setSearchParams(
-          (prev) => {
-            prev.set("tab", t);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
-      });
-    };
+    const [activeTab, setActiveTab] = useState("players"); // Only one tab anyway
 
     const regionalPlayers = useMemo(() => {
       return Object.values(atMet)

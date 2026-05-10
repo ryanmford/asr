@@ -6,7 +6,7 @@ interface ASRNeonToggleProps {
  options: (string | { label: React.ReactNode; value: string })[];
  activeOption: string;
  onChange: (value: string) => void;
- layoutId: string;
+ layoutId?: string;
  theme: "light" | "dark";
  className?: string;
 }
@@ -15,12 +15,9 @@ export const ASRNeonToggle = ({
  options,
  activeOption,
  onChange,
- layoutId,
  theme,
  className,
 }: ASRNeonToggleProps) => {
- const instanceId = React.useId();
- const isolatedLayoutId = `${layoutId}-${instanceId.replace(/:/g, "")}`;
 
  return (
  <div
@@ -60,10 +57,11 @@ export const ASRNeonToggle = ({
  >
  {isActive && (
  <motion.div
- layoutId={isolatedLayoutId}
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
  className="absolute inset-0 z-0 rounded-full"
  style={{ borderRadius: 9999 }}
- transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
+ transition={{ duration: 0.15 }}
  >
  {/* Outer Drop Shadow */}
  <div 

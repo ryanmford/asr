@@ -153,13 +153,13 @@ export const ASRMap = ({
         zoomToBoundsOnClick: true,
         iconCreateFunction: (cluster: any) => {
           const count = cluster.getChildCount();
-          let outerConic = "#3b82f6";
+          let conicGradientStr = "from_0deg,#3b82f6,#2563eb,#1d4ed8,#2563eb,#3b82f6";
           
           if (count > 50) {
-            outerConic = "#a855f7";
+            conicGradientStr = "from_0deg,#a855f7,#7e22ce,#581c87,#7e22ce,#a855f7";
           }
           if (count > 200) {
-            outerConic = "#f43f5e";
+            conicGradientStr = "from_0deg,#f43f5e,#e11d48,#9f1239,#e11d48,#f43f5e";
           }
 
           const currentIsDark = isDarkRef.current;
@@ -172,14 +172,13 @@ export const ASRMap = ({
           return window.L.divIcon({
             html: `
               <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
-                <!-- Drop shadow (added to main parent instead for seamless hover effect if needed, but keeping isolated here works too) -->
                 <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
                   <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                     <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90"></div>
+                     <div class="w-full h-full neon-border-rotate bg-[conic-gradient(${conicGradientStr})] opacity-90"></div>
                   </div>
                   <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
                 </div>
-
+                
                 <!-- cluster color inner glow -->
                 <div class="absolute inset-[3px] rounded-full z-10 transition-colors shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"></div>
                 

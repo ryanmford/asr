@@ -12,7 +12,7 @@ export interface ASRPremiumButtonProps {
  target?: string;
  rel?: string;
  variant?: "premium" | "solid";
- color?: "blue" | "red" | "gold";
+ color?: "blue" | "red" | "gold" | "purple-blue";
  disabled?: boolean;
  radius?: "none" | "2xl" | "3xl" | "full";
  effect?: "neon" | "metallic";
@@ -27,7 +27,7 @@ export const ASRPremiumButton = ({
  target,
  rel,
  variant = "premium",
- color = "blue",
+ color = "purple-blue",
  disabled = false,
  radius = "2xl",
  effect = "neon",
@@ -61,6 +61,8 @@ export const ASRPremiumButton = ({
  return "text-red-400";
  case "gold":
  return "text-amber-400";
+ case "blue":
+ return "text-blue-500";
  default:
  return "text-blue-400";
  }
@@ -74,6 +76,8 @@ export const ASRPremiumButton = ({
  return "bg-[conic-gradient(from_0deg,#ef4444,#f87171,#b91c1c,#f87171,#ef4444)] opacity-90";
  case "gold":
  return "bg-[conic-gradient(from_0deg,#f59e0b,#fbbf24,#d97706,#fbbf24,#f59e0b)] opacity-90";
+ case "blue":
+ return "bg-[conic-gradient(from_0deg,#60a5fa,#3b82f6,#1d4ed8,#3b82f6,#60a5fa)] opacity-90";
  default:
  return "bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90";
  }
