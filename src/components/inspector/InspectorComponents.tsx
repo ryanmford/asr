@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "motion/react";
 import { Building2, ArrowUpRight, ArrowRight } from "lucide-react";
 import { cn, trackEvent } from "../../lib/asr-utils";
 import { ASRPremiumButton } from "../ui/ASRPremiumButton";

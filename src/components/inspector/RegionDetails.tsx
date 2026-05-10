@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { cn, formatLocation, normalizeName } from "../../lib/asr-utils";
 import { ASRStatCard } from "../ui/ASRStatCard";
 import { FallbackAvatar } from "../ui/FallbackAvatar";

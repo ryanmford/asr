@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useContext } from "react";
 import { useDataStore } from "../../store/useDataStore";
 import { useAppStore } from "../../store/useAppStore";
-import { MapPin, User, ChevronRight, ChevronDown, ArrowRight, Activity, Trophy, Users, Globe, Zap, Watch } from "lucide-react";
+import { MapPin, User, ChevronRight, ChevronDown, ArrowRight, Activity, Trophy, Users, Globe, Watch } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { ASRSearchInput } from "../common/ASRSearchInput";
@@ -10,6 +10,30 @@ import { ThemeContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
+
+interface SearchResultPlayer {
+  pKey?: string;
+  name?: string;
+  _gRank?: number;
+  _g?: string;
+  wins?: number;
+  totalFireCount?: number;
+}
+interface SearchResultCourse {
+  name?: string;
+  totalAllTimeRuns?: number;
+  totalRuns?: number;
+}
+interface SearchResultTeam {
+  name?: string;
+  pts?: number;
+  _isGym?: boolean;
+}
+interface SearchResultFeature {
+  type: string;
+  data: SearchResultPlayer | SearchResultCourse | SearchResultTeam;
+}
+
 
 export const HomeView = React.memo(() => {
   const navigate = useNavigate();
@@ -39,10 +63,10 @@ export const HomeView = React.memo(() => {
     const players = [...playerList_M_AT, ...playerList_F_AT].filter(p => (p.name || "").toLowerCase().includes(q));
     const courses = masterCourseList.filter(c => (c.name || "").toLowerCase().includes(q));
     const teamsArr = [
-      ...((teamsAggregated as any)?.gyms?.allTime || []),
-      ...((teamsAggregated as any)?.teams?.allTime || [])
+      ...((teamsAggregated as { gyms?: { allTime?: SearchResultTeam[] }, teams?: { allTime?: SearchResultTeam[] } })?.gyms?.allTime || []),
+      ...((teamsAggregated as { gyms?: { allTime?: SearchResultTeam[] }, teams?: { allTime?: SearchResultTeam[] } })?.teams?.allTime || [])
     ];
-    const teams = teamsArr.filter((t: any) => (t.name || "").toLowerCase().includes(q));
+    const teams = teamsArr.filter((t: SearchResultTeam) => (t.name || "").toLowerCase().includes(q));
     
     return { players, courses, teams };
   }, [search, playerList_M_AT, playerList_F_AT, masterCourseList, teamsAggregated]);
@@ -53,7 +77,7 @@ export const HomeView = React.memo(() => {
       ...searchResults.players.slice(0, 5).map(p => ({ type: "player", data: p })),
       ...searchResults.courses.slice(0, 5).map(c => ({ type: "course", data: c })),
       ...searchResults.teams.slice(0, 5).map(t => ({ type: "team", data: t }))
-    ] as { type: "player" | "course" | "team", data: any }[];
+    ] as { type: "player" | "course" | "team", data: SearchResultPlayer | SearchResultCourse | SearchResultTeam }[];
   }, [searchResults]);
 
   const [searchFocusedIndex, setSearchFocusedIndex] = useState(-1);
@@ -87,9 +111,9 @@ export const HomeView = React.memo(() => {
     const sortedCourses = [...masterCourseList].sort((a,b) => ((b.totalAllTimeRuns || b.totalRuns || 0) - (a.totalAllTimeRuns || a.totalRuns || 0)));
 
     const teamsArr = [
-      ...((teamsAggregated as any)?.gyms?.allTime || []).map((t: any) => ({ ...t, _isGym: true })),
-      ...((teamsAggregated as any)?.teams?.allTime || []).map((t: any) => ({ ...t, _isGym: false }))
-    ].sort((a,b) => ((b as any).pts || 0) - ((a as any).pts || 0));
+      ...((teamsAggregated as { gyms?: { allTime?: SearchResultTeam[] }, teams?: { allTime?: SearchResultTeam[] } })?.gyms?.allTime || []).map((t: SearchResultTeam) => ({ ...t, _isGym: true })),
+      ...((teamsAggregated as { gyms?: { allTime?: SearchResultTeam[] }, teams?: { allTime?: SearchResultTeam[] } })?.teams?.allTime || []).map((t: SearchResultTeam) => ({ ...t, _isGym: false }))
+    ].sort((a,b) => ((b as SearchResultTeam).pts || 0) - ((a as SearchResultTeam).pts || 0));
     
     return {
       topPlayer: combinedPlayers.length > 0 ? combinedPlayers[0] : null,
@@ -214,7 +238,7 @@ export const HomeView = React.memo(() => {
         <div className="w-full max-w-7xl mx-auto">
           <ASRSearchInput
               value={search}
-              onChange={(e: any) => setSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
               onKeyDown={handleSearchKeyDown}
               placeholder="Search players, courses, gyms..."
               theme={theme}
@@ -237,7 +261,7 @@ export const HomeView = React.memo(() => {
                    {searchResults.players.slice(0, 5).map((p, i) => {
                      const isFocused = searchFocusedIndex === i;
                      return (
-                       <button key={(p as any).pKey || p.name || i} onClick={() => navigateToEntity("player", p)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                       <button key={(p as SearchResultPlayer).pKey || p.name || i} onClick={() => navigateToEntity("player", p)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                           <User className="w-4 h-4 opacity-50" />
                           <span className="font-bold flex-1">{p.name}</span>
                           <ChevronRight className="w-4 h-4 opacity-30 ml-auto" />
@@ -266,7 +290,7 @@ export const HomeView = React.memo(() => {
                {searchResults.teams.length > 0 && (
                  <div className="p-2">
                    <div className="px-3 py-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Teams/Gyms</div>
-                   {searchResults.teams.slice(0, 5).map((t: any, i) => {
+                   {searchResults.teams.slice(0, 5).map((t: SearchResultTeam, i) => {
                      const isFocused = searchFocusedIndex === i + searchResults.players.slice(0, 5).length + searchResults.courses.slice(0, 5).length;
                      return (
                        <button key={t.name || i} onClick={() => navigateToEntity("team", t)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
@@ -330,193 +354,6 @@ export const HomeView = React.memo(() => {
           </div>
         </div>
       </motion.div>
-
-      {/* Global Stats Grid */}
-      {isLoading ? (
-        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-           {[...Array(4)].map((_, i) => (
-             <div key={i} className="bg-black/5 dark:bg-white/5 rounded-3xl p-5 h-[140px] flex flex-col items-center justify-center gap-3 animate-pulse">
-               <div className="w-6 h-6 bg-black/10 dark:bg-white/10 rounded-full" />
-               <div className="w-16 h-8 bg-black/10 dark:bg-white/10 rounded-lg" />
-               <div className="w-12 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
-             </div>
-           ))}
-        </motion.div>
-      ) : kpiStats && (
-        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
-            {/* Sparkline */}
-            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={playersTrend}>
-                  <YAxis domain={['dataMin', 'dataMax']} hide />
-                  <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} isAnimationActive={true} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <User className="w-6 h-6 text-blue-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
-            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
-              <CountUp end={(kpiStats as any).players || 0} />
-            </div>
-            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Players</div>
-            {/* Subtle Sparkline Marks */}
-            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
-            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
-          </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
-            {/* Sparkline */}
-            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={runsTrend}>
-                  <YAxis domain={['dataMin', 'dataMax']} hide />
-                  <Line type="monotone" dataKey="value" stroke="#a855f7" strokeWidth={2} dot={false} isAnimationActive={true} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <Watch className="w-6 h-6 text-purple-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
-            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
-              <CountUp end={(kpiStats as any).runs || 0} />
-            </div>
-            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Runs</div>
-            {/* Subtle Sparkline Marks */}
-            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
-            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
-          </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
-            {/* Sparkline */}
-            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={coursesTrend}>
-                  <YAxis domain={['dataMin', 'dataMax']} hide />
-                  <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={true} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <MapPin className="w-6 h-6 text-emerald-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
-            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
-              <CountUp end={(kpiStats as any).courses || 0} />
-            </div>
-            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Courses</div>
-            {/* Subtle Sparkline Marks */}
-            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
-            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
-          </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
-            {/* Sparkline */}
-            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={countriesTrend}>
-                  <YAxis domain={['dataMin', 'dataMax']} hide />
-                  <Line type="monotone" dataKey="value" stroke="#f59e0b" strokeWidth={2} dot={false} isAnimationActive={true} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <Globe className="w-6 h-6 text-amber-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
-            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
-              <CountUp end={(kpiStats as any).countries || 0} />
-            </div>
-            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Countries</div>
-            {/* Subtle Sparkline Marks */}
-            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
-            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Featured Section */}
-      {isLoading ? (
-        <motion.div variants={itemVariants} className="relative w-full min-h-[140px] bg-black/5 dark:bg-white/5 rounded-3xl p-6 flex flex-row items-center justify-between animate-pulse">
-           <div className="flex flex-col gap-3">
-             <div className="w-24 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
-             <div className="w-48 h-6 bg-black/10 dark:bg-white/10 rounded-lg mb-2" />
-             <div className="flex gap-4">
-               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-             </div>
-           </div>
-           <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded-full flex-shrink-0 ml-4" />
-        </motion.div>
-      ) : currentFeature && (
-        <motion.div variants={itemVariants} className="w-full">
-          <div onClick={() => navigateToEntity(currentFeature.type, currentFeature.data)} onTouchStart={() => {}} className={cn("relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]")}>
-            {/* Neon Border Setup */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                <div className="w-full h-full neon-border-rotate" style={{ backgroundImage: currentFeature.gradientUrl }} />
-              </div>
-              <div className="absolute inset-[1px] rounded-[2rem] backdrop-blur-xl z-20 bg-white/95 dark:bg-zinc-950/95" />
-            </div>
-
-            <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30">
-              <AnimatePresence mode="wait">
-                <motion.div 
-                  key={currentFeature.label}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between"
-                >
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <div className={cn("text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5", currentFeature.color)}>
-                      {currentFeature.icon} {currentFeature.label}
-                    </div>
-                    <div className={cn(
-                      "font-black tracking-tight text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none truncate w-full", 
-                      (currentFeature.displayName || currentFeature.data.name).length > 22 ? "text-lg sm:text-xl md:text-2xl" :
-                      (currentFeature.displayName || currentFeature.data.name).length > 15 ? "text-xl sm:text-2xl md:text-3xl" :
-                      "text-2xl sm:text-3xl md:text-4xl",
-                      currentFeature.hoverText
-                    )}>
-                      {currentFeature.displayName || currentFeature.data.name}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
-                    {currentFeature.metrics.map((m: any, i: number) => (
-                      <div key={i} className="flex flex-col">
-                        <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{m.label}</span>
-                        <span className="text-base sm:text-lg md:text-xl font-black text-zinc-900 dark:text-white tabular-nums flex items-center mt-0.5 leading-none">
-                          {m.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className={cn("w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0", currentFeature.bg, currentFeature.color, currentFeature.hoverBg)}>
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-
-            {/* Pagination Dots */}
-            <div className="absolute bottom-1 sm:bottom-2 left-0 right-0 flex justify-center gap-0.5 z-40">
-              {featureList.map((_, idx) => {
-                const isActive = idx === (((carouselIndex % featureList.length) + featureList.length) % featureList.length);
-                return (
-                  <button
-                    key={idx}
-                    onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
-                    className="w-10 h-10 flex items-center justify-center group/dot focus:outline-none"
-                    aria-label={`Go to slide ${idx + 1}`}
-                  >
-                    <div
-                      className={cn(
-                        "h-1.5 rounded-full transition-all duration-300",
-                        isActive 
-                          ? cn("w-4", currentFeature.color) // Match dot color to feature text color
-                          : "w-1.5 bg-black/20 dark:bg-white/20 group-hover/dot:bg-black/40 dark:group-hover/dot:bg-white/40"
-                      )}
-                      style={isActive ? { backgroundColor: 'currentColor' } : {}}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
-      )}
 
       {/* Navigation Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -605,6 +442,193 @@ export const HomeView = React.memo(() => {
           </div>
       </motion.div>
 
+      {/* Global Stats Grid */}
+      {isLoading ? (
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+           {[...Array(4)].map((_, i) => (
+             <div key={i} className="bg-black/5 dark:bg-white/5 rounded-3xl p-5 h-[140px] flex flex-col items-center justify-center gap-3 animate-pulse">
+               <div className="w-6 h-6 bg-black/10 dark:bg-white/10 rounded-full" />
+               <div className="w-16 h-8 bg-black/10 dark:bg-white/10 rounded-lg" />
+               <div className="w-12 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
+             </div>
+           ))}
+        </motion.div>
+      ) : kpiStats && (
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
+            {/* Sparkline */}
+            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={playersTrend}>
+                  <YAxis domain={['dataMin', 'dataMax']} hide />
+                  <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} isAnimationActive={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <User className="w-6 h-6 text-blue-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
+            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
+              <CountUp end={(kpiStats as { players?: number, runs?: number, courses?: number, countries?: number }).players || 0} />
+            </div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Players</div>
+            {/* Subtle Sparkline Marks */}
+            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
+            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
+          </div>
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
+            {/* Sparkline */}
+            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={runsTrend}>
+                  <YAxis domain={['dataMin', 'dataMax']} hide />
+                  <Line type="monotone" dataKey="value" stroke="#a855f7" strokeWidth={2} dot={false} isAnimationActive={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <Watch className="w-6 h-6 text-purple-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
+            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
+              <CountUp end={(kpiStats as { players?: number, runs?: number, courses?: number, countries?: number }).runs || 0} />
+            </div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Runs</div>
+            {/* Subtle Sparkline Marks */}
+            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
+            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
+          </div>
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
+            {/* Sparkline */}
+            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={coursesTrend}>
+                  <YAxis domain={['dataMin', 'dataMax']} hide />
+                  <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <MapPin className="w-6 h-6 text-emerald-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
+            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
+              <CountUp end={(kpiStats as { players?: number, runs?: number, courses?: number, countries?: number }).courses || 0} />
+            </div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Courses</div>
+            {/* Subtle Sparkline Marks */}
+            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
+            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
+          </div>
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
+            {/* Sparkline */}
+            <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={countriesTrend}>
+                  <YAxis domain={['dataMin', 'dataMax']} hide />
+                  <Line type="monotone" dataKey="value" stroke="#f59e0b" strokeWidth={2} dot={false} isAnimationActive={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <Globe className="w-6 h-6 text-amber-500 mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-transform relative z-10" />
+            <div className="text-3xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter relative z-10">
+              <CountUp end={(kpiStats as { players?: number, runs?: number, courses?: number, countries?: number }).countries || 0} />
+            </div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1 relative z-10">Countries</div>
+            {/* Subtle Sparkline Marks */}
+            <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
+            <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Featured Section */}
+      {isLoading ? (
+        <motion.div variants={itemVariants} className="relative w-full min-h-[140px] bg-black/5 dark:bg-white/5 rounded-3xl p-6 flex flex-row items-center justify-between animate-pulse">
+           <div className="flex flex-col gap-3">
+             <div className="w-24 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
+             <div className="w-48 h-6 bg-black/10 dark:bg-white/10 rounded-lg mb-2" />
+             <div className="flex gap-4">
+               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
+               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
+               <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
+             </div>
+           </div>
+           <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded-full flex-shrink-0 ml-4" />
+        </motion.div>
+      ) : currentFeature && (
+        <motion.div variants={itemVariants} className="w-full">
+          <div onClick={() => navigateToEntity(currentFeature.type, currentFeature.data)} onTouchStart={() => {}} className={cn("relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]")}>
+            {/* Neon Border Setup */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                <div className="w-full h-full neon-border-rotate" style={{ backgroundImage: currentFeature.gradientUrl }} />
+              </div>
+              <div className="absolute inset-[1px] rounded-[2rem] backdrop-blur-xl z-20 bg-white/95 dark:bg-zinc-950/95" />
+            </div>
+
+            <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={currentFeature.label}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between"
+                >
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <div className={cn("text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5", currentFeature.color)}>
+                      {currentFeature.icon} {currentFeature.label}
+                    </div>
+                    <div className={cn(
+                      "font-black tracking-tight text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none truncate w-full", 
+                      (currentFeature.displayName || currentFeature.data.name).length > 22 ? "text-lg sm:text-xl md:text-2xl" :
+                      (currentFeature.displayName || currentFeature.data.name).length > 15 ? "text-xl sm:text-2xl md:text-3xl" :
+                      "text-2xl sm:text-3xl md:text-4xl",
+                      currentFeature.hoverText
+                    )}>
+                      {currentFeature.displayName || currentFeature.data.name}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
+                    {currentFeature.metrics.map((m: { label: string; value: string | number }, i: number) => (
+                      <div key={i} className="flex flex-col">
+                        <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{m.label}</span>
+                        <span className="text-base sm:text-lg md:text-xl font-black text-zinc-900 dark:text-white tabular-nums flex items-center mt-0.5 leading-none">
+                          {m.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className={cn("w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0", currentFeature.bg, currentFeature.color, currentFeature.hoverBg)}>
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="absolute bottom-1 sm:bottom-2 left-0 right-0 flex justify-center gap-0.5 z-40">
+              {featureList.map((_, idx) => {
+                const isActive = idx === (((carouselIndex % featureList.length) + featureList.length) % featureList.length);
+                return (
+                  <button
+                    key={idx}
+                    onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
+                    className="w-10 h-10 flex items-center justify-center group/dot focus:outline-none"
+                    aria-label={`Go to slide ${idx + 1}`}
+                  >
+                    <div
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300",
+                        isActive 
+                          ? cn("w-4", currentFeature.color) // Match dot color to feature text color
+                          : "w-1.5 bg-black/20 dark:bg-white/20 group-hover/dot:bg-black/40 dark:group-hover/dot:bg-white/40"
+                      )}
+                      style={isActive ? { backgroundColor: 'currentColor' } : {}}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Recent Activity */}
       {(isLoading || (recentFeed && recentFeed.length > 0)) && (
         <motion.div variants={itemVariants} className="flex flex-col gap-4 mt-4">
@@ -629,7 +653,7 @@ export const HomeView = React.memo(() => {
                 ))
               ) : (() => {
                 let currentMonth = "";
-                return recentFeed.slice(0, visibleRuns).map((item: any, idx: number) => {
+                return recentFeed.slice(0, visibleRuns).map((item: { label: string; value: string | number }, idx: number) => {
                   const fires = item.fireCount || 0;
                   const rank = item.rank || 0;
                   const playerName = String(item.name || "").trim();

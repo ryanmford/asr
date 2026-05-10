@@ -3,7 +3,6 @@ import { Play, MapPin } from "lucide-react";
 import { THEME, cn, trackEvent, formatFlagsWithSpace } from "../lib/asr-utils";
 import { ThemeContext } from "../App";
 import { useAppStore } from "../store/useAppStore";
-import { motion } from "motion/react";
 
 export const ASRRankBadge = React.memo(
  ({ rank, size = "md", scale = 1 }: { rank?: string | number | null; size?: "sm" | "md" | "lg"; scale?: number }) => {

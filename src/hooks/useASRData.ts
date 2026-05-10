@@ -22,7 +22,7 @@ export const useFetchASRData = () => {
       
       if (isInitialFetch && !initialDataConsumed.current) {
         if (typeof window !== 'undefined' && 'window' in globalThis && (window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__) {
-           console.log("Hydrating from __INITIAL_DATA__");
+           
            setData((window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__!);
            initialDataConsumed.current = true;
            setFetchStatus({ isSyncing: false, hasError: false });
