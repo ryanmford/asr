@@ -3,22 +3,24 @@ import { normalizeName } from "../lib/asr-utils";
 import { Zap, Medal, Waypoints } from "lucide-react";
 import { PlayerProfile, TeamProfile, ASRDataContext } from "../types";
 
+const EMPTY_OBJ = {};
+const EMPTY_ARR: any[] = [];
+const EMPTY_LB = { M: {}, F: {} };
+
 export const usePlayerDetailsData = (
   player: PlayerProfile,
   activeMode: "open" | "all-time",
   dataContext: ASRDataContext,
 ) => {
-  const {
-    lbAT = { M: {}, F: {} },
-    lbOP = { M: {}, F: {} },
-    atMet = {},
-    cMet = {},
-    pRaw = {},
-    setterMet = {},
-    lbAT_Courses = { M: {}, F: {} },
-    courseRunsHistory = {},
-    masterCourseList = [],
-  } = dataContext;
+  const lbAT = dataContext.lbAT || EMPTY_LB;
+  const lbOP = dataContext.lbOP || EMPTY_LB;
+  const atMet = dataContext.atMet || EMPTY_OBJ;
+  const cMet = dataContext.cMet || EMPTY_OBJ;
+  const pRaw = dataContext.pRaw || EMPTY_OBJ;
+  const setterMet = dataContext.setterMet || EMPTY_OBJ;
+  const lbAT_Courses = dataContext.lbAT_Courses || EMPTY_LB;
+  const courseRunsHistory = dataContext.courseRunsHistory || EMPTY_OBJ;
+  const masterCourseList = dataContext.masterCourseList || EMPTY_ARR;
 
   const pKey = player.pKey || normalizeName(player.name);
   const meta = atMet[pKey] || player;
@@ -326,14 +328,12 @@ export const useTeamDetailsData = (
   mode: "open" | "all-time",
   dataContext: ASRDataContext,
 ) => {
-  const {
-    atMet = {},
-    openData = [],
-    settersWithImpact = [],
-    pRaw = {},
-    lbAT = { M: {}, F: {} },
-    teamsAggregated = {},
-  } = dataContext || {};
+  const atMet = dataContext?.atMet || EMPTY_OBJ;
+  const openData = dataContext?.openData || EMPTY_ARR;
+  const settersWithImpact = dataContext?.settersWithImpact || EMPTY_ARR;
+  const pRaw = dataContext?.pRaw || EMPTY_OBJ;
+  const lbAT = dataContext?.lbAT || EMPTY_LB;
+  const teamsAggregated = dataContext?.teamsAggregated || EMPTY_OBJ;
 
   const teamCategory = team?.category || "gyms";
   const contextStr = mode === "all-time" ? "allTime" : "open";

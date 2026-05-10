@@ -676,35 +676,34 @@ export const HomeView = React.memo(() => {
                         </div>
                         
                         {/* Content Card */}
-                        <div className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between" onClick={() => navigateToEntity("course", item.course || { name: item.courseName })}>
-                          <div className="flex flex-col items-start text-left gap-1.5 sm:gap-2">
-                            <div className="flex flex-wrap items-center gap-2">
+                        <div className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between min-w-0" onClick={() => navigateToEntity("course", item.course || { name: item.courseName })}>
+                          <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
+                            <div className="flex items-center gap-2 max-w-full w-full">
                               <span 
-                                className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5" 
+                                className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5 min-w-0 max-w-full shrink" 
                                 onClick={(e) => { e.stopPropagation(); navigateToEntity("player", item.athlete || { name: item.name }); }}
                               >
-                                {athleteFlag && <span className="text-[12px] opacity-90">{athleteFlag}</span>}
-                                {playerName}
+                                {athleteFlag && <span className="text-[12px] opacity-90 shrink-0">{athleteFlag}</span>}
+                                <span className="truncate">{playerName}</span>
                                 {rankBadge && (
-                                   <span className="animate-bounce inline-block text-[14px]">
+                                   <span className="animate-bounce inline-block text-[14px] shrink-0">
                                      {rankBadge.icon}
                                    </span>
                                 )}
                               </span>
                               {fires > 0 && (
-                                <span className="flex items-center text-xs bg-orange-500/10 text-orange-500 px-1.5 py-0.5 rounded-full">
+                                <span className="flex items-center text-xs bg-orange-500/10 text-orange-500 px-1.5 py-0.5 rounded-full shrink-0">
                                   {Array.from({ length: Math.min(3, fires) }).map((_, i) => <span key={i} className="animate-pulse">🔥</span>)}
                                 </span>
                               )}
                             </div>
                             
-                            <div className="flex items-center text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 gap-1.5 hover:text-blue-500 transition-colors group/course">
-                              <MapPin className="w-3.5 h-3.5 text-zinc-400 group-hover/course:text-blue-500 transition-colors" />
-                              <span className="truncate max-w-[150px] sm:max-w-[250px]">{courseName}{item.course?.city ? `, ${item.course.city}` : ""}</span>
+                            <div className="flex items-center text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 gap-1 hover:text-blue-500 transition-colors group/course max-w-full min-w-0 w-full mt-0.5">
+                              <span className="truncate max-w-full">{courseName}{item.course?.city ? `, ${item.course.city}` : ""}</span>
                             </div>
                           </div>
                           
-                          <div className="flex flex-col justify-center items-end ml-4">
+                          <div className="flex flex-col justify-center items-end shrink-0">
                             <div className="text-lg sm:text-2xl font-black tabular-nums tracking-tighter text-zinc-900 dark:text-white">
                               {resultVal}
                             </div>

@@ -60,7 +60,7 @@ export const InspectorBody = React.memo(
     const { settersWithImpact, setterMet } = useSettersDerived();
     const { pRaw, playerLB_AT, playerLB_OP } = useLeaderboards();
 
-    const dataContext = {
+    const dataContext = React.useMemo(() => ({
       data: dataCore,
       atPerfs: atPerfs,
       opPerfs: opPerfs,
@@ -79,7 +79,12 @@ export const InspectorBody = React.memo(
       teamsAggregated: teamsAggregated,
       courseRunsHistory: courseRunsHistory,
       masterCourseList: masterCourseList,
-    };
+    }), [
+      dataCore, atPerfs, opPerfs, atMet, openData, cMet, 
+      playerLB_AT, playerLB_OP, setterMet, pRaw, 
+      settersWithImpact, atRawBest, opRawBest, lbAT, 
+      lbOpen, teamsAggregated, courseRunsHistory, masterCourseList
+    ]);
 
     const finalData = data || item;
     const finalMode = initialMode || options?.initialMode;

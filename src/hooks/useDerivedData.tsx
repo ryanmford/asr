@@ -35,13 +35,13 @@ export const useURLState = () => {
     [setSearchParams, location.state],
   );
 
-  return {
+  return useMemo(() => ({
     eventType,
     isAllTimeContext,
     setEventType,
     searchParams,
     setSearchParams,
-  };
+  }), [eventType, isAllTimeContext, setEventType, searchParams, setSearchParams]);
 };
 
 export const useAppNavigation = () => {
@@ -153,14 +153,14 @@ export const useAppNavigation = () => {
     }
   }, [navigate, location, closeModals]);
 
-  return {
+  return useMemo(() => ({
     navigateToEntity,
     closeModals,
     goBackOne,
     canGoForward,
     goForwardOne,
     prefetchEntity,
-  };
+  }), [navigateToEntity, closeModals, goBackOne, canGoForward, goForwardOne, prefetchEntity]);
 };
 
 export const useMasterCourseList = () => {
@@ -168,10 +168,13 @@ export const useMasterCourseList = () => {
 };
 
 export const useSettersDerived = () => {
-  return {
-    settersWithImpact: useDataStore((s) => s.settersWithImpact),
-    setterMet: useDataStore((s) => s.setterMet),
-  };
+  const settersWithImpact = useDataStore((s) => s.settersWithImpact);
+  const setterMet = useDataStore((s) => s.setterMet);
+  
+  return useMemo(() => ({
+    settersWithImpact,
+    setterMet,
+  }), [settersWithImpact, setterMet]);
 };
 
 export const usePlayerList = () => {

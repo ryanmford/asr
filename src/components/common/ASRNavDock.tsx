@@ -139,21 +139,6 @@ export const ASRNavDock = React.memo(
                         )}
                       />
                     </motion.div>
-
-                    {/* Active Indicator Dot */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-dot"
-                        className="absolute rounded-full bg-blue-500"
-                        style={{
-                          bottom: isCompact ? "-4px" : "-6px",
-                          width: "4px",
-                          height: "4px",
-                          boxShadow: theme === "dark" ? "0 0 10px rgba(59,130,246,0.8)" : "0 2px 6px rgba(59,130,246,0.4)"
-                        }}
-                        transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
-                      />
-                    )}
                   </div>
                 </motion.button>
               );
