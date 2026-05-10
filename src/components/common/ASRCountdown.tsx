@@ -104,8 +104,8 @@ export const ASRCountdown = React.memo(
           )}
         >
           {/* The Rotating Neon Border - Full Wrap */}
-          <div className="absolute inset-[-250%] neon-border-rotate-x-slow z-0 pointer-events-none transition-opacity duration-500">
-            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
+            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity neon-border-rotate-x-slow" />
           </div>
 
           {/* The Inner Surface Fill (with glass effect) */}
@@ -184,8 +184,8 @@ export const ASRCountdown = React.memo(
           )}
         >
           {/* The Rotating Neon Border - Full Wrap */}
-          <div className="absolute inset-[-250%] neon-border-rotate-x-slow z-0 pointer-events-none transition-opacity duration-500">
-            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40" />
+          <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
+            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 neon-border-rotate-x-slow" />
           </div>
 
           <div
@@ -219,8 +219,8 @@ export const ASRCountdown = React.memo(
             : "bg-white/40 border-black/5 shadow-xl shadow-black/5",
         )}
       >
-        <div className="absolute inset-[-250%] neon-border-rotate-x-slow z-0 pointer-events-none transition-opacity duration-500">
-          <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
+          <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity neon-border-rotate-x-slow" />
         </div>
 
         <div
@@ -234,49 +234,49 @@ export const ASRCountdown = React.memo(
 
         <div
           className={cn(
-            "flex items-center gap-4 sm:gap-10 z-20 font-black tracking-tight transition-colors pr-8 pl-2 sm:px-0",
+            "flex items-center gap-3 sm:gap-8 z-20 font-black tracking-tight transition-colors pr-10 pl-2 sm:px-0",
             "theme-text-base",
           )}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 hidden min-[360px]:flex">
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest opacity-60">
+            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest opacity-60">
               OPEN CLIPS DUE IN:
             </span>
           </div>
           <div className="flex items-center font-black tabular-nums tracking-tighter">
             <div className="flex items-center">
-              <span className="text-[16px] sm:text-[20px]">
+              <span className="text-[14px] sm:text-[18px]">
                 {String(currentTime.days).padStart(2, "0")}
               </span>
-              <span className="text-[10px] sm:text-[11px] ml-1 opacity-50">
+              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
                 D
               </span>
             </div>
-            <span className="opacity-30 mx-2 sm:mx-4">:</span>
+            <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[16px] sm:text-[20px]">
+              <span className="text-[14px] sm:text-[18px]">
                 {String(currentTime.hours).padStart(2, "0")}
               </span>
-              <span className="text-[10px] sm:text-[11px] ml-1 opacity-50">
+              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
                 H
               </span>
             </div>
-            <span className="opacity-30 mx-2 sm:mx-4">:</span>
+            <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[16px] sm:text-[20px]">
+              <span className="text-[14px] sm:text-[18px]">
                 {String(currentTime.minutes).padStart(2, "0")}
               </span>
-              <span className="text-[10px] sm:text-[11px] ml-1 opacity-50">
+              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
                 M
               </span>
             </div>
-            <span className="opacity-30 mx-2 sm:mx-4">:</span>
+            <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[16px] sm:text-[20px]">
+              <span className="text-[14px] sm:text-[18px]">
                 {String(currentTime.seconds).padStart(2, "0")}
               </span>
-              <span className="text-[10px] sm:text-[11px] ml-1 opacity-50">
+              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
                 S
               </span>
             </div>

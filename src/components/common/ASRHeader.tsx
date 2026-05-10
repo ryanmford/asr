@@ -45,8 +45,8 @@ export const ASRHeader = React.memo(
           >
             <span
               className={cn(
-                "text-[16px] sm:text-[22px] font-sans font-black italic uppercase tracking-tighter leading-none whitespace-nowrap transition-colors flex items-center gap-2",
-                "theme-text-base",
+                "flex text-[18px] sm:text-[22px] font-black italic uppercase tracking-tighter leading-none whitespace-nowrap transition-colors items-center pr-1",
+                theme === "dark" ? "text-white" : "text-zinc-900",
               )}
             >
               APEX SPEED RUN

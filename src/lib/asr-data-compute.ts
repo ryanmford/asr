@@ -177,6 +177,67 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
       ),
   };
 
+  // KPI TRENDS (Sparklines)
+  const allRuns: any[] = [];
+  Object.values(courseRunsHistory || {}).forEach((runsArray) => {
+    allRuns.push(...(runsArray as any[]));
+  });
+
+  const undatedRuns = allRuns.filter(r => !r.date || isNaN(new Date(r.date).getTime()));
+  const datedRuns = allRuns.filter(r => r.date && !isNaN(new Date(r.date).getTime())).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const uniquePlayersAtStart = new Set(undatedRuns.map(r => r.pKey).filter(Boolean));
+  const uniqueCoursesAtStart = new Set(undatedRuns.map(r => String(r.course).toUpperCase()).filter(Boolean));
+  const uniqueCountriesAtStart = new Set(
+    undatedRuns.map(r => {
+      const c = cMet?.[String(r.course).toUpperCase()];
+      return c?.country;
+    }).filter(v => v && v !== "UNKNOWN")
+  );
+
+  let currentRunsCount = undatedRuns.length;
+  const currentUniquePlayers = new Set(uniquePlayersAtStart);
+  const currentUniqueCourses = new Set(uniqueCoursesAtStart);
+  const currentUniqueCountries = new Set(uniqueCountriesAtStart);
+
+  const runsTrend = [{ value: currentRunsCount }];
+  const playersTrend = [{ value: currentUniquePlayers.size }];
+  const coursesTrend = [{ value: currentUniqueCourses.size }];
+  const countriesTrend = [{ value: currentUniqueCountries.size }];
+
+  // Sample points to make it ~15 data points
+  const numDataPoints = 15;
+  const chunkSize = Math.max(1, Math.floor(datedRuns.length / (numDataPoints - 1)));
+
+  for (let i = 0; i < datedRuns.length; i++) {
+    const r = datedRuns[i];
+    currentRunsCount++;
+    if (r.pKey) currentUniquePlayers.add(r.pKey);
+    const courseKey = String(r.course).toUpperCase();
+    if (courseKey) {
+      currentUniqueCourses.add(courseKey);
+      const countryStr = cMet?.[courseKey]?.country;
+      if (countryStr && countryStr !== "UNKNOWN") {
+         currentUniqueCountries.add(countryStr);
+      }
+    }
+
+    // Capture point at chunk intervals, or at the very end
+    if ((i + 1) % chunkSize === 0 || i === datedRuns.length - 1) {
+       runsTrend.push({ value: currentRunsCount });
+       playersTrend.push({ value: currentUniquePlayers.size });
+       coursesTrend.push({ value: currentUniqueCourses.size });
+       countriesTrend.push({ value: currentUniqueCountries.size });
+    }
+  }
+
+  const kpiTrends = {
+    runs: runsTrend,
+    players: playersTrend,
+    courses: coursesTrend,
+    countries: countriesTrend,
+  };
+
   // SETTER STATS
   const leadMap: Record<string, string[]> = {};
   const assistMap: Record<string, string[]> = {};
@@ -432,6 +493,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     ...nextState,
     masterCourseList, 
     kpiStats, 
+    kpiTrends,
     settersWithImpact, 
     setterMet,
     teamsAggregated,

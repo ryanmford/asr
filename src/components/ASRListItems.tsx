@@ -64,27 +64,7 @@ export const ASRRankBadge = React.memo(
  },
 );
 
-export const ASRPerformanceBadge = React.memo(({ type, count = 1 }: { type: 1 | 2 | 3 | "fire" | string | number; count?: number }) => {
- const badges: Record<string, string> = { 1: "🥇", 2: "🥈", 3: "🥉", fire: "🔥" };
- const glows: Record<string, string> = {
- 1: "glow-gold",
- 2: "glow-silver",
- 3: "glow-bronze",
- fire: "glow-blue",
- };
- return (
- <div
- className={`inline-grid gap-0 justify-items-center select-none shrink-0 ${glows[type]} leading-none`}
- style={{ gridTemplateColumns: `repeat(${Math.max(1, Math.min(10, count))}, min-content)` }}
- >
- {Array.from({ length: count }).map((_, i) => (
- <span key={i} className="emoji-slot">
- {badges[type]}
- </span>
- ))}
- </div>
- );
-});
+
 
 export const ASRListItem = React.memo(
  ({
@@ -128,9 +108,13 @@ export const ASRListItem = React.memo(
  const theme = useContext(ThemeContext);
  const accentColor = theme === "dark" ? "text-white" : "text-zinc-900";
  const tableHover =
- theme === "dark" ? "hover:bg-white/[0.08]" : "hover:bg-black/[0.05]";
+ theme === "dark" 
+ ? "hover:bg-white/[0.08]" 
+ : "hover:bg-black/[0.05]";
  const cardHover =
- theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-blue-50";
+ theme === "dark" 
+ ? "hover:bg-white/5 hover:border-white/20 transition-colors duration-150" 
+ : "hover:bg-black/5 hover:border-black/20 transition-colors duration-150";
 
  const ItemWrapper: React.ElementType = layoutId ? motion.div : 'div';
 

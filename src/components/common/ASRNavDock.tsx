@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Users, MapPin, Trophy, Waypoints } from "lucide-react";
+import { User, Users, MapPin, Trophy, Home } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "../../lib/asr-utils";
 
@@ -56,31 +56,34 @@ export const ASRNavDock = React.memo(
     }, []);
 
     const navItems = [
+      { id: "home", icon: Home, label: "HOME" },
+      { id: "courses", icon: MapPin, label: "COURSES" },
       { id: "players", icon: User, label: "PLAYERS" },
       { id: "teams", icon: Users, label: "TEAM" },
-      { id: "courses", icon: MapPin, label: "COURSES" },
-      { id: "setters", icon: Waypoints, label: "SETTERS" },
-      { id: "wof", icon: Trophy, label: "WOF" },
+      { id: "hof", icon: Trophy, label: "HOF" },
     ];
 
     return (
       <div 
         className={cn(
-          "fixed left-1/2 -translate-x-1/2 z-[100] px-4 w-full pointer-events-none transition-all duration-500 ease-in-out",
+          "fixed left-1/2 -translate-x-1/2 z-[100] px-4 w-full pointer-events-none transition-all duration-500 ease-out flex justify-center items-center",
           isCompact ? "max-w-[320px]" : "max-w-[400px]",
           isKeyboardOpen ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
         )}
-        style={{ bottom: `calc(${isCompact ? '16px' : '24px'} + env(safe-area-inset-bottom, 0px))` }}
+        style={{ 
+          bottom: `calc(24px + env(safe-area-inset-bottom, 0px))`,
+          height: '64px'
+        }}
       >
-        <div className="relative group pointer-events-auto">
+        <div className="relative group pointer-events-auto w-full">
           {/* Main Glass Container */}
           <nav
             className={cn(
-              "relative flex items-center justify-around rounded-full border shadow-2xl backdrop-blur-[24px] transition-all duration-500 ease-out",
-              isCompact ? "px-1 py-0.5" : "p-1",
+              "relative flex items-center justify-around rounded-full border backdrop-blur-2xl transition-all duration-500 ease-out",
+              isCompact ? "px-1.5 py-1" : "p-1.5",
               theme === "dark"
-                ? "bg-zinc-950/40 border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
-                : "bg-white/40 border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)]",
+                ? "bg-zinc-900/60 border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
+                : "bg-white/70 border-black/[0.04] shadow-[0_20px_40px_rgba(0,0,0,0.12)]",
             )}
           >
             {navItems.map((item) => {
@@ -90,49 +93,69 @@ export const ASRNavDock = React.memo(
               const Icon = item.icon;
 
               return (
-                <button
+                <motion.button
                   key={item.id}
                   aria-label={`View ${item.label}`}
                   onClick={() => setView(item.id)}
+                  whileTap={{ scale: 0.82 }}
+                  style={{ WebkitTapHighlightColor: "transparent" }}
                   className={cn(
-                    "relative flex flex-col items-center justify-center flex-1 rounded-full transition-all duration-500 group outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 active:scale-95",
+                    "relative flex flex-col items-center justify-center flex-1 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 cursor-pointer overflow-visible",
                     isCompact ? "h-11" : "h-12",
-                    isActive
-                      ? "z-20"
-                      : "z-10 hover:text-zinc-600 dark:hover:text-zinc-300",
+                    isActive ? "z-20" : "z-10"
                   )}
                 >
-                  <div
-                    className={cn(
-                      "relative transition-all duration-500 ease-out flex flex-col items-center gap-1",
-                      isActive
-                        ? "text-blue-500"
-                        : "text-zinc-500",
-                    )}
-                  >
-                    <Icon
-                      size={isCompact ? 18 : 20}
-                      strokeWidth={isActive ? 2.5 : 2}
+                  {/* Subtle active background pill */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-pill"
                       className={cn(
-                        "transition-all duration-500",
-                        isActive && theme === "dark" ? "glow-blue" : "",
+                        "absolute inset-0 rounded-full",
+                        theme === "dark"
+                          ? "bg-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
+                          : "bg-black/[0.04] shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                       )}
+                      transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
                     />
+                  )}
 
-                    {/* Tiny Indicator Dot */}
+                  <div className="relative flex flex-col items-center justify-center z-10 w-full h-full pointer-events-none">
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        y: isActive ? -1.5 : 0,
+                        color: isActive
+                          ? "#3b82f6" // text-blue-500
+                          : theme === "dark" ? "#a1a1aa" : "#71717a", // text-zinc-400 / text-zinc-500
+                      }}
+                      transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
+                    >
+                      <Icon
+                        size={isCompact ? 18 : 22}
+                        strokeWidth={isActive ? 2.5 : 2}
+                        className={cn(
+                          "transition-shadow duration-300",
+                          isActive && theme === "dark" ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" : ""
+                        )}
+                      />
+                    </motion.div>
+
+                    {/* Active Indicator Dot */}
                     {isActive && (
                       <motion.div
                         layoutId="nav-dot"
-                        className="w-1 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] absolute -bottom-2.5"
-                        transition={{
-                          type: "spring",
-                          bounce: 0.2,
-                          duration: 0.5,
+                        className="absolute rounded-full bg-blue-500"
+                        style={{
+                          bottom: isCompact ? "-4px" : "-6px",
+                          width: "4px",
+                          height: "4px",
+                          boxShadow: theme === "dark" ? "0 0 10px rgba(59,130,246,0.8)" : "0 2px 6px rgba(59,130,246,0.4)"
                         }}
+                        transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
                       />
                     )}
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </nav>

@@ -1,12 +1,15 @@
 import React, { useContext, useState } from "react";
 import { cn } from "../../lib/asr-utils";
 import { ThemeContext } from "../../App";
+import { useDataStore } from "../../store/useDataStore";
 import { motion, AnimatePresence } from "motion/react";
-import { X } from "lucide-react";
+import { X, Instagram, Youtube, Link, RefreshCw, CheckCircle2 } from "lucide-react";
 
 export const ASRFooter = React.memo(() => {
   const theme = useContext(ThemeContext);
   const [activeModal, setActiveModal] = useState<"about" | "privacy" | "terms" | null>(null);
+  const lastUpdated = useDataStore((s) => s.lastUpdated);
+  const isLoading = useDataStore((s) => s.isLoading);
 
   const modalContent = {
     about: {
@@ -51,22 +54,52 @@ export const ASRFooter = React.memo(() => {
     <>
       <footer
         className={cn(
-          "w-full py-16 px-6 mt-16 border-t flex flex-col items-center gap-8 pb-[calc(4rem+env(safe-area-inset-bottom,0px))] transition-colors duration-500",
+          "w-full py-16 px-6 mt-16 border-t flex flex-col items-center gap-8 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(4rem+env(safe-area-inset-bottom,0px))] transition-colors duration-500",
           theme === "dark"
             ? "bg-zinc-950 text-zinc-400 border-zinc-800/50"
             : "bg-slate-50 text-slate-500 border-slate-200/50"
         )}
       >
-        <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-7xl gap-6">
-          <div className="flex items-center justify-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-bold tracking-widest uppercase transition-colors shrink-0 whitespace-nowrap pt-4 md:pt-0">
+        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-7xl gap-6">
+          <div className="flex items-center gap-4 text-zinc-400">
+            <a href="https://www.instagram.com/apexspeedrun/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a href="https://www.youtube.com/apexmovement" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
+              <Youtube className="w-5 h-5" />
+            </a>
+            <a href="https://beacons.ai/apexspeedrun" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
+              <Link className="w-5 h-5" />
+            </a>
+          </div>
+
+          <div className="flex items-center justify-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-bold tracking-widest uppercase transition-colors shrink-0 whitespace-nowrap">
             <button onClick={() => setActiveModal("about")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">About</button>
             <button onClick={() => setActiveModal("privacy")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">Privacy Policy</button>
             <button onClick={() => setActiveModal("terms")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">Terms of Service</button>
           </div>
         </div>
 
-        <div className="w-full max-w-7xl flex flex-col items-center pt-8 border-t border-current/10 text-[10px] font-bold uppercase tracking-widest opacity-40">
-          <span>© {new Date().getFullYear()} APEX SPEED RUN</span>
+        <div className="w-full max-w-7xl flex flex-col-reverse md:flex-row items-center justify-between pt-8 border-t border-current/10 text-[10px] font-bold uppercase tracking-widest opacity-40 gap-4">
+          <div className="flex items-center gap-2">
+            <span>© {new Date().getFullYear()} APEX SPEED RUN</span>
+            <span className="opacity-50">|</span>
+            <span>v1.0.0-beta</span>
+          </div>
+
+          <div className="flex items-center gap-2 relative">
+            {isLoading ? (
+              <div className="flex items-center gap-2 text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-full">
+                <RefreshCw className="w-3 h-3 animate-spin" />
+                <span>Syncing Live Data...</span>
+              </div>
+            ) : lastUpdated ? (
+              <div className="flex items-center gap-2 text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>Updated: {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            ) : null}
+          </div>
         </div>
       </footer>
 

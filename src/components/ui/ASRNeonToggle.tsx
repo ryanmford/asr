@@ -76,9 +76,9 @@ export const ASRNeonToggle = ({
  />
  
  <div className="absolute inset-0 overflow-hidden rounded-full ios-gpu-fix">
- {/* The Rotating Neon Border - Long Trail */}
- <div className="absolute inset-[-200%] neon-border-rotate z-0">
- <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_15deg,#3b82f6_45deg,#3b82f6_315deg,transparent_345deg,transparent_360deg)]" />
+ {/* The Rotating Neon Border - Full Perimeter Gradient */}
+ <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+ <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
  </div>
 
  {/* The Inner Surface Fill (with glass effect) */}

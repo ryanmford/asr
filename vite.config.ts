@@ -46,7 +46,7 @@ export default defineConfig(({mode}) => {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
             'ui-vendor': ['lucide-react', 'motion', 'clsx', 'tailwind-merge'],
-            'chart-vendor': ['recharts', 'd3-geo', 'react-simple-maps'],
+            'chart-vendor': ['recharts'],
             'state-vendor': ['zustand']
           }
         }

@@ -20,6 +20,7 @@ interface ASRDataState {
   // Computed Data
   masterCourseList: CourseData[];
   kpiStats: Record<string, unknown> | null;
+  kpiTrends: Record<string, { value: number }[]> | null;
   settersWithImpact: SetterProfile[];
   setterMet: Record<string, unknown>;
   teamsAggregated: TeamProfile[];
@@ -60,7 +61,7 @@ export const useDataStore = create<ASRDataState>((set) => {
         initialData = JSON.parse(cached);
         initialIsLoading = false;
       }
-    } catch (e) {
+    } catch {
       // Ignore
     }
   }
@@ -83,6 +84,7 @@ export const useDataStore = create<ASRDataState>((set) => {
 
     masterCourseList: [],
     kpiStats: null,
+    kpiTrends: null,
     settersWithImpact: [],
     setterMet: {},
     teamsAggregated: [],

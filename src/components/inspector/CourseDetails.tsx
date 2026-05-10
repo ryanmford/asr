@@ -552,9 +552,7 @@ export const CourseDetails = React.memo(
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       transition={{
                         delay: i * 0.05,
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
+                        duration: 0.3
                       }}
                       className="flex"
                     >

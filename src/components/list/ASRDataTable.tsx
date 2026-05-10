@@ -131,7 +131,7 @@ export const ASRDataTable = React.memo(
  onItemClick,
  isLoading = false,
  showRankings = true,
- middleLabel = "ATHLETE / DATA",
+ middleLabel = "PLAYER / DATA",
  showVideoColumn = false,
  }: ASRDataTableProps) => {
  const theme = useContext(ThemeContext);
@@ -155,13 +155,13 @@ export const ASRDataTable = React.memo(
 
  if (isLoading) {
   return (
-    <div className="flex flex-col w-full px-4 pt-2 animate-in fade-in duration-500 pb-32">
+    <div className="flex flex-col w-full px-4 pt-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-32">
       <div className="flex flex-col gap-3 max-w-7xl mx-auto w-full">
         {[1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div
             key={i}
             className={cn(
-              "h-[76px] w-full rounded-[1.5rem] border flex items-center px-4 gap-5 relative overflow-hidden isolate",
+              "h-[76px] sm:h-[96px] lg:h-[116px] w-full rounded-[1.25rem] sm:rounded-[1.5rem] lg:rounded-[2rem] border flex items-center px-4 gap-5 relative overflow-hidden isolate",
               theme === "dark"
                 ? "bg-white/[0.02] border-white/[0.04]"
                 : "bg-black/[0.02] border-black/[0.04]"

@@ -174,8 +174,8 @@ export const ASRMap = ({
               <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
                 <!-- Drop shadow (added to main parent instead for seamless hover effect if needed, but keeping isolated here works too) -->
                 <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                  <div class="absolute inset-[-200%] neon-border-rotate z-0 opacity-100 transition-opacity">
-                    <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,${outerConic}_180deg,transparent_315deg,transparent_360deg)]"></div>
+                  <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                     <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90"></div>
                   </div>
                   <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
                 </div>
@@ -294,8 +294,8 @@ export const ASRMap = ({
               <div class="relative flex flex-col items-center mt-2">
                 <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
                   <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                    <div class="absolute inset-[-200%] neon-border-rotate z-0 opacity-100 transition-opacity">
-                      <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]"></div>
+                    <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                      <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90"></div>
                     </div>
                     <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
                   </div>
@@ -330,7 +330,7 @@ export const ASRMap = ({
           userMarkerRef.current.setIcon(window.L.divIcon({
         html: `
           <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
-            <div class="absolute inset-[-100%] bg-blue-500 rounded-full animate-ping opacity-25"></div>
+            <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
             <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${currentIsDark ? 'border-zinc-900' : 'border-white'}">
               <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
             </div>
@@ -397,7 +397,7 @@ export const ASRMap = ({
                 icon: window.L.divIcon({
                   html: `
                     <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
-                      <div class="absolute inset-[-100%] bg-blue-500 rounded-full animate-ping opacity-25"></div>
+                      <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
                       <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${isDarkRef.current ? 'border-zinc-900' : 'border-white'}">
                         <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
                       </div>
@@ -468,8 +468,8 @@ export const ASRMap = ({
             : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
         )}>
           <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-            <div className="absolute inset-[-200%] neon-border-rotate z-0 opacity-50 group-hover:opacity-100 transition-opacity">
-              <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]" />
+            <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
             </div>
             <div className={cn(
               "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
@@ -498,8 +498,8 @@ export const ASRMap = ({
             : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
         )}>
           <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-            <div className="absolute inset-[-200%] neon-border-rotate z-0 opacity-50 group-hover:opacity-100 transition-opacity">
-              <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]" />
+            <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
             </div>
             <div className={cn(
               "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
@@ -513,7 +513,7 @@ export const ASRMap = ({
               onClick={handleZoomIn}
               className={cn(
                 "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-white hover:bg-white/10" : "text-black hover:bg-black/5"
+                isDark ? "text-blue-400 hover:bg-white/10" : "text-blue-600 hover:bg-black/5"
               )}
            >
               <Plus size={18} strokeWidth={2.5}/>
@@ -526,7 +526,7 @@ export const ASRMap = ({
               onClick={handleZoomOut}
               className={cn(
                 "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-white hover:bg-white/10" : "text-black hover:bg-black/5"
+                isDark ? "text-blue-400 hover:bg-white/10" : "text-blue-600 hover:bg-black/5"
               )}
            >
               <Minus size={18} strokeWidth={2.5}/>

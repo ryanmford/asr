@@ -223,9 +223,7 @@ export const PlayerDetails = React.memo(
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       transition={{
                         delay: i * 0.05,
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
+                        duration: 0.3
                       }}
                     >
                       <ASRStatCard
@@ -238,9 +236,11 @@ export const PlayerDetails = React.memo(
                 </div>
               </div>
 
-              <div className="px-6 pb-2">
-                <ASRWeeklyActivityChart runs={allRuns} />
-              </div>
+              {activeMode === "all-time" && (
+                <div className="px-6 pb-2">
+                  <ASRWeeklyActivityChart runs={allRuns} />
+                </div>
+              )}
 
               <div className="p-6 flex flex-col gap-6 pt-6 relative min-h-[300px]">
                 <SectionTitle>VERIFIED RUNS</SectionTitle>
@@ -275,7 +275,7 @@ export const PlayerDetails = React.memo(
                       NO VERIFIED RUNS
                     </h4>
                     <p className={cn("text-xs font-medium tracking-wide max-w-[240px] leading-relaxed relative z-10", theme === "dark" ? "text-zinc-500" : "text-slate-500")}>
-                      THIS ATHLETE HAS NOT LOGGED ANY OFFICIAL RUNS IN THIS DIVISION.
+                      THIS PLAYER HAS NOT LOGGED ANY OFFICIAL RUNS IN THIS DIVISION.
                     </p>
                   </div>
                 )}
@@ -380,7 +380,7 @@ export const PlayerDetails = React.memo(
                       NO VERIFIED SETS
                     </h4>
                     <p className={cn("text-xs font-medium tracking-wide max-w-[240px] leading-relaxed relative z-10", theme === "dark" ? "text-zinc-500" : "text-slate-500")}>
-                      THIS ATHLETE HAS NOT SET ANY OFFICIAL COURSES YET.
+                      THIS PLAYER HAS NOT SET ANY OFFICIAL COURSES YET.
                     </p>
                   </div>
                 )}

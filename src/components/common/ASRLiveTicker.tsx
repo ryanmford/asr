@@ -11,7 +11,17 @@ interface ASRLiveTickerProps {
 
 export const ASRLiveTicker = React.memo(
   ({ onEntityClick, theme }: ASRLiveTickerProps) => {
-    const feed = useDataStore((s) => s.recentFeed);
+    const rawFeed = useDataStore((s) => s.recentFeed);
+    const [feed, setFeed] = React.useState(rawFeed);
+
+    React.useEffect(() => {
+      setFeed((prev) => {
+        if (JSON.stringify(prev) !== JSON.stringify(rawFeed)) {
+          return rawFeed;
+        }
+        return prev;
+      });
+    }, [rawFeed]);
 
     if (!feed || feed.length === 0) {
       return (

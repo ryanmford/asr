@@ -10,6 +10,7 @@ interface ASRSearchInputProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
   ) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   theme: "light" | "dark";
   placeholder?: string;
   className?: string;
@@ -19,6 +20,7 @@ export const ASRSearchInput = React.memo(
   ({
     value,
     onChange,
+    onKeyDown,
     theme,
     placeholder = "",
     className,
@@ -35,9 +37,9 @@ export const ASRSearchInput = React.memo(
           )}
         >
           {/* Moving Neon Border Effect when focused */}
-          <div className="absolute inset-0 rounded-2xl z-0 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
-            <div className="absolute inset-[-200%] neon-border-rotate">
-              <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]" />
+          <div className="absolute inset-0 overflow-hidden rounded-2xl z-0 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
+            <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+               <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90" />
             </div>
             {/* Inner Surface Fill */}
             <div
@@ -55,6 +57,7 @@ export const ASRSearchInput = React.memo(
             type="text"
             value={value}
             onChange={onChange}
+            onKeyDown={onKeyDown}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={isFocused ? "" : placeholder}

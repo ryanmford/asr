@@ -68,14 +68,14 @@ export const ASRPremiumButton = ({
 
  const getConicGradient = () => {
  if (disabled)
- return "bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#71717a_180deg,transparent_315deg,transparent_360deg)]";
+ return "bg-[conic-gradient(from_0deg,#d4d4d8,#a1a1aa,#71717a,#a1a1aa,#d4d4d8)] opacity-90";
  switch (color) {
  case "red":
- return "bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#ef4444_180deg,transparent_315deg,transparent_360deg)]";
+ return "bg-[conic-gradient(from_0deg,#ef4444,#f87171,#b91c1c,#f87171,#ef4444)] opacity-90";
  case "gold":
- return "bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#fbbf24_180deg,transparent_315deg,transparent_360deg)]";
+ return "bg-[conic-gradient(from_0deg,#f59e0b,#fbbf24,#d97706,#fbbf24,#f59e0b)] opacity-90";
  default:
- return "bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)]";
+ return "bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)] opacity-90";
  }
  };
 
@@ -146,7 +146,7 @@ export const ASRPremiumButton = ({
  )}
  >
  {/* The Shimmering Neon Outline - Long Trail */}
- <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300%] aspect-square">
+ <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
  <div
  className={cn(
  "w-full h-full neon-border-rotate transition-opacity duration-500",

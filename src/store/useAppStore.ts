@@ -9,6 +9,8 @@ export interface AppState {
   setMapMode: (mode: "map" | "list") => void;
   playingVideoUrl: string | null;
   setPlayingVideoUrl: (url: string | null) => void;
+  showOnboarding: boolean;
+  setShowOnboarding: (show: boolean) => void;
 }
 
 const getInitialGen = () => {
@@ -43,4 +45,6 @@ export const useAppStore = create<AppState>((set) => ({
   },
   playingVideoUrl: null,
   setPlayingVideoUrl: (playingVideoUrl) => set({ playingVideoUrl }),
+  showOnboarding: false,
+  setShowOnboarding: (showOnboarding) => set({ showOnboarding }),
 }));

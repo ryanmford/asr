@@ -133,7 +133,7 @@ export const ASRWallOfFame = React.memo(
  return (
  <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700">
  {/* Leaderboard Grids */}
- <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 px-4">
+ <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
  {sections.map((sec) => (
  <div key={sec.k} className="flex flex-col gap-5">
  <ASRSectionHeading title={sec.l} theme={theme} />
@@ -179,38 +179,44 @@ export const ASRWallOfFame = React.memo(
  )
  }
  className={cn(
- "flex items-center justify-between py-5 px-6 transition-all group relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset active:scale-95",
+ "flex items-center justify-between py-4 sm:py-5 px-4 sm:px-6 transition-colors duration-150 group relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset",
  hoverClass,
+ i === 0 && (theme === "dark" ? "bg-white/[0.02]" : "bg-black/[0.02]")
  )}
  >
- <div className="flex items-center gap-4 min-w-0">
+ <div className="flex items-center gap-4 min-w-0 z-10 relative">
  <ASRRankBadge rank={i + 1} />
  <div className="flex flex-col text-left">
  <span
  className={cn(
- "text-[11px] sm:text-[14px] font-black uppercase truncate group-hover:text-blue-500 transition-colors pr-2 tracking-tight",
+ "text-[11px] sm:text-[14px] font-black uppercase truncate pr-2 tracking-tight transition-colors",
  theme === "dark"
  ? "text-zinc-100"
  : "text-zinc-900",
+ i === 0 ? "text-zinc-900 dark:text-white group-hover:text-blue-500" : "group-hover:text-blue-500"
  )}
  >
  {flags} {a.name}
  </span>
  </div>
  </div>
- <div className="flex items-center justify-end gap-2 shrink-0 text-right">
+ <div className="flex items-center justify-end gap-2 shrink-0 text-right z-10 relative">
  <span
  className={cn(
  "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-blue-500",
  theme === "dark" ? "text-white" : "text-zinc-900",
  isTop3 ? "scale-110" : "opacity-100",
+ i === 0 && ""
  )}
  >
  {displayVal}
  </span>
  </div>
  {isTop3 && i === 0 && (
- <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rotate-45 translate-x-8 -translate-y-8 pointer-events-none" />
+ <>
+   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rotate-45 translate-x-16 -translate-y-16 pointer-events-none blur-xl" />
+   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+ </>
  )}
  </button>
  );
@@ -222,7 +228,7 @@ export const ASRWallOfFame = React.memo(
  </div>
 
  {/* Medal Table */}
- <div className="px-4">
+ <div className="px-4 sm:px-6">
  <ASRSectionHeading title="WORLDWIDE MEDAL COUNT" theme={theme} />
  <div
  className={cn(
@@ -313,7 +319,7 @@ export const ASRWallOfFame = React.memo(
  onEntityClick("region", { ...c, type: "country" });
  }}
  className={cn(
- "transition-all group cursor-pointer relative",
+ "transition-colors duration-150 group cursor-pointer relative",
  theme === "dark"
  ? "hover:bg-blue-500/10"
  : "hover:bg-blue-600/5",
@@ -372,7 +378,7 @@ export const ASRWallOfFame = React.memo(
  </div>
  </div>
 
- <div className="px-4 mt-8">
+ <div className="px-4 sm:px-6 mt-8">
  <ASRPromotionBanner
  type={
  ["coach", "setter"][

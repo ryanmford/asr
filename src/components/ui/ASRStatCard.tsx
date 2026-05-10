@@ -46,7 +46,7 @@ export const ASRStatCard = React.memo(
  WINS: "TOTAL WINS",
  "TOTAL SETS": "TOTAL NUMBER OF SETS CREATED",
  "AVG SET RATING": "AVERAGE RATING FOR CREATED SETS",
- RATING: "CURRENT ATHLETE RATING",
+ RATING: "CURRENT PLAYER RATING",
  RUNS: "TOTAL RUNS COMPLETED",
  "WIN %": "PERCENTAGE OF RUNS WON",
  "AVG TIME": "AVERAGE RUN TIME",
@@ -92,17 +92,12 @@ export const ASRStatCard = React.memo(
  }
  }}
  className={cn(
- "stat-card-container min-h-[4.5rem] relative group flex flex-col transition-all duration-300 w-full overflow-hidden rounded-[1.25rem] outline-none",
+ "stat-card-container min-h-[4.5rem] relative group flex flex-col w-full overflow-hidden outline-none",
  description ? "cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" : "cursor-default",
         "theme-focus",
           isHeader
             ? "bg-transparent"
-            : cn(
-                THEME.BENTO_CARD(theme),
-                theme === "dark"
-                  ? "hover:bg-zinc-900/30"
-                  : "hover:bg-white/60",
-              ),
+            : THEME.BENTO_CARD(theme)
  )}
  >
  <div className={cn("flex flex-col flex-1 p-2 h-full", isHeader && "p-0")}>

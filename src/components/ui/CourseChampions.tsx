@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React, { useMemo } from "react";
-import { cn, fixCountryEntity, formatFlagsWithSpace } from "../../lib/asr-utils";
+import { cn, fixCountryEntity, formatFlagsWithSpace, THEME } from "../../lib/asr-utils";
 import { Trophy, Clock } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 
@@ -122,15 +122,10 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  key={i}
  onClick={() => navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete })}
  className={cn(
- "group flex flex-col relative pl-[58px] pr-5 py-3.5 rounded-[1.25rem] border transition-all text-left w-full outline-none hover:scale-[1.02] active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+ "group flex flex-col relative pl-[58px] pr-5 py-3.5 text-left w-full outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
  "theme-focus",
- theme === "dark"
- ? i === 0
- ? "bg-zinc-900 border-amber-500/30 hover:bg-zinc-800 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
- : "bg-zinc-900/60 border-zinc-800 hover:bg-zinc-800"
- : i === 0
- ? "bg-amber-500/5 border-amber-500/30 hover:bg-amber-500/10 shadow-sm"
- : "bg-white border-zinc-200 hover:bg-zinc-50",
+ THEME.BENTO_CARD(theme),
+ i === 0 ? "border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]" : ""
  )}
  >
  <div

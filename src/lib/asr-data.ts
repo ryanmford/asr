@@ -732,7 +732,7 @@ export const calculateWofStats = (
       },
     };
   } catch (e) {
-    console.error("WOF stats calculation failed", e);
+    console.error("HOF stats calculation failed", e);
     return null;
   }
 };

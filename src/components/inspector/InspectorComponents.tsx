@@ -102,52 +102,7 @@ export const ProfileHeader = React.memo(
   ),
 );
 
-interface TabButtonProps {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-  theme: "light" | "dark";
-  layoutId?: string;
-}
 
-export const TabButton = React.memo(
-  ({ active, onClick, children, icon, theme, layoutId = "active-tab-line" }: TabButtonProps) => (
-    <button
-      onClick={onClick}
-      className={cn(
-        "relative flex items-center gap-1.5 px-2 py-2.5 text-[8px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap active:scale-95 group flex-1 justify-center",
-        active
-          ? theme === "dark" ? "text-white" : "text-black"
-          : theme === "dark"
-            ? "text-zinc-500 hover:text-white"
-            : "text-zinc-400 hover:text-zinc-900",
-      )}
-    >
-      {icon && (
-        <span
-          className={cn(
-            "transition-transform group-hover:scale-110",
-            active ? "scale-110" : "opacity-40 group-hover:opacity-100",
-          )}
-        >
-          {icon}
-        </span>
-      )}
-      <span className="relative z-10 italic">{children}</span>
-      {active && (
-        <motion.div
-           layoutId={layoutId}
-          className={cn(
-            "absolute bottom-[-1px] left-4 right-4 h-0.5 rounded-full",
-            theme === "dark" ? "bg-white shadow-[0_0_15px_rgba(255,255,255,0.6)]" : "bg-black"
-          )}
-          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-        />
-      )}
-    </button>
-  ),
-);
 
 export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: Record<string, unknown> & { asrPatron?: string }; theme: "light" | "dark"; isBanner?: boolean }) => {
   const hasSponsor = !!course.sponsorName;

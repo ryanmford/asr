@@ -46,9 +46,12 @@ export const THEME = {
     "text-[8px] sm:text-[9.5px] font-display font-black uppercase tracking-widest sm:tracking-[0.15em] opacity-60",
   VALUE: "font-mono font-black tabular-nums tracking-tighter",
   BENTO_CARD: (t: string) =>
-    t === "dark"
-      ? "bg-zinc-900/20 border border-white/5 backdrop-blur-md shadow-sm"
-      : "bg-white/40 border border-zinc-200/60 backdrop-blur-md shadow-sm",
+    cn(
+      "rounded-[1.5rem] border backdrop-blur-md transition-all duration-150",
+      t === "dark"
+        ? "bg-zinc-900/50 border-white/10 shadow-sm hover:bg-white/5 hover:border-white/20"
+        : "bg-white/60 border-black/5 shadow-sm hover:bg-black/5 hover:border-black/10"
+    ),
   INPUT: (t: string) =>
     t === "dark"
       ? "bg-black/40 text-white focus:bg-white/[0.03] border-white/10 focus:border-blue-500/50 shadow-inner"

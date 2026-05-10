@@ -183,7 +183,7 @@ export const usePlayerList = () => {
   }) || [];
 };
 
-export const getInspectorDataForPath = (
+const getInspectorDataForPath = (
   pathname: string,
   atMet: Record<string, PlayerProfile>,
   masterCourseList: CourseData[],
@@ -284,9 +284,7 @@ export const useCourseList = () => {
   return useDataStore((s) => isAllTimeContext ? s.courseList_AT : s.courseList_OP) || [];
 };
 
-export const useSettersListOut = () => {
-  return useDataStore((s) => s.settersList) || [];
-};
+
 
 export const useTeamList = () => {
   const teamCategory = useAppStore((s) => s.teamCategory);
@@ -295,11 +293,11 @@ export const useTeamList = () => {
     if (isAllTimeContext) {
       if (teamCategory === 'gyms') return s.teamList_gyms_AT;
       if (teamCategory === 'teams') return s.teamList_teams_AT;
-      return [];
+      return null;
     } else {
       if (teamCategory === 'gyms') return s.teamList_gyms_OP;
       if (teamCategory === 'teams') return s.teamList_teams_OP;
-      return [];
+      return null;
     }
   }) || [];
 };

@@ -99,7 +99,7 @@ export const InspectorBody = React.memo(
             
             <h2 className={cn("text-lg sm:text-xl font-black uppercase tracking-widest", "theme-text-base")}>
               {type === "player"
-                ? "Athlete Not Found"
+                ? "Player Not Found"
                 : type === "course"
                   ? "Course Not Found"
                   : type === "setter"

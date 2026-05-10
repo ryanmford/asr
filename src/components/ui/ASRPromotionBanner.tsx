@@ -143,22 +143,15 @@ export const ASRPromotionBanner = React.memo(
  target="_blank"
  rel="noopener noreferrer"
  className={cn(
- "@container group relative w-full rounded-[2.5rem] p-6 @md:p-8 @2xl:p-10 overflow-hidden flex flex-col @2xl:flex-row items-center @2xl:items-stretch justify-between gap-8 transition-all hover:scale-[1.01] active:scale-[0.99] border shadow-2xl",
+ "@container group relative w-full rounded-[3rem] p-8 @md:p-10 @2xl:p-12 overflow-hidden flex flex-col @2xl:flex-row items-center @2xl:items-stretch justify-between gap-12 transition-all hover:scale-[1.01] active:scale-[0.99]",
  theme === "dark"
- ? "bg-zinc-950 border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
- : "bg-white border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)]",
+ ? "bg-zinc-950"
+ : "bg-white",
  )}
  >
  {/* The Rotating Neon Border (Only visible on group hover) */}
- <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300%] aspect-square">
- <div className="w-full h-full neon-border-rotate z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700">
- <div
- className={`w-full h-full opacity-40`}
- style={{
- background: `conic-gradient(from 0deg, transparent 0deg, transparent 45deg, ${config.bgGradient} 180deg, transparent 315deg, transparent 360deg)`,
- }}
- />
- </div>
+ <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+ <div className="w-full h-full neon-border-rotate z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,#2563eb,#4f46e5,#9333ea,#4f46e5,#2563eb)]" style={{ opacity: 0.9 }} />
  </div>
 
  {/* Inner Surface Mask to keep the border as an outline */}
@@ -224,7 +217,7 @@ export const ASRPromotionBanner = React.memo(
  <div className="relative z-10 flex shrink-0 items-center justify-center">
  <div
  className={cn(
- "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl rotate-12 overflow-hidden border-4 shadow-2xl flex items-center justify-center p-4 transition-colors",
+ "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl rotate-12 overflow-hidden flex items-center justify-center p-4 transition-colors",
  config.borderFocus,
  theme === "dark" ? "bg-zinc-900" : "bg-slate-50",
  )}
@@ -233,7 +226,7 @@ export const ASRPromotionBanner = React.memo(
  </div>
  <div
  className={cn(
- "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl -rotate-12 overflow-hidden border-4 shadow-2xl flex items-center justify-center p-4 -ml-10 @2xl:-ml-12 mt-6 @2xl:mt-8 opacity-50 transition-colors",
+ "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl -rotate-12 overflow-hidden flex items-center justify-center p-4 -ml-10 @2xl:-ml-12 mt-6 @2xl:mt-8 opacity-50 transition-colors",
  config.borderGhost,
  theme === "dark" ? "bg-zinc-900" : "bg-slate-50",
  )}

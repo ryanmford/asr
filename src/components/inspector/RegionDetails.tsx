@@ -104,7 +104,7 @@ export const RegionDetails = React.memo(
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <ASRStatCard label="ATHLETES" value={regionalPlayers.length} />
+                <ASRStatCard label="PLAYERS" value={regionalPlayers.length} />
                 <ASRStatCard
                   label="REGIONAL WINS"
                   value={

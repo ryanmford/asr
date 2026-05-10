@@ -41,10 +41,10 @@ export const MathOverlay = () => (
 );
 
 export const PhysicsOverlay = () => (
- <div className="absolute inset-0 opacity-[0.1] pointer-events-none overflow-hidden select-none flex items-center justify-center">
- <div className="w-full h-full border-[0.5px] border-white/20 rounded-full animate-[spin_60s_linear_infinite]" />
- <div className="absolute w-4/5 h-4/5 border-[0.5px] border-white/10 rounded-full animate-[spin_40s_linear_infinite_reverse]" />
- <div className="absolute w-2/3 h-2/3 border-[0.5px] border-white/5 rounded-full animate-[spin_20s_linear_infinite]" />
+ <div className="absolute inset-0 opacity-[0.05] pointer-events-none overflow-hidden select-none flex items-center justify-center">
+ <div className="w-full h-full border-[0.5px] border-white/20 rounded-full" />
+ <div className="absolute w-4/5 h-4/5 border-[0.5px] border-white/10 rounded-full" />
+ <div className="absolute w-2/3 h-2/3 border-[0.5px] border-white/5 rounded-full" />
  </div>
 );
 

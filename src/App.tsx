@@ -27,13 +27,15 @@ import { ASRVideoModal } from "./components/common/ASRVideoModal";
 
 const PlayersView = React.lazy(() => import("./components/views/PlayersView").then(m => ({ default: m.PlayersView })));
 const TeamsView = React.lazy(() => import("./components/views/TeamsView").then(m => ({ default: m.TeamsView })));
-const SettersView = React.lazy(() => import("./components/views/SettersView").then(m => ({ default: m.SettersView })));
+const HomeView = React.lazy(() => import("./components/views/HomeView").then(m => ({ default: m.HomeView })));
 const MapCoursesView = React.lazy(() => import("./components/views/MapCoursesView").then(m => ({ default: m.MapCoursesView })));
 const ASRWallOfFame = React.lazy(() => import("./components/views/ASRWallOfFame").then(m => ({ default: m.ASRWallOfFame })));
 const InspectorBody = React.lazy(() => import("./components/inspector/InspectorBody").then(m => ({ default: m.InspectorBody })));
 
 import { motion, AnimatePresence } from "motion/react";
 import { RouteScrollRestoration } from "./components/common/RouteScrollRestoration";
+import { useAppStore } from "./store/useAppStore";
+import { useDataStore } from "./store/useDataStore";
 
 import { PageHeader } from "./components/common/PageHeader";
 import {
@@ -168,12 +170,13 @@ export default function App() {
 
 function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme: (theme: "light" | "dark") => void }) {
   const isLoading = useDataStore((s) => s.isLoading);
+  const showOnboarding = useAppStore((s) => s.showOnboarding);
+  const setShowOnboarding = useAppStore((s) => s.setShowOnboarding);
 
   const { eventType, isAllTimeContext, setEventType } = useURLState();
   const { navigateToEntity, closeModals, goBackOne, canGoForward, goForwardOne } = useAppNavigation();
 
   const [showIntro, setShowIntro] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const p = localStorage.getItem(CONFIG.PREFS_KEY);
@@ -192,7 +195,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
     }
   }, [theme]);
 
-  const [medalSort, setMedalSort] = useState<{ key: string; direction: "ascending" | "descending" }>({ key: "total", direction: "descending" });
+  const [medalSort, setMedalSort] = useState<{ key: string; direction: "ascending" | "descending" }>({ key: "gold", direction: "descending" });
 
   const handleReqSort = useCallback((key: string) => {
     setMedalSort((p) => ({
@@ -215,7 +218,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   const view = backgroundLocation.pathname.split("/")[1] || "players";
 
   const handleHome = useCallback(() => {
-    navigate("/players");
+    navigate("/home");
   }, [navigate]);
 
   const handleViewChange = useCallback((v: string) => {
@@ -300,7 +303,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           eventType={eventType as "open" | "all-time"}
           setEventType={setEventType}
           onHome={handleHome}
-          hideTabs={view === "wof" || view === "setters"}
+          hideTabs={view === "hof" || view === "setters" || view === "home"}
         />
       </div>
 
@@ -316,7 +319,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
             }>
             <AnimatePresence mode="wait">
               <Routes location={backgroundLocation} key={backgroundLocation.pathname}>
-                <Route path="/" element={<Navigate to="/players" replace />} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/players/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <PlayersView theme={theme} />
@@ -327,9 +330,9 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                     <TeamsView theme={theme} />
                   </motion.div>
                 } />
-                <Route path="/setters/:id?" element={
+                <Route path="/home" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
-                    <SettersView theme={theme} />
+                    <HomeView />
                   </motion.div>
                 } />
                 <Route path="/map/:id?" element={<Navigate to="/courses" replace />} />
@@ -338,9 +341,9 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                     <MapCoursesView theme={theme} />
                   </motion.div>
                 } />
-                <Route path="/wof" element={
+                <Route path="/hof" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex flex-col">
-                    <PageHeader title="WALL OF FAME" theme={theme} />
+                    <PageHeader title="HALL OF FAME" theme={theme} />
                     <ASRWallOfFame
                       theme={theme}
                       onEntityClick={navigateToEntity}

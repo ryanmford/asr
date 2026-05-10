@@ -162,7 +162,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             className={cn(
-              "w-full max-w-xl rounded-[3rem] p-8 sm:p-14 border shadow-[0_20px_100px_rgba(0,0,0,0.4)] relative overflow-hidden ios-clip-fix mt-[var(--safe-top)] transition-colors duration-500 backdrop-blur-3xl",
+              "w-full max-w-xl h-[580px] sm:h-[660px] flex flex-col justify-between rounded-[3rem] p-8 sm:p-14 border shadow-[0_20px_100px_rgba(0,0,0,0.4)] relative overflow-hidden ios-clip-fix mt-[var(--safe-top)] transition-colors duration-500 backdrop-blur-3xl",
               theme === "dark"
                 ? "bg-zinc-950/80 border-white/10 text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                 : "bg-white/90 border-zinc-200 text-zinc-900 shadow-[inset_0_1px_0_rgba(255,255,255,1)]",
@@ -199,30 +199,30 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
               <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
             </button>
 
-            <div className="flex flex-col items-start text-left space-y-8 sm:space-y-10 relative z-10 pt-12 sm:pt-0 w-full">
+            <div className="flex flex-col items-start text-left relative z-10 pt-10 sm:pt-0 w-full h-full flex-1 justify-between gap-4 sm:gap-6">
               <motion.div
                 key={step}
                 initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
                 className={cn(
-                  "self-center w-20 h-20 sm:w-28 sm:h-28 rounded-[1.8rem] sm:rounded-[2.5rem] flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden",
+                  "self-center w-20 h-20 sm:w-24 sm:h-24 rounded-[1.8rem] sm:rounded-[2.2rem] flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden mt-4",
                   theme === "dark" ? "bg-blue-500/20" : "bg-blue-500/10",
                 )}
               >
                 <div className="absolute inset-0 bg-blue-500 animate-pulse opacity-10" />
                 {React.cloneElement(steps[step].icon as React.ReactElement<any>, {
                   className:
-                    "relative z-10 w-10 h-10 sm:w-14 sm:h-14 text-blue-500",
+                    "relative z-10 w-10 h-10 sm:w-12 sm:h-12 text-blue-500",
                   strokeWidth: 2.5,
                 })}
               </motion.div>
 
-              <div className="space-y-5 w-full">
+              <div className="space-y-3 sm:space-y-4 w-full flex-1 flex flex-col justify-center">
                 <motion.h2
                   key={step + "-title"}
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  className="text-4xl sm:text-5xl font-black uppercase tracking-tighter italic leading-[0.9] whitespace-normal break-words text-left"
+                  className="text-2xl sm:text-3xl md:text-3xl font-black uppercase tracking-tighter italic leading-none whitespace-nowrap w-full text-center sm:text-left"
                 >
                   {steps[step].title}
                 </motion.h2>
@@ -231,7 +231,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
-                  className="text-lg sm:text-xl font-black opacity-70 leading-relaxed text-inherit whitespace-normal break-words w-full text-left"
+                  className="text-base sm:text-lg font-bold opacity-80 leading-relaxed text-inherit whitespace-normal break-words w-full text-center sm:text-left"
                 >
                   {steps[step].desc}
                 </motion.div>
