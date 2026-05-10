@@ -83,7 +83,7 @@ export const ASRListItem = React.memo(
  mapUrl,
  showVideoIcon = false,
  isUnclaimed = false,
- layoutId, isCompact = false, onHover,
+ isCompact = false, onHover,
  }: {
    rank?: string | number | null;
    title?: React.ReactNode;
@@ -100,7 +100,6 @@ export const ASRListItem = React.memo(
    mapUrl?: string | null;
    showVideoIcon?: boolean;
    isUnclaimed?: boolean;
-   layoutId?: string;
    isCompact?: boolean;
    onHover?: () => void;
  }) => {
@@ -116,11 +115,11 @@ export const ASRListItem = React.memo(
  ? "hover:bg-white/5 hover:border-white/20 transition-colors duration-150" 
  : "hover:bg-black/5 hover:border-black/20 transition-colors duration-150";
 
- const ItemWrapper: React.ElementType = layoutId ? motion.div : 'div';
+ const ItemWrapper: React.ElementType = 'div';
 
  if (variant === "table") {
  return (
- <ItemWrapper {...(layoutId ? { layoutId } : {})}
+ <ItemWrapper
  onClick={onClick}
  role={onClick ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick ? 0 : undefined}
@@ -273,7 +272,7 @@ export const ASRListItem = React.memo(
  // Use the prop passed from ASRRankList
 
  return (
- <ItemWrapper {...(layoutId ? { layoutId } : {})}
+ <ItemWrapper
  onClick={isUnclaimed ? undefined : onClick}
  role={onClick && !isUnclaimed ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
  tabIndex={onClick && !isUnclaimed ? 0 : undefined}

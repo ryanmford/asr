@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, startTransition } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { cn, formatLocation, normalizeName } from "../../lib/asr-utils";
 import { ASRStatCard } from "../ui/ASRStatCard";
@@ -25,13 +25,15 @@ export const RegionDetails = React.memo(
     const location = useLocation();
     const activeTab = "players"; // Only one tab anyway
     const setActiveTab = (t: string) => {
-      setSearchParams(
-        (prev) => {
-          prev.set("tab", t);
-          return prev;
-        },
-        { replace: true, state: location.state },
-      );
+      startTransition(() => {
+        setSearchParams(
+          (prev) => {
+            prev.set("tab", t);
+            return prev;
+          },
+          { replace: true, state: location.state },
+        );
+      });
     };
 
     const regionalPlayers = useMemo(() => {

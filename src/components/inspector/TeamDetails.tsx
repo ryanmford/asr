@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, startTransition } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { cn, formatLocation, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { ASRStatCard } from "../ui/ASRStatCard";
@@ -43,13 +43,15 @@ export const TeamDetails = React.memo(
       "open";
     const setMode = React.useCallback(
       (m: "open" | "all-time") => {
-        setSearchParams(
-          (prev) => {
-            prev.set("mode", m);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
+        startTransition(() => {
+          setSearchParams(
+            (prev) => {
+              prev.set("mode", m);
+              return prev;
+            },
+            { replace: true, state: location.state },
+          );
+        });
       },
       [setSearchParams, location.state],
     );
@@ -74,13 +76,15 @@ export const TeamDetails = React.memo(
       : "players";
     const setActiveTab = React.useCallback(
       (t: string) => {
-        setSearchParams(
-          (prev) => {
-            prev.set("tab", t);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
+        startTransition(() => {
+          setSearchParams(
+            (prev) => {
+              prev.set("tab", t);
+              return prev;
+            },
+            { replace: true, state: location.state },
+          );
+        });
       },
       [setSearchParams, location.state],
     );

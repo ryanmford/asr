@@ -1,6 +1,6 @@
  
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, startTransition } from "react";
 import { useDataStore } from "../store/useDataStore";
 import { useAppStore } from "../store/useAppStore";
 import {
@@ -24,13 +24,15 @@ export const useURLState = () => {
 
   const setEventType = useCallback(
     (nextType: "open" | "all-time") => {
-      setSearchParams(
-        (prev) => {
-          prev.set("eventType", nextType);
-          return prev;
-        },
-        { replace: true, state: location.state },
-      );
+      startTransition(() => {
+        setSearchParams(
+          (prev) => {
+            prev.set("eventType", nextType);
+            return prev;
+          },
+          { replace: true, state: location.state },
+        );
+      });
     },
     [setSearchParams, location.state],
   );

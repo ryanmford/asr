@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, startTransition } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ASRWeeklyActivityChart } from "../ui/ASRWeeklyActivityChart";
@@ -66,13 +66,15 @@ export const PlayerDetails = React.memo(
       : initialTab || "runs";
     const setActiveTab = React.useCallback(
       (t: string) => {
-        setSearchParams(
-          (prev) => {
-            prev.set("tab", t);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
+        startTransition(() => {
+          setSearchParams(
+            (prev) => {
+              prev.set("tab", t);
+              return prev;
+            },
+            { replace: true, state: location.state },
+          );
+        });
       },
       [setSearchParams, location.state],
     );
@@ -81,13 +83,15 @@ export const PlayerDetails = React.memo(
       (searchParams.get("mode") as "open" | "all-time") || "open";
     const setActiveMode = React.useCallback(
       (m: "open" | "all-time") => {
-        setSearchParams(
-          (prev) => {
-            prev.set("mode", m);
-            return prev;
-          },
-          { replace: true, state: location.state },
-        );
+        startTransition(() => {
+          setSearchParams(
+            (prev) => {
+              prev.set("mode", m);
+              return prev;
+            },
+            { replace: true, state: location.state },
+          );
+        });
       },
       [setSearchParams, location.state],
     );

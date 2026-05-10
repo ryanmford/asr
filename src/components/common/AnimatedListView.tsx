@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
-import React, { useMemo } from "react";
+import React, { useMemo, startTransition } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { useDebounce } from "../../hooks/useDataHooks";
 import { PageHeader } from "../common/PageHeader";
@@ -42,11 +42,13 @@ export const AnimatedListView = React.memo(({
   const search = searchParams.get("q") || searchParams.get(searchKey) || "";
   
   const setSearch = (val: string) => {
-    setSearchParams(prev => {
-      if (val) prev.set(searchKey, val);
-      else prev.delete(searchKey);
-      return prev;
-    }, { replace: true, state: location.state });
+    startTransition(() => {
+      setSearchParams(prev => {
+        if (val) prev.set(searchKey, val);
+        else prev.delete(searchKey);
+        return prev;
+      }, { replace: true, state: location.state });
+    });
   };
 
   const debouncedSearch = useDebounce(search, 300);

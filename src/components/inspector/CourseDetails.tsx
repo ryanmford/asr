@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, startTransition } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import {
   Zap,
@@ -209,25 +209,29 @@ export const CourseDetails = React.memo(
       ? (urlTab as "stats" | "men" | "women")
       : "stats";
     const setActiveTab = (t: string) => {
-      setSearchParams(
-        (prev) => {
-          prev.set("tab", t);
-          return prev;
-        },
-        { replace: true, state: location.state },
-      );
+      startTransition(() => {
+        setSearchParams(
+          (prev) => {
+            prev.set("tab", t);
+            return prev;
+          },
+          { replace: true, state: location.state },
+        );
+      });
     };
 
     const activeMode =
       (searchParams.get("mode") as "open" | "all-time") || "open";
     const setActiveMode = (m: "open" | "all-time") => {
-      setSearchParams(
-        (prev) => {
-          prev.set("mode", m);
-          return prev;
-        },
-        { replace: true, state: location.state },
-      );
+      startTransition(() => {
+        setSearchParams(
+          (prev) => {
+            prev.set("mode", m);
+            return prev;
+          },
+          { replace: true, state: location.state },
+        );
+      });
     };
 
     const recordsM = useMemo(() => {

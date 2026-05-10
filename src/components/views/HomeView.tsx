@@ -237,7 +237,7 @@ export const HomeView = React.memo(() => {
                    {searchResults.players.slice(0, 5).map((p, i) => {
                      const isFocused = searchFocusedIndex === i;
                      return (
-                       <button key={(p as any).pKey || p.name || i} onClick={() => navigateToEntity("player", p)} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-colors", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5")}>
+                       <button key={(p as any).pKey || p.name || i} onClick={() => navigateToEntity("player", p)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                           <User className="w-4 h-4 opacity-50" />
                           <span className="font-bold flex-1">{p.name}</span>
                           <ChevronRight className="w-4 h-4 opacity-30 ml-auto" />
@@ -253,7 +253,7 @@ export const HomeView = React.memo(() => {
                    {searchResults.courses.slice(0, 5).map((c, i) => {
                      const isFocused = searchFocusedIndex === i + searchResults.players.slice(0, 5).length;
                      return (
-                       <button key={c.name} onClick={() => navigateToEntity("course", c)} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-colors", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5")}>
+                       <button key={c.name} onClick={() => navigateToEntity("course", c)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                           <MapPin className="w-4 h-4 opacity-50" />
                           <span className="font-bold flex-1">{c.name}</span>
                           <ChevronRight className="w-4 h-4 opacity-30 ml-auto" />
@@ -269,7 +269,7 @@ export const HomeView = React.memo(() => {
                    {searchResults.teams.slice(0, 5).map((t: any, i) => {
                      const isFocused = searchFocusedIndex === i + searchResults.players.slice(0, 5).length + searchResults.courses.slice(0, 5).length;
                      return (
-                       <button key={t.name || i} onClick={() => navigateToEntity("team", t)} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-colors", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5")}>
+                       <button key={t.name || i} onClick={() => navigateToEntity("team", t)} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                           <Users className="w-4 h-4 opacity-50" />
                           <span className="font-bold flex-1">{t.name}</span>
                           <ChevronRight className="w-4 h-4 opacity-30 ml-auto" />
@@ -315,8 +315,9 @@ export const HomeView = React.memo(() => {
           </p>
           <div className="flex w-full sm:max-w-xs mt-1 sm:mt-6 mx-auto">
             <button 
-              className="group relative px-6 py-4 sm:py-5 w-full bg-blue-600 overflow-hidden rounded-2xl font-bold text-lg sm:text-xl tracking-wide text-white transition-colors duration-150 hover:bg-blue-500 active:bg-blue-700" 
+              className="group relative px-6 py-4 sm:py-5 w-full bg-blue-600 overflow-hidden rounded-2xl font-bold text-lg sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]" 
               onClick={() => setShowOnboarding(true)}
+              onTouchStart={() => {}}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_50%)]"></div>
@@ -343,7 +344,7 @@ export const HomeView = React.memo(() => {
         </motion.div>
       ) : kpiStats && (
         <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 h-[140px]">
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
             {/* Sparkline */}
             <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
               <ResponsiveContainer width="100%" height="100%">
@@ -362,7 +363,7 @@ export const HomeView = React.memo(() => {
             <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
             <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
           </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 h-[140px]">
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
             {/* Sparkline */}
             <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
               <ResponsiveContainer width="100%" height="100%">
@@ -381,7 +382,7 @@ export const HomeView = React.memo(() => {
             <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
             <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
           </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 h-[140px]">
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
             {/* Sparkline */}
             <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
               <ResponsiveContainer width="100%" height="100%">
@@ -400,7 +401,7 @@ export const HomeView = React.memo(() => {
             <div className="absolute left-2.5 bottom-8 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">#</div>
             <div className="absolute right-4 bottom-2 text-[9px] font-mono font-bold text-black/[0.04] dark:text-white/[0.04] pointer-events-none select-none mix-blend-overlay">T</div>
           </div>
-          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 h-[140px]">
+          <div className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-5 flex flex-col items-center justify-center text-center hover:bg-black/10 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] transition-all duration-300 group hover:-translate-y-1 h-[140px]" onTouchStart={() => {}}>
             {/* Sparkline */}
             <div className="absolute inset-0 bottom-0 top-auto h-2/3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity flex items-end">
               <ResponsiveContainer width="100%" height="100%">
@@ -438,7 +439,7 @@ export const HomeView = React.memo(() => {
         </motion.div>
       ) : currentFeature && (
         <motion.div variants={itemVariants} className="w-full">
-          <div onClick={() => navigateToEntity(currentFeature.type, currentFeature.data)} className={cn("relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1")}>
+          <div onClick={() => navigateToEntity(currentFeature.type, currentFeature.data)} onTouchStart={() => {}} className={cn("relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]")}>
             {/* Neon Border Setup */}
             <div className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
@@ -520,8 +521,9 @@ export const HomeView = React.memo(() => {
       {/* Navigation Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div 
-             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-colors duration-150 group hover:bg-black/10 dark:hover:bg-white/10 min-h-[220px]"
+             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-all duration-150 group hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
              onClick={() => navigate("/hof")}
+             onTouchStart={() => {}}
           >
 
 
@@ -540,8 +542,9 @@ export const HomeView = React.memo(() => {
           </div>
           
           <div 
-             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-colors duration-150 group hover:bg-black/10 dark:hover:bg-white/10 min-h-[220px]"
+             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-all duration-150 group hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
              onClick={() => navigate("/courses")}
+             onTouchStart={() => {}}
           >
 
 
@@ -560,8 +563,9 @@ export const HomeView = React.memo(() => {
           </div>
           
           <div 
-             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-colors duration-150 group hover:bg-black/10 dark:hover:bg-white/10 min-h-[220px]"
+             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-all duration-150 group hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
              onClick={() => navigate("/players")}
+             onTouchStart={() => {}}
           >
 
 
@@ -580,8 +584,9 @@ export const HomeView = React.memo(() => {
           </div>
           
           <div 
-             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-colors duration-150 group hover:bg-black/10 dark:hover:bg-white/10 min-h-[220px]"
+             className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start cursor-pointer transition-all duration-150 group hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
              onClick={() => navigate("/teams")}
+             onTouchStart={() => {}}
           >
 
 
@@ -676,12 +681,13 @@ export const HomeView = React.memo(() => {
                         </div>
                         
                         {/* Content Card */}
-                        <div className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between min-w-0" onClick={() => navigateToEntity("course", item.course || { name: item.courseName })}>
+                        <div className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 active:scale-[0.98] active:bg-black/5 dark:active:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between min-w-0" onClick={() => navigateToEntity("course", item.course || { name: item.courseName })} onTouchStart={() => {}}>
                           <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
                             <div className="flex items-center gap-2 max-w-full w-full">
                               <span 
-                                className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5 min-w-0 max-w-full shrink" 
+                                className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase hover:text-blue-500 active:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5 min-w-0 max-w-full shrink" 
                                 onClick={(e) => { e.stopPropagation(); navigateToEntity("player", item.athlete || { name: item.name }); }}
+                                onTouchStart={() => {}}
                               >
                                 {athleteFlag && <span className="text-[12px] opacity-90 shrink-0">{athleteFlag}</span>}
                                 <span className="truncate">{playerName}</span>
@@ -719,8 +725,9 @@ export const HomeView = React.memo(() => {
             {!isLoading && recentFeed && recentFeed.length > visibleRuns && (
               <div className="flex justify-center mt-8">
                 <button
-                  className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 transition-all duration-300 rounded-2xl"
+                  className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 active:text-blue-500 transition-all duration-300 rounded-2xl"
                   onClick={() => setVisibleRuns(prev => Math.min(prev + 20, 100, recentFeed.length))}
+                  onTouchStart={() => {}}
                 >
                   <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
                   Load More

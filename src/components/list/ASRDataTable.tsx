@@ -103,7 +103,6 @@ const MemoizedVirtualRow = React.memo(({
       className={cn("w-full px-4", viewType === "card" && "pb-3")}
     >
       <ASRListItem
-        layoutId={`card-${item.id || item.name || virtualRow.key}`}
         variant={viewType}
         rank={item.currentRank}
         title={item.name}
