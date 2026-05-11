@@ -210,16 +210,14 @@ export const CourseDetails = React.memo(
         ? (urlTab as "stats" | "men" | "women")
         : "stats"
     );
-    const deferredTab = React.useDeferredValue(activeTab);
 
     const [activeMode, setActiveMode] = useState<"open" | "all-time">(
       (searchParams.get("mode") as "open" | "all-time") || "open"
     );
-    const deferredMode = React.useDeferredValue(activeMode);
 
     const recordsM = useMemo(() => {
-      const source = deferredMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = deferredMode === "all-time" ? atRawBest : opRawBest;
+      const source = activeMode === "all-time" ? lbAT_Courses : lbOP_Courses;
+      const rawBest = activeMode === "all-time" ? atRawBest : opRawBest;
       const sourceM = source?.M[cName] || {};
       const times = Object.values(sourceM) as number[];
       const record = times.length > 0 ? Math.min(...times) : 0;
@@ -244,11 +242,11 @@ export const CourseDetails = React.memo(
         }
         return { ...r, rank: currentRank };
       });
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, deferredMode]);
+    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, activeMode]);
 
     const recordsF = useMemo(() => {
-      const source = deferredMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = deferredMode === "all-time" ? atRawBest : opRawBest;
+      const source = activeMode === "all-time" ? lbAT_Courses : lbOP_Courses;
+      const rawBest = activeMode === "all-time" ? atRawBest : opRawBest;
       const sourceF = source?.F[cName] || {};
       const times = Object.values(sourceF) as number[];
       const record = times.length > 0 ? Math.min(...times) : 0;
@@ -273,7 +271,7 @@ export const CourseDetails = React.memo(
         }
         return { ...r, rank: currentRank };
       });
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, deferredMode]);
+    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, activeMode]);
 
     const stats = [
       {
@@ -428,10 +426,9 @@ export const CourseDetails = React.memo(
           className={cn(
             "flex flex-col flex-1 transition-colors",
             theme === "dark" ? "bg-[#030303]" : "bg-white",
-            activeTab !== deferredTab ? "opacity-70 pointer-events-none transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"
           )}
         >
-          {deferredTab === "men" && (
+          {activeTab === "men" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -479,7 +476,7 @@ export const CourseDetails = React.memo(
             </div>
           )}
 
-          {deferredTab === "women" && (
+          {activeTab === "women" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -527,7 +524,7 @@ export const CourseDetails = React.memo(
             </div>
           )}
 
-          {deferredTab === "stats" && (
+          {activeTab === "stats" && (
             <InspectorTabContainer tight>
               <div className="flex flex-col gap-4">
                 <SectionTitle>STATS</SectionTitle>
