@@ -55,7 +55,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
         title: "1. Find a course",
         desc: (
           <>
-            Use our map and course guides to find a course near you. Join{" "}
+            Use the ASR map to find a course near you. Join{" "}
             <a
               href={CONFIG.SKOOL_LINK}
               target="_blank"
@@ -70,7 +70,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             >
               Apex Skool app
             </a>{" "}
-            to access the latest ASR resources.
+            to access the ASR community.
           </>
         ),
         icon: <MapPin />,
@@ -94,7 +94,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             >
               Apex Skool app
             </a>{" "}
-            for filming requirements and official rules to ensure that your best
+            for official rules to make sure your best
             runs count.
           </>
         ),
@@ -119,8 +119,8 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             >
               Apex Skool app
             </a>{" "}
-            for official review. Once verified, your stats will update and
-            broadcast live on our website.
+            for official review. Once verified, your stats will be updated and
+            broadcast live in the ASR app.
           </>
         ),
         icon: <ShieldCheck />,

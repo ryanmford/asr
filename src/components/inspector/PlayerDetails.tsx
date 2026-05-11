@@ -65,9 +65,11 @@ export const PlayerDetails = React.memo(
     const [activeTab, setActiveTab] = useState<string>(
       validTabs.includes(urlTab as string) ? (urlTab as string) : initialTab || "runs"
     );
+    const deferredTab = React.useDeferredValue(activeTab);
     const [activeMode, setActiveMode] = useState<"open" | "all-time">(
       (searchParams.get("mode") as "open" | "all-time") || "open"
     );
+    const deferredMode = React.useDeferredValue(activeMode);
 
     const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);
 
@@ -89,7 +91,7 @@ export const PlayerDetails = React.memo(
       vitals,
       rankListRuns,
       vaultItems,
-    } = usePlayerDetailsData(player, activeMode, dataContext);
+    } = usePlayerDetailsData(player, deferredMode, dataContext);
 
     return (
       <div
@@ -139,9 +141,10 @@ export const PlayerDetails = React.memo(
           className={cn(
             "flex flex-col flex-1 transition-colors",
             theme === "dark" ? "bg-[#050505]" : "bg-[#FAFAFA]",
+            activeTab !== deferredTab ? "opacity-70 pointer-events-none transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"
           )}
         >
-          {activeTab === "runs" && (
+          {deferredTab === "runs" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -263,7 +266,7 @@ export const PlayerDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "sets" && (
+          {deferredTab === "sets" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -368,7 +371,7 @@ export const PlayerDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "vault" && (
+          {deferredTab === "vault" && (
             <InspectorTabContainer className="gap-14 text-center">
               <div className="flex flex-col gap-8">
                 <SectionTitle noPadding>TOKENS</SectionTitle>
@@ -451,7 +454,7 @@ export const PlayerDetails = React.memo(
             </InspectorTabContainer>
           )}
 
-          {activeTab === "bio" && (
+          {deferredTab === "bio" && (
             <InspectorTabContainer>
               <div className="flex flex-col gap-4">
                 <SectionTitle>SEND TIP</SectionTitle>

@@ -47,12 +47,14 @@ export const TeamDetails = React.memo(
           : (urlTab as string)
         : "players"
     );
+    const deferredTab = React.useDeferredValue(activeTab);
     
     const [mode, setMode] = useState<"open" | "all-time">(
       (searchParams.get("mode") as "open" | "all-time") ||
       initialMode ||
       "open"
     );
+    const deferredMode = React.useDeferredValue(mode);
 
     const {
       tMeta,
@@ -63,7 +65,7 @@ export const TeamDetails = React.memo(
       playerTuples,
       setterTuples,
       vaultItems,
-    } = useTeamDetailsData(team, mode, dataContext);
+    } = useTeamDetailsData(team, deferredMode, dataContext);
 
     const randomPlayersPromo = useMemo(() => {
       const types: PromoType[] = ["coach"];
@@ -125,9 +127,10 @@ export const TeamDetails = React.memo(
           className={cn(
             "flex flex-col flex-1 transition-colors",
             theme === "dark" ? "bg-[#030303]" : "bg-white",
+            activeTab !== deferredTab ? "opacity-70 pointer-events-none transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"
           )}
         >
-          {activeTab === "bio" && (
+          {deferredTab === "bio" && (
             <InspectorTabContainer>
               <div className="flex flex-col gap-4">
                 <SectionTitle>GYM PROFILE</SectionTitle>
@@ -172,7 +175,7 @@ export const TeamDetails = React.memo(
               </div>
             </InspectorTabContainer>
           )}
-          {activeTab === "players" && (
+          {deferredTab === "players" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -219,7 +222,7 @@ export const TeamDetails = React.memo(
               </div>
             </div>
           )}
-          {activeTab === "setters" && (
+          {deferredTab === "setters" && (
             <InspectorTabContainer>
               <div className="grid grid-cols-2 gap-4">
                 <ASRStatCard label="IMPACT" value={setterStats.impact} />
@@ -244,7 +247,7 @@ export const TeamDetails = React.memo(
             </InspectorTabContainer>
           )}
 
-          {activeTab === "vault" && (
+          {deferredTab === "vault" && (
             <InspectorTabContainer className="gap-14 text-center">
               <div className="flex flex-col gap-8">
                 <SectionTitle noPadding>MEDALS</SectionTitle>

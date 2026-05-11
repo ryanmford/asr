@@ -17,6 +17,7 @@ export const ASRNeonToggle = ({
  onChange,
  theme,
  className,
+ layoutId,
 }: ASRNeonToggleProps) => {
 
  return (
@@ -57,6 +58,7 @@ export const ASRNeonToggle = ({
  >
  {isActive && (
  <motion.div
+ layoutId={layoutId ? `${layoutId}-pill` : undefined}
  initial={{ opacity: 0 }}
  animate={{ opacity: 1 }}
  className="absolute inset-0 z-0 rounded-full"
