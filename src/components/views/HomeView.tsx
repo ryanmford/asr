@@ -316,13 +316,13 @@ export const HomeView = React.memo(() => {
       initial="hidden"
       animate="show"
       variants={containerVariants}
-      className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 pt-4 sm:pt-4 pb-32 gap-6 sm:gap-16"
+      className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 pt-2 sm:pt-4 pb-32 gap-4 sm:gap-16"
     >
       {/* Global Search */}
       <motion.div
         variants={itemVariants}
         className={cn(
-          "py-3 sm:py-4 -mx-4 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-4 sm:mb-6",
+          "py-2 sm:py-4 -mx-4 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-2 sm:mb-6",
           theme === "dark"
             ? "border-white/5 bg-zinc-950/80"
             : "border-black/5 bg-white/80",
@@ -338,7 +338,7 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden px-4 py-8 sm:p-16 lg:p-24 flex flex-col items-center justify-center gap-4 sm:gap-12 w-full text-center shrink-0",
+          "relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden px-4 py-6 sm:p-16 lg:p-24 flex flex-col items-center justify-center gap-3 sm:gap-12 w-full text-center shrink-0",
           theme === "dark" ? "bg-zinc-950" : "bg-white",
         )}
       >
@@ -378,15 +378,15 @@ export const HomeView = React.memo(() => {
           )}
         ></div>
 
-        <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-4 sm:space-y-8 w-full mx-auto">
-          <h1 className="text-[clamp(1.5rem,7.5vw,4rem)] md:text-5xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.1] sm:leading-none uppercase flex flex-row items-center justify-center gap-2 sm:gap-4 text-center">
+        <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-3 sm:space-y-8 w-full mx-auto">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.1] sm:leading-none uppercase flex flex-row items-center justify-center gap-2 sm:gap-4 text-center">
             <span className="italic transform -skew-x-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-500 pb-1 sm:pb-2 pr-2 sm:pr-8 break-words text-balance">
               Apex Speed Run
             </span>
           </h1>
           <p
             className={cn(
-              "font-medium text-sm sm:text-xl lg:text-2xl max-w-2xl leading-relaxed mx-auto px-2",
+              "font-medium text-xs sm:text-xl lg:text-2xl max-w-2xl leading-relaxed mx-auto px-2",
               theme === "dark" ? "text-zinc-400" : "text-zinc-500",
             )}
           >
@@ -395,7 +395,7 @@ export const HomeView = React.memo(() => {
           </p>
           <div className="flex w-full sm:max-w-xs mt-1 sm:mt-6 mx-auto">
             <button
-              className="group relative px-6 py-4 sm:py-5 w-full bg-blue-500 overflow-hidden rounded-2xl font-bold text-lg sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]"
+              className="group relative px-6 py-3 sm:py-5 w-full bg-blue-500 overflow-hidden rounded-xl sm:rounded-2xl font-bold text-base sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]"
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
             >
@@ -441,7 +441,7 @@ export const HomeView = React.memo(() => {
               }}
               onTouchStart={() => {}}
               className={cn(
-                "relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
+                "relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-8 sm:pb-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
               )}
             >
               <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30">

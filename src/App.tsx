@@ -235,7 +235,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       </div>
 
       <main
-        className="flex-1 w-full max-w-7xl mx-auto flex flex-col relative pt-4"
+        className="flex-1 w-full max-w-7xl mx-auto flex flex-col relative pt-0 sm:pt-4"
       >
         <div className="flex-1 flex flex-col">
             <RouteErrorBoundary>
