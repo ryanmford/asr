@@ -193,6 +193,8 @@ const getInspectorDataForPath = (
   atMet: Record<string, PlayerProfile>,
   masterCourseList: CourseData[],
   settersWithImpact: SetterProfile[],
+  setterMet: Record<string, SetterProfile>,
+  cMet: Record<string, unknown>,
 ) => {
   const pathSegments = pathname.split("/").filter(Boolean);
   const viewPrefix = pathSegments[0];
@@ -203,24 +205,26 @@ const getInspectorDataForPath = (
   if (!entitySlug) return null;
 
   if (viewPrefix === "players") {
-    const found = Object.values(atMet || {}).find(
-      (a: PlayerProfile) =>
-        a.name?.toLowerCase() === entitySlug.toLowerCase() ||
-        a.pKey === entitySlug.toLowerCase(),
-    );
+    const pKey = entitySlug.toLowerCase();
+    // Fast O(1) lookup
+    let found = atMet?.[pKey];
+    if (!found) {
+      found = Object.values(atMet || {}).find(
+        (a: PlayerProfile) =>
+          a.name?.toLowerCase() === pKey ||
+          a.pKey === pKey,
+      );
+    }
     return {
       type: "player",
-      data: found || { name: entitySlug, pKey: entitySlug },
+      data: found || { name: entitySlug, pKey },
       isNotFound: !found,
       requestedId: entitySlug,
     };
   }
   if (viewPrefix === "courses") {
-    const found = masterCourseList.find(
-      (c: CourseData) =>
-        c.name?.toLowerCase() === entitySlug.toLowerCase() ||
-        c.pKey === entitySlug.toLowerCase(),
-    );
+    const cKey = entitySlug.toUpperCase();
+    let found = masterCourseList.find((c) => c.pKey === cKey || c.name?.toUpperCase() === cKey);
     return {
       type: "course",
       data: found || { name: entitySlug },
@@ -229,11 +233,15 @@ const getInspectorDataForPath = (
     };
   }
   if (viewPrefix === "setters") {
-    const found = settersWithImpact.find(
-      (s: SetterProfile) =>
-        s.name?.toLowerCase() === entitySlug.toLowerCase() ||
-        s.pKey === entitySlug.toLowerCase(),
-    );
+    const sKey = entitySlug.toLowerCase();
+    let found = setterMet?.[sKey];
+    if (!found) {
+      found = settersWithImpact.find(
+        (s: SetterProfile) =>
+          s.name?.toLowerCase() === sKey ||
+          s.pKey === sKey,
+      );
+    }
     return {
       type: "setter",
       data: found || { name: entitySlug },
@@ -251,13 +259,22 @@ const getInspectorDataForPath = (
 export const useInspectorData = () => {
   const location = useLocation();
 
-  const atMet = useDataStore((s) => s.atMet);
+  const atMet = useDataStore((s) => s.atMet as Record<string, PlayerProfile>);
   const masterCourseList = useMasterCourseList();
   const settersWithImpact = useDataStore((s) => s.settersWithImpact);
+  const setterMet = useDataStore((s) => s.setterMet as Record<string, SetterProfile>);
+  const cMet = useDataStore((s) => s.cMet as Record<string, unknown>);
+
+  // Only recompute when pathname or state changes, ignoring search params/hash
+  const locationPathname = location.pathname;
+  const locationState = location.state;
 
   return useMemo(() => {
     const history = [];
-    let currentLoc: { pathname: string; state?: { backgroundLocation?: unknown } } | null = location;
+    let currentLoc: { pathname: string; state?: { backgroundLocation?: unknown } } | null = {
+      pathname: locationPathname,
+      state: locationState as { backgroundLocation?: unknown } | undefined,
+    };
 
     while (currentLoc) {
       const data = getInspectorDataForPath(
@@ -265,12 +282,14 @@ export const useInspectorData = () => {
         atMet,
         masterCourseList,
         settersWithImpact,
+        setterMet,
+        cMet,
       );
       if (data) {
         history.unshift(data);
       }
       if (currentLoc.state && currentLoc.state.backgroundLocation) {
-        currentLoc = currentLoc.state.backgroundLocation;
+        currentLoc = currentLoc.state.backgroundLocation as { pathname: string; state?: { backgroundLocation?: unknown } };
       } else {
         break;
       }
@@ -281,7 +300,7 @@ export const useInspectorData = () => {
       history: history,
       historyIndex: history.length > 0 ? history.length - 1 : -1,
     };
-  }, [location, atMet, masterCourseList, settersWithImpact]);
+  }, [locationPathname, locationState, atMet, masterCourseList, settersWithImpact, setterMet, cMet]);
 };
 
 export const useCourseList = () => {

@@ -41,15 +41,28 @@ export const ASRRankList = ({
  const theme = useContext(ThemeContext);
  const { atMet = {}, cMet = {} } = dataContext;
 
- const displayAthletes = [...athletes];
-  if (padTo > 0 && displayAthletes.length < padTo) {
-    const padCount = padTo - displayAthletes.length;
-    for (let i = 0; i < padCount; i++) {
-      displayAthletes.push({ pKey: "UNCLAIMED RANK", isUnclaimed: true });
+  const { finalAthletes, listRenderKey } = React.useMemo(() => {
+    const displayAthletes = [...athletes];
+    if (padTo > 0 && displayAthletes.length < padTo) {
+      const padCount = padTo - displayAthletes.length;
+      for (let i = 0; i < padCount; i++) {
+        displayAthletes.push({ pKey: "UNCLAIMED RANK", isUnclaimed: true } as any);
+      }
     }
-  }
 
-  const finalAthletes = limit ? displayAthletes.slice(0, limit) : displayAthletes;
+    const _finalAthletes = limit ? displayAthletes.slice(0, limit) : displayAthletes;
+
+    let _listRenderKey = "empty";
+    if (displayAthletes && displayAthletes.length > 0) {
+      const firstItem = displayAthletes[0] as any;
+      const topKey = Array.isArray(firstItem)
+        ? firstItem[0]
+        : firstItem.pKey || firstItem.label || "unknown";
+      _listRenderKey = `${topKey}`;
+    }
+
+    return { finalAthletes: _finalAthletes, listRenderKey: _listRenderKey };
+  }, [athletes, limit, padTo]);
 
   const estimateSize = React.useCallback(() => isCompact ? 80 : 100, [isCompact]);
   const virtualizer = useWindowVirtualizer({
@@ -57,16 +70,6 @@ export const ASRRankList = ({
     estimateSize,
     overscan: 5,
   });
-
- // Generate a composite key based on list composition to trigger stagger animations when swapping lists (like Open vs All-Time)
- const listRenderKey = React.useMemo(() => {
- if (!displayAthletes || displayAthletes.length === 0) return "empty";
- const firstItem = displayAthletes[0];
- const topKey = Array.isArray(firstItem)
- ? firstItem[0]
- : firstItem.pKey || firstItem.label || "unknown";
- return `${topKey}`;
- }, [displayAthletes]);
 
  return (
  <div className={cn("space-y-6 text-left overflow-visible", className)}>

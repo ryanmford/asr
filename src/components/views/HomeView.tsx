@@ -61,58 +61,41 @@ export const HomeView = React.memo(() => {
   const { navigateToEntity } = useAppNavigation();
   const [visibleRuns, setVisibleRuns] = useState(20);
 
+  const courseList_AT = useDataStore((s) => s.courseList_AT);
+  const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
+  const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
+
   const playersTrend = kpiTrends?.players || [];
   const runsTrend = kpiTrends?.runs || [];
   const coursesTrend = kpiTrends?.courses || [];
   const countriesTrend = kpiTrends?.countries || [];
 
   const { topPlayer, topCourse, topTeam } = useMemo(() => {
-    const combinedPlayers = [
-      ...playerList_M_AT.map((p, i) => ({ ...p, _gRank: i + 1, _g: "M" })),
-      ...playerList_F_AT.map((p, i) => ({ ...p, _gRank: i + 1, _g: "F" })),
-    ].sort(
-      (a, b) =>
-        (b.wins || 0) +
-        (b.totalFireCount || 0) -
-        ((a.wins || 0) + (a.totalFireCount || 0)),
-    );
+    let topPlayer: any = null;
+    let topScore = -1;
+    [playerList_M_AT[0], playerList_F_AT[0]].filter(Boolean).forEach((p: any) => {
+       const score = (p.wins || 0) + (p.totalFireCount || 0);
+       if (score > topScore) { topScore = score; topPlayer = p; }
+    });
 
-    const sortedCourses = [...masterCourseList].sort(
-      (a, b) =>
-        (b.totalAllTimeRuns || b.totalRuns || 0) -
-        (a.totalAllTimeRuns || a.totalRuns || 0),
-    );
+    const topCourse =
+      courseList_AT.find((c: any) => String(c.name).toUpperCase().includes("FUNDA")) ||
+      (courseList_AT.length > 0 ? courseList_AT[0] : null);
 
-    const teamsArr = [
-      ...(
-        (
-          teamsAggregated as {
-            gyms?: { allTime?: SearchResultTeam[] };
-            teams?: { allTime?: SearchResultTeam[] };
-          }
-        )?.gyms?.allTime || []
-      ).map((t: SearchResultTeam) => ({ ...t, _isGym: true })),
-      ...(
-        (
-          teamsAggregated as {
-            gyms?: { allTime?: SearchResultTeam[] };
-            teams?: { allTime?: SearchResultTeam[] };
-          }
-        )?.teams?.allTime || []
-      ).map((t: SearchResultTeam) => ({ ...t, _isGym: false })),
-    ].sort(
-      (a, b) =>
-        ((b as SearchResultTeam).pts || 0) - ((a as SearchResultTeam).pts || 0),
-    );
+    let topTeam: any = null;
+    const gTop = teamList_gyms_AT[0] as any;
+    const tTop = teamList_teams_AT[0] as any;
+    
+    if (gTop && tTop) {
+       topTeam = (gTop.pts >= tTop.pts) ? { ...gTop, _isGym: true } : { ...tTop, _isGym: false };
+    } else if (gTop) {
+       topTeam = { ...gTop, _isGym: true };
+    } else if (tTop) {
+       topTeam = { ...tTop, _isGym: false };
+    }
 
-    return {
-      topPlayer: combinedPlayers.length > 0 ? combinedPlayers[0] : null,
-      topCourse:
-        sortedCourses.find((c) => c.name.toUpperCase().includes("FUNDA")) ||
-        (sortedCourses.length > 0 ? sortedCourses[0] : null),
-      topTeam: teamsArr.length > 0 ? teamsArr[0] : null,
-    };
-  }, [playerList_M_AT, playerList_F_AT, masterCourseList, teamsAggregated]);
+    return { topPlayer, topCourse, topTeam };
+  }, [playerList_M_AT, playerList_F_AT, courseList_AT, teamList_gyms_AT, teamList_teams_AT]);
 
   const [carouselIndex, setCarouselIndex] = useState(0);
 
@@ -235,38 +218,55 @@ export const HomeView = React.memo(() => {
     show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   };
 
-  const kpi =
-    (kpiStats as {
-      players?: number;
-      runs?: number;
-      courses?: number;
-      countries?: number;
-      cities?: number;
-    }) || {};
-  const tAgg = teamsAggregated as any;
-  const totalGyms = Math.max(
-    tAgg?.gyms?.open?.length || 0,
-    tAgg?.gyms?.allTime?.length || 0,
-  );
-  const totalTeams = Math.max(
-    tAgg?.teams?.open?.length || 0,
-    tAgg?.teams?.allTime?.length || 0,
-  );
-  const totalMedals = masterCourseList.reduce((acc, c) => {
-    const mCount = Math.min(3, c.allTimeAthletesM?.length || 0);
-    const fCount = Math.min(3, c.allTimeAthletesF?.length || 0);
-    return acc + mCount + fCount;
-  }, 0);
+  const {
+    kpi,
+    totalGyms,
+    totalTeams,
+    totalMedals,
+    medalsTrendData,
+    playersTrendData,
+    runsTrendData,
+    coursesTrendData,
+    countriesTrendData,
+  } = useMemo(() => {
+    const kpiData = (kpiStats as any) || {};
 
-  const playersTrendData = kpiTrends?.players || [];
-  const runsTrendData = kpiTrends?.runs || [];
-  const coursesTrendData = kpiTrends?.courses || [];
-  const countriesTrendData = kpiTrends?.countries || [];
+    const tGyms = Math.max(
+      teamList_gyms_AT?.length || 0,
+      1,
+    );
+    const tTeams = Math.max(
+      teamList_teams_AT?.length || 0,
+      1,
+    );
+    const tMedals = masterCourseList.reduce((acc, c: any) => {
+      const mCount = Math.min(3, c.allTimeAthletesM?.length || 0);
+      const fCount = Math.min(3, c.allTimeAthletesF?.length || 0);
+      return acc + mCount + fCount;
+    }, 0);
 
-  const medalsMultiplier = kpi.courses ? totalMedals / kpi.courses : 6;
-  const medalsTrendData = coursesTrendData.map((d) => ({
-    value: Math.round(d.value * medalsMultiplier),
-  }));
+    const pTrendData = kpiTrends?.players || [];
+    const rTrendData = kpiTrends?.runs || [];
+    const cTrendData = kpiTrends?.courses || [];
+    const cntTrendData = kpiTrends?.countries || [];
+
+    const medalsMultiplier = kpiData.courses ? tMedals / kpiData.courses : 6;
+    const mTrendData = cTrendData.map((d: any) => ({
+      value: Math.round(d.value * medalsMultiplier),
+    }));
+
+    return {
+      kpi: kpiData,
+      totalGyms: tGyms,
+      totalTeams: tTeams,
+      totalMedals: tMedals,
+      medalsTrendData: mTrendData,
+      playersTrendData: pTrendData,
+      runsTrendData: rTrendData,
+      coursesTrendData: cTrendData,
+      countriesTrendData: cntTrendData,
+    };
+  }, [kpiStats, teamList_gyms_AT, teamList_teams_AT, masterCourseList, kpiTrends]);
 
   return (
     <motion.div
