@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Search, CloudOff } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { ASRListItem } from "../ASRListItems";
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useDataStore } from "../../store/useDataStore";

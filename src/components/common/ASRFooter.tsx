@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { cn } from "../../lib/asr-utils";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { useDataStore } from "../../store/useDataStore";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Instagram, Youtube, Link, RefreshCw, CheckCircle2 } from "lucide-react";

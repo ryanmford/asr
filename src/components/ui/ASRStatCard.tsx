@@ -2,7 +2,7 @@
  
 import React, { useState, useEffect, useContext } from "react";
 import { cn, THEME, trackEvent } from "../../lib/asr-utils";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 
 interface ASRStatCardProps {
  label: string;

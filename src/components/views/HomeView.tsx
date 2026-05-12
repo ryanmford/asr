@@ -18,7 +18,7 @@ import { useAppNavigation } from "../../hooks/useDerivedData";
 import { ASRSearchInput } from "../common/ASRSearchInput";
 import { ASRGlobalSearch } from "../common/ASRGlobalSearch";
 import { CountUp } from "../common/CountUp";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
 import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";

@@ -1,6 +1,6 @@
 import React, { useMemo, useContext, useState, useRef } from "react";
 import { cn } from "../../lib/utils";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { motion, AnimatePresence } from "motion/react";
 
 interface ActivityChartProps {

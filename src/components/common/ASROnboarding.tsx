@@ -12,7 +12,7 @@ import {
   CornerUpRight,
   ChevronRight,
 } from "lucide-react";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { CONFIG, trackEvent, cn } from "../../lib/asr-utils";
 
 import { ASRPremiumButton } from "../ui/ASRPremiumButton";

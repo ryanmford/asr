@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Play, MapPin } from "lucide-react";
 import { THEME, cn, trackEvent, formatFlagsWithSpace } from "../lib/asr-utils";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../theme-context";
 import { useAppStore } from "../store/useAppStore";
 
 export const ASRRankBadge = React.memo(

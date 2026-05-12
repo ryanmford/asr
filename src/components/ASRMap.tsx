@@ -8,7 +8,7 @@ import {
   Minus
 } from "lucide-react";
 import { trackEvent, cn } from "../lib/asr-utils";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../theme-context";
 
 declare global {
   interface Window {

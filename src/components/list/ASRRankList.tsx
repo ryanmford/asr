@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Activity } from "lucide-react";
 import { motion } from "motion/react";
 import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity } from "../../lib/asr-utils";
-import { ThemeContext } from "../../App";
+import { ThemeContext } from "../../theme-context";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRListItem } from "../ASRListItems";
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
