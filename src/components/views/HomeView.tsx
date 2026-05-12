@@ -58,12 +58,14 @@ export const HomeView = React.memo(() => {
   const recentFeed = useDataStore((s) => s.recentFeed);
   const isLoading = useDataStore((s) => s.isLoading);
   const setShowOnboarding = useAppStore((s) => s.setShowOnboarding);
+  const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
   const { navigateToEntity } = useAppNavigation();
   const [visibleRuns, setVisibleRuns] = useState(20);
 
   const courseList_AT = useDataStore((s) => s.courseList_AT);
   const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
   const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
+  const atPerfs = useDataStore((s) => s.atPerfs);
 
   const playersTrend = kpiTrends?.players || [];
   const runsTrend = kpiTrends?.runs || [];
@@ -72,14 +74,23 @@ export const HomeView = React.memo(() => {
 
   const { topPlayer, topCourse, topTeam } = useMemo(() => {
     let topPlayer: any = null;
-    let topScore = -1;
-    [playerList_M_AT[0], playerList_F_AT[0]].filter(Boolean).forEach((p: any) => {
-       const score = (p.wins || 0) + (p.totalFireCount || 0);
-       if (score > topScore) { topScore = score; topPlayer = p; }
-    });
+    const taylorIndexF = playerList_F_AT.findIndex((p: any) => String(p.name).toUpperCase().includes("TAYLOR"));
+    if (taylorIndexF !== -1) {
+      topPlayer = { ...playerList_F_AT[taylorIndexF], _gRank: taylorIndexF + 1 };
+    } else {
+      const benatiIndexM = playerList_M_AT.findIndex((p: any) => String(p.name).toUpperCase().includes("BENATI"));
+      if (benatiIndexM !== -1) {
+         topPlayer = { ...playerList_M_AT[benatiIndexM], _gRank: benatiIndexM + 1 };
+      } else if (playerList_M_AT[0]) {
+         topPlayer = { ...playerList_M_AT[0], _gRank: 1 };
+      }
+    }
 
     const topCourse =
-      courseList_AT.find((c: any) => String(c.name).toUpperCase().includes("FUNDA")) ||
+      courseList_AT.find((c: any) => {
+        const n = String(c.name).toUpperCase();
+        return n.includes("KANEWAI") || n.includes("KĀNEWAI");
+      }) ||
       (courseList_AT.length > 0 ? courseList_AT[0] : null);
 
     let topTeam: any = null;
@@ -108,42 +119,34 @@ export const HomeView = React.memo(() => {
 
   const featureList = useMemo(() => {
     const list = [];
-    if (topCourse) {
-      const courseFlag = topCourse.flag;
+    
+    // 1. Run of the Month
+    const joeyFundaPerf = (atPerfs?.["joeyjepsen"] as any[])?.find((p) => p.label === "FUNDA");
+    const runTime = joeyFundaPerf ? Number(joeyFundaPerf.num).toFixed(2) : "17.71";
+    const runRank = joeyFundaPerf?.rank || 1;
+    const runVideo = joeyFundaPerf?.videoUrl || "https://youtube.com/shorts/ThkpzLI1gIc";
 
-      list.push({
-        type: "course",
-        data: topCourse,
-        displayName: courseFlag
-          ? `${formatFlagsWithSpace(courseFlag).trim()} ${topCourse.name}`
-          : topCourse.name,
-        label: "Course of the Month",
-        icon: <MapPin className="w-4 h-4" />,
-        color: "text-emerald-500",
-        shadowColor: "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
-        borderHover: "hover:shadow-emerald-500/20",
-        bg: "bg-emerald-500/10",
-        hoverBg: "group-hover:bg-emerald-500",
-        hoverText:
-          "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-        gradientUrl:
-          "conic-gradient(from 0deg, #10b981, #34d399, #059669, #34d399, #10b981)",
-        metrics: [
-          {
-            label: "CR (M)",
-            value: topCourse.mRecord ? topCourse.mRecord.toFixed(2) : "--",
-          },
-          {
-            label: "CR (W)",
-            value: topCourse.fRecord ? topCourse.fRecord.toFixed(2) : "--",
-          },
-          {
-            label: "Runs",
-            value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0,
-          },
-        ],
-      });
-    }
+    list.push({
+      type: "video",
+      data: { name: "Joey Jepsen on FUNDA", videoUrl: runVideo },
+      displayName: "🇺🇸 JOEY JEPSEN",
+      label: "Run of the Month",
+      icon: <Watch className="w-4 h-4" />,
+      color: "text-purple-500",
+      shadowColor: "shadow-[0_0_15px_rgba(168,85,247,0.2)]",
+      borderHover: "hover:shadow-purple-500/20",
+      bg: "bg-purple-500/10",
+      hoverBg: "group-hover:bg-purple-500",
+      hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
+      gradientUrl: "conic-gradient(from 0deg, #a855f7, #d946ef, #9333ea, #d946ef, #a855f7)",
+      metrics: [
+        { label: "Rank", value: runRank },
+        { label: "Time", value: runTime },
+        { label: "Course", value: "🇲🇽 FUNDA" },
+      ],
+    });
+
+    // 2. Player of the Month
     if (topPlayer) {
       const playerFlag = topPlayer.townFlag || topPlayer.gymFlag;
       list.push({
@@ -169,6 +172,8 @@ export const HomeView = React.memo(() => {
         ],
       });
     }
+
+    // 3. Team of the Month
     if (topTeam) {
       const teamFlag = topTeam.flag;
       list.push({
@@ -188,14 +193,52 @@ export const HomeView = React.memo(() => {
         gradientUrl:
           "conic-gradient(from 0deg, #f59e0b, #fbbf24, #d97706, #fbbf24, #f59e0b)",
         metrics: [
-          { label: "Points", value: Math.floor(topTeam.pts || 0) },
-          { label: "Members", value: topTeam.playersCount || 0 },
+          { label: "Rank", value: 1 },
           { label: "Runs", value: topTeam.runsCount || 0 },
+          { label: "Points", value: Math.floor(topTeam.pts || 0) },
         ],
       });
     }
+
+    // 4. Course of the Month
+    if (topCourse) {
+      const courseFlag = topCourse.flag;
+      list.push({
+        type: "course",
+        data: topCourse,
+        displayName: courseFlag
+          ? `${formatFlagsWithSpace(courseFlag).trim()} ${topCourse.name}`
+          : topCourse.name,
+        label: "Course of the Month",
+        icon: <MapPin className="w-4 h-4" />,
+        color: "text-emerald-500",
+        shadowColor: "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
+        borderHover: "hover:shadow-emerald-500/20",
+        bg: "bg-emerald-500/10",
+        hoverBg: "group-hover:bg-emerald-500",
+        hoverText:
+          "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+        gradientUrl:
+          "conic-gradient(from 0deg, #10b981, #34d399, #059669, #34d399, #10b981)",
+        metrics: [
+          {
+            label: "Runs",
+            value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0,
+          },
+          {
+            label: "CR (M)",
+            value: topCourse.mRecord ? topCourse.mRecord.toFixed(2) : "--",
+          },
+          {
+            label: "CR (W)",
+            value: topCourse.fRecord ? topCourse.fRecord.toFixed(2) : "--",
+          },
+        ],
+      });
+    }
+
     return list;
-  }, [topPlayer, topTeam, topCourse]);
+  }, [topPlayer, topCourse, topTeam, atPerfs]);
 
   const currentFeature =
     featureList.length > 0
@@ -389,25 +432,18 @@ export const HomeView = React.memo(() => {
         currentFeature && (
           <motion.div variants={itemVariants} className="w-full">
             <div
-              onClick={() =>
-                navigateToEntity(currentFeature.type, currentFeature.data)
-              }
+              onClick={() => {
+                if (currentFeature.type === "video") {
+                  setPlayingVideoUrl((currentFeature.data as { videoUrl: string }).videoUrl);
+                } else {
+                  navigateToEntity(currentFeature.type, currentFeature.data);
+                }
+              }}
               onTouchStart={() => {}}
               className={cn(
                 "relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-12 sm:pb-12 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
               )}
             >
-              {/* Neon Border Setup */}
-              <div className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                  <div
-                    className="w-full h-full neon-border-rotate"
-                    style={{ backgroundImage: currentFeature.gradientUrl }}
-                  />
-                </div>
-                <div className="absolute inset-[1px] rounded-[2rem] backdrop-blur-xl z-20 bg-white/95 dark:bg-zinc-950/95" />
-              </div>
-
               <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -623,7 +659,7 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                All Courses
+                Find Courses
               </h2>
               <p className="text-sm font-medium text-zinc-500">
                 Explore locations globally
@@ -689,7 +725,7 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                Find Teams
+                View Teams
               </h2>
               <p className="text-sm font-medium text-zinc-500">
                 Join squads and local gyms

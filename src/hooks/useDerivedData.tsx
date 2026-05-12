@@ -224,7 +224,7 @@ const getInspectorDataForPath = (
   }
   if (viewPrefix === "courses") {
     const cKey = entitySlug.toUpperCase();
-    let found = masterCourseList.find((c) => c.pKey === cKey || c.name?.toUpperCase() === cKey);
+    const found = masterCourseList.find((c) => c.pKey === cKey || c.name?.toUpperCase() === cKey);
     return {
       type: "course",
       data: found || { name: entitySlug },
