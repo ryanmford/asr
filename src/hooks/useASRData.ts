@@ -14,6 +14,7 @@ if (typeof Worker !== "undefined") {
 export const useFetchASRData = () => {
   const setData = useDataStore((s) => s.setData);
   const setFetchStatus = useDataStore((s) => s.setFetchStatus);
+  const refreshTrigger = useDataStore((s) => s.refreshTrigger);
   const initialDataConsumed = useRef(false);
 
   const fetchData = useCallback(
@@ -149,4 +150,10 @@ export const useFetchASRData = () => {
     }, CONFIG.REFRESH_INTERVAL || 60000);
     return () => clearInterval(interval);
   }, [fetchData]);
+
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      fetchData(false);
+    }
+  }, [refreshTrigger, fetchData]);
 };

@@ -5,25 +5,25 @@
 
 @layer components {
   /* THEME UTILITIES */
-  .theme-bg-base { @apply bg-[#FAFAFA] dark:bg-zinc-950; }
-  .theme-bg-surface { @apply bg-white dark:bg-[#030303]; }
+  .theme-bg-base { @apply bg-[#FAFAFA] dark:bg-[#030303] transition-colors duration-500; }
+  .theme-bg-surface { @apply bg-white dark:bg-[#0A0A0A] transition-colors duration-500; }
   
-  .theme-text-base { @apply text-zinc-900 dark:text-zinc-100; }
-  .theme-text-muted { @apply text-zinc-500 dark:text-zinc-400; }
-  .theme-text-faint { @apply text-zinc-400 dark:text-zinc-600; }
+  .theme-text-base { @apply text-zinc-900 dark:text-zinc-100 transition-colors duration-500; }
+  .theme-text-muted { @apply text-zinc-500 dark:text-zinc-400 transition-colors duration-500; }
+  .theme-text-faint { @apply text-zinc-400 dark:text-zinc-600 transition-colors duration-500; }
   
-  .theme-border { @apply border-black/5 dark:border-white/5; }
-  .theme-border-strong { @apply border-zinc-200 dark:border-zinc-800; }
-  .theme-border-dashed { @apply border-slate-300 dark:border-zinc-800; }
+  .theme-border { @apply border-black/10 dark:border-white/10 transition-colors duration-500; }
+  .theme-border-strong { @apply border-zinc-300 dark:border-zinc-800 transition-colors duration-500; }
+  .theme-border-dashed { @apply border-slate-300 dark:border-zinc-800 transition-colors duration-500; }
   
-  .theme-card { @apply bg-white border border-black/5 shadow-sm dark:bg-white/[0.02] dark:border-white/5 dark:shadow-xl text-black dark:text-white; }
-  .theme-glass { @apply bg-white/60 border border-black/5 backdrop-blur-xl shadow-lg dark:bg-zinc-900/40 dark:border-white/5 dark:backdrop-blur-2xl dark:shadow-xl text-black dark:text-white; }
-  .theme-panel { @apply bg-slate-50 border border-slate-200 dark:bg-zinc-900/20 dark:border-zinc-800 text-black dark:text-white; }
+  .theme-card { @apply bg-white border border-black/5 shadow-md dark:bg-white/[0.03] dark:border-white/5 dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] text-black dark:text-white transition-all duration-500; }
+  .theme-glass { @apply bg-white/70 border border-black/5 backdrop-blur-2xl shadow-[0_8px_32px_rgb(0,0,0,0.05)] dark:bg-[#0A0A0A]/60 dark:border-white/[0.08] dark:backdrop-blur-3xl dark:shadow-[0_8px_32px_rgb(0,0,0,0.4)] text-black dark:text-white transition-all duration-500; }
+  .theme-panel { @apply bg-zinc-50 border border-black/10 shadow-inner dark:bg-white/[0.02] dark:border-white/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] text-black dark:text-white transition-all duration-500; }
   
-  .theme-hover { @apply hover:bg-black/5 dark:hover:bg-white/5; }
-  .theme-hover-strong { @apply hover:bg-black/10 dark:hover:bg-white/10; }
+  .theme-hover { @apply hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300; }
+  .theme-hover-strong { @apply hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-300; }
   
-  .theme-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#030303]; }
+  .theme-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#030303] transition-all duration-300; }
 }
 
 
@@ -88,6 +88,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Ensure Leaflet maps don't break the layout stack */

@@ -10,41 +10,16 @@ import {
   Activity,
   Trophy,
   Users,
-  Globe,
-  Watch,
+  Timer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
-import { ASRSearchInput } from "../common/ASRSearchInput";
 import { ASRGlobalSearch } from "../common/ASRGlobalSearch";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
-import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
+import { cn, formatFlagsWithSpace, fixCountryEntity } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
-
-interface SearchResultPlayer {
-  pKey?: string;
-  name?: string;
-  _gRank?: number;
-  _g?: string;
-  wins?: number;
-  totalFireCount?: number;
-}
-interface SearchResultCourse {
-  name?: string;
-  totalAllTimeRuns?: number;
-  totalRuns?: number;
-}
-interface SearchResultTeam {
-  name?: string;
-  pts?: number;
-  _isGym?: boolean;
-}
-interface SearchResultFeature {
-  type: string;
-  data: SearchResultPlayer | SearchResultCourse | SearchResultTeam;
-}
 
 export const HomeView = React.memo(() => {
   const navigate = useNavigate();
@@ -52,7 +27,6 @@ export const HomeView = React.memo(() => {
   const masterCourseList = useDataStore((s) => s.masterCourseList);
   const playerList_M_AT = useDataStore((s) => s.playerList_M_AT);
   const playerList_F_AT = useDataStore((s) => s.playerList_F_AT);
-  const teamsAggregated = useDataStore((s) => s.teamsAggregated);
   const kpiStats = useDataStore((s) => s.kpiStats);
   const kpiTrends = useDataStore((s) => s.kpiTrends);
   const recentFeed = useDataStore((s) => s.recentFeed);
@@ -66,11 +40,6 @@ export const HomeView = React.memo(() => {
   const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
   const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
   const atPerfs = useDataStore((s) => s.atPerfs);
-
-  const playersTrend = kpiTrends?.players || [];
-  const runsTrend = kpiTrends?.runs || [];
-  const coursesTrend = kpiTrends?.courses || [];
-  const countriesTrend = kpiTrends?.countries || [];
 
   const { topPlayer, topCourse, topTeam } = useMemo(() => {
     let topPlayer: any = null;
@@ -131,7 +100,7 @@ export const HomeView = React.memo(() => {
       data: { name: "Joey Jepsen on FUNDA", videoUrl: runVideo },
       displayName: "🇺🇸 JOEY JEPSEN",
       label: "Run of the Month",
-      icon: <Watch className="w-4 h-4" />,
+      icon: <Timer className="w-4 h-4" />,
       color: "text-purple-500",
       shadowColor: "shadow-[0_0_15px_rgba(168,85,247,0.2)]",
       borderHover: "hover:shadow-purple-500/20",
@@ -268,9 +237,7 @@ export const HomeView = React.memo(() => {
     totalMedals,
     medalsTrendData,
     playersTrendData,
-    runsTrendData,
     coursesTrendData,
-    countriesTrendData,
   } = useMemo(() => {
     const kpiData = (kpiStats as any) || {};
 
@@ -289,9 +256,7 @@ export const HomeView = React.memo(() => {
     }, 0);
 
     const pTrendData = kpiTrends?.players || [];
-    const rTrendData = kpiTrends?.runs || [];
     const cTrendData = kpiTrends?.courses || [];
-    const cntTrendData = kpiTrends?.countries || [];
 
     const medalsMultiplier = kpiData.courses ? tMedals / kpiData.courses : 6;
     const mTrendData = cTrendData.map((d: any) => ({
@@ -305,9 +270,7 @@ export const HomeView = React.memo(() => {
       totalMedals: tMedals,
       medalsTrendData: mTrendData,
       playersTrendData: pTrendData,
-      runsTrendData: rTrendData,
       coursesTrendData: cTrendData,
-      countriesTrendData: cntTrendData,
     };
   }, [kpiStats, teamList_gyms_AT, teamList_teams_AT, masterCourseList, kpiTrends]);
 
@@ -316,13 +279,13 @@ export const HomeView = React.memo(() => {
       initial="hidden"
       animate="show"
       variants={containerVariants}
-      className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 pt-2 sm:pt-4 pb-32 gap-4 sm:gap-16"
+      className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 pt-0 sm:pt-1 pb-24 gap-2 sm:gap-4"
     >
       {/* Global Search */}
       <motion.div
         variants={itemVariants}
         className={cn(
-          "py-2 sm:py-4 -mx-4 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-2 sm:mb-6",
+          "py-2 sm:py-3 -mx-4 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-1",
           theme === "dark"
             ? "border-white/5 bg-zinc-950/80"
             : "border-black/5 bg-white/80",
@@ -338,8 +301,8 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden px-4 py-6 sm:p-16 lg:p-24 flex flex-col items-center justify-center gap-3 sm:gap-12 w-full text-center shrink-0",
-          theme === "dark" ? "bg-zinc-950" : "bg-white",
+          "relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden px-4 py-6 sm:py-8 lg:py-12 flex flex-col items-center justify-center gap-2 sm:gap-4 w-full text-center shrink-0 border transition-all duration-500",
+          theme === "dark" ? "bg-[#0A0A0A] border-white/5 shadow-2xl" : "bg-white border-black/5 shadow-xl",
         )}
       >
         <div
@@ -356,7 +319,7 @@ export const HomeView = React.memo(() => {
           className={cn(
             "absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_8s_ease-in-out_infinite] pointer-events-none",
             theme === "dark"
-              ? "bg-blue-500/30 mix-blend-screen"
+              ? "bg-blue-600/30 mix-blend-screen"
               : "bg-blue-500/20 mix-blend-multiply",
           )}
         ></div>
@@ -364,8 +327,8 @@ export const HomeView = React.memo(() => {
           className={cn(
             "absolute bottom-0 left-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_12s_ease-in-out_infinite] pointer-events-none",
             theme === "dark"
-              ? "bg-purple-600/30 mix-blend-screen"
-              : "bg-purple-400/20 mix-blend-multiply",
+              ? "bg-indigo-600/30 mix-blend-screen"
+              : "bg-indigo-400/20 mix-blend-multiply",
           )}
           style={{ animationDelay: "2s" }}
         ></div>
@@ -378,9 +341,9 @@ export const HomeView = React.memo(() => {
           )}
         ></div>
 
-        <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-3 sm:space-y-8 w-full mx-auto">
+        <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-2 sm:space-y-6 w-full mx-auto">
           <h1 className="text-3xl md:text-5xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.1] sm:leading-none uppercase flex flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-            <span className="italic transform -skew-x-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-500 pb-1 sm:pb-2 pr-2 sm:pr-8 break-words text-balance">
+            <span className={cn("italic transform -skew-x-6 pb-1 sm:pb-2 pr-2 sm:pr-8 break-words text-balance", theme === "dark" ? "text-white" : "text-zinc-900")}>
               Apex Speed Run
             </span>
           </h1>
@@ -393,15 +356,15 @@ export const HomeView = React.memo(() => {
             Track your speed runs, compete worldwide, climb the leaderboards,
             and become unstoppable.
           </p>
-          <div className="flex w-full sm:max-w-xs mt-1 sm:mt-6 mx-auto">
+          <div className="flex w-full sm:max-w-xs mt-1 sm:mt-3 mx-auto">
             <button
-              className="group relative px-6 py-3 sm:py-5 w-full bg-blue-500 overflow-hidden rounded-xl sm:rounded-2xl font-bold text-base sm:text-xl tracking-wide text-white transition-all duration-150 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98]"
+              className="group relative px-6 py-3 sm:py-4 w-full overflow-hidden rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg tracking-wide text-white transition-all duration-150 active:scale-[0.98]"
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600"></div>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_50%)]"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <span className="relative z-10 flex items-center justify-center gap-2 uppercase drop-shadow-sm">
                 Get Started
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
@@ -415,7 +378,7 @@ export const HomeView = React.memo(() => {
       {isLoading ? (
         <motion.div
           variants={itemVariants}
-          className="relative w-full min-h-[140px] bg-black/5 dark:bg-white/5 rounded-3xl p-6 flex flex-row items-center justify-between animate-pulse"
+          className="relative w-full min-h-[120px] bg-black/5 dark:bg-white/5 rounded-3xl p-6 flex flex-row items-center justify-between animate-pulse"
         >
           <div className="flex flex-col gap-3">
             <div className="w-24 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
@@ -441,10 +404,10 @@ export const HomeView = React.memo(() => {
               }}
               onTouchStart={() => {}}
               className={cn(
-                "relative w-full min-h-[140px] flex flex-row items-center justify-between rounded-[2rem] p-5 sm:p-6 pb-8 sm:pb-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
+                "relative w-full min-h-[160px] flex flex-row items-center justify-between rounded-[2rem] p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
               )}
             >
-              <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30">
+              <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentFeature.label}
@@ -506,7 +469,7 @@ export const HomeView = React.memo(() => {
 
               <div
                 className={cn(
-                  "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0",
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
                   currentFeature.bg,
                   currentFeature.color,
                   currentFeature.hoverBg,
@@ -516,7 +479,7 @@ export const HomeView = React.memo(() => {
               </div>
 
               {/* Pagination Dots */}
-              <div className="absolute bottom-1 sm:bottom-2 left-0 right-0 flex justify-center gap-0.5 z-40">
+              <div className="absolute bottom-3 sm:bottom-3 left-0 right-0 flex justify-center gap-1.5 z-40">
                 {featureList.map((_, idx) => {
                   const isActive =
                     idx ===
@@ -604,7 +567,7 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                Top Players
+                Players
               </h2>
               <p className="text-sm font-medium text-zinc-500">
                 View leaderboards & runs
@@ -659,7 +622,7 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                Find Courses
+                Courses
               </h2>
               <p className="text-sm font-medium text-zinc-500">
                 Explore locations globally
@@ -725,7 +688,7 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                View Teams
+                Gyms & Teams
               </h2>
               <p className="text-sm font-medium text-zinc-500">
                 Join squads and local gyms
@@ -806,7 +769,7 @@ export const HomeView = React.memo(() => {
       {(isLoading || (recentFeed && recentFeed.length > 0)) && (
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-4 mt-4"
+          className="flex flex-col gap-3 mt-2 sm:mt-4"
         >
           <div className="flex items-center gap-2 px-2">
             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
@@ -861,6 +824,11 @@ export const HomeView = React.memo(() => {
                               item.athlete?.country ||
                               "",
                           ).trim();
+
+                          const courseFlag = fixCountryEntity(
+                            item.course?.country || "",
+                            item.course?.flag || item.course?.region || ""
+                          ).flag;
 
                           let rankBadge = null;
                           if (rank === 1)
@@ -931,8 +899,8 @@ export const HomeView = React.memo(() => {
                                   className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 active:scale-[0.98] active:bg-black/5 dark:active:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between min-w-0"
                                   onClick={() =>
                                     navigateToEntity(
-                                      "course",
-                                      item.course || { name: item.courseName },
+                                      "player",
+                                      item.athlete || { name: item.name },
                                     )
                                   }
                                   onTouchStart={() => {}}
@@ -940,15 +908,7 @@ export const HomeView = React.memo(() => {
                                   <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
                                     <div className="flex items-center gap-2 max-w-full w-full">
                                       <span
-                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase hover:text-blue-500 active:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5 min-w-0 max-w-full shrink"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          navigateToEntity(
-                                            "player",
-                                            item.athlete || { name: item.name },
-                                          );
-                                        }}
-                                        onTouchStart={() => {}}
+                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-blue-500 group-has-[.course-target:hover]/card:!text-zinc-900 dark:group-has-[.course-target:hover]/card:!text-white"
                                       >
                                         {athleteFlag && (
                                           <span className="text-[12px] opacity-90 shrink-0">
@@ -980,8 +940,19 @@ export const HomeView = React.memo(() => {
                                       )}
                                     </div>
 
-                                    <div className="flex items-center text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 gap-1 hover:text-blue-500 transition-colors group/course max-w-full min-w-0 w-full mt-0.5">
+                                    <div 
+                                      className="course-target flex items-center text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:!text-blue-500 transition-colors cursor-pointer max-w-full min-w-0 w-max -ml-3 -mt-2 -mb-2 px-3 py-2 rounded-md"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigateToEntity("course", item.course || { name: item.courseName });
+                                      }}
+                                    >
                                       <span className="truncate max-w-full">
+                                        {courseFlag && (
+                                          <span className="opacity-80 mr-1">
+                                            {courseFlag}
+                                          </span>
+                                        )}
                                         {courseName}
                                         {item.course?.city
                                           ? `, ${item.course.city}`
@@ -991,7 +962,7 @@ export const HomeView = React.memo(() => {
                                   </div>
 
                                   <div className="flex flex-col justify-center items-end shrink-0">
-                                    <div className="text-lg sm:text-2xl font-black tabular-nums tracking-tighter text-zinc-900 dark:text-white">
+                                    <div className="text-lg sm:text-2xl font-black tabular-nums tracking-tighter text-zinc-900 dark:text-white transition-colors group-hover/card:text-blue-500 group-has-[.course-target:hover]/card:!text-zinc-900 dark:group-has-[.course-target:hover]/card:!text-white">
                                       {resultVal}
                                     </div>
                                   </div>

@@ -17,44 +17,24 @@ import { useKpiStats } from "../../hooks/useAppCalculations";
 export const ASRCountdown = React.memo(
   ({ targetDate, eventType, onHelp, theme }: ASRCountdownProps) => {
     const [currentTime, setCurrentTime] = useState<any>(null);
-    const [isDismissed, setIsDismissed] = useState(() => {
-      if (typeof sessionStorage !== "undefined") {
-        return sessionStorage.getItem("asr_countdown_dismissed") === "true";
-      }
-      return false;
-    });
-
-    const handleDismiss = React.useCallback((e: React.MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      setIsDismissed(true);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem("asr_countdown_dismissed", "true");
-      }
-    }, []);
+    const [isVisible, setIsVisible] = useState(true);
 
     const isAllTime = eventType === "all-time";
     const stats = useKpiStats();
 
     const CloseButton = () => (
-      <div 
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsVisible(false);
+        }}
         className={cn(
-          "absolute right-0 top-[1.2px] bottom-[1.2px] z-30 flex items-center justify-end pl-12 pr-1 pointer-events-none sm:!bg-none sm:!bg-transparent sm:pl-0 sm:pr-0 sm:right-2 sm:top-1/2 sm:-translate-y-1/2 sm:bottom-auto",
-          theme === "dark" 
-            ? "bg-gradient-to-l from-zinc-950 via-zinc-950/90 to-transparent" 
-            : "bg-gradient-to-l from-white via-white/90 to-transparent"
+          "absolute right-1 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors z-50",
+          theme === "dark" ? "hover:bg-white/10" : "hover:bg-black/5"
         )}
       >
-        <div 
-          role="button"
-          tabIndex={0}
-          onClick={handleDismiss}
-          onPointerDown={(e) => { e.stopPropagation(); }}
-          className="w-12 h-12 sm:w-8 sm:h-8 opacity-60 sm:opacity-30 hover:opacity-100 transition-opacity flex items-center justify-center rounded-full sm:hover:bg-black/10 sm:dark:hover:bg-white/10 pointer-events-auto"
-        >
-          <X size={16} className="text-current" />
-        </div>
-      </div>
+        <X className="w-4 h-4 sm:w-5 sm:h-5 opacity-40 hover:opacity-100 transition-opacity" />
+      </button>
     );
 
     useEffect(() => {
@@ -88,7 +68,7 @@ export const ASRCountdown = React.memo(
       return () => clearInterval(timer);
     }, [targetDate, isAllTime]);
 
-    if (isDismissed) return null;
+    if (!isVisible) return null;
 
     if (isAllTime && stats) {
       return (
@@ -239,44 +219,43 @@ export const ASRCountdown = React.memo(
           )}
         >
           <div className="flex items-center gap-2 hidden min-[360px]:flex">
-            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest opacity-60">
+            <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60">
               OPEN CLIPS DUE IN:
             </span>
           </div>
           <div className="flex items-center font-black tabular-nums tracking-tighter">
             <div className="flex items-center">
-              <span className="text-[14px] sm:text-[18px]">
+              <span className="text-[16px] sm:text-[20px]">
                 {String(currentTime.days).padStart(2, "0")}
               </span>
-              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
+              <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                 D
               </span>
             </div>
             <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[14px] sm:text-[18px]">
+              <span className="text-[16px] sm:text-[20px]">
                 {String(currentTime.hours).padStart(2, "0")}
               </span>
-              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
+              <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                 H
               </span>
             </div>
             <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[14px] sm:text-[18px]">
+              <span className="text-[16px] sm:text-[20px]">
                 {String(currentTime.minutes).padStart(2, "0")}
               </span>
-              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
+              <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                 M
               </span>
             </div>
             <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
             <div className="flex items-center">
-              <span className="text-[14px] sm:text-[18px]">
+              <span className="text-[16px] sm:text-[20px]">
                 {String(currentTime.seconds).padStart(2, "0")}
               </span>
-              <span className="text-[9px] sm:text-[10px] ml-1 opacity-50">
+              <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                 S
               </span>
             </div>

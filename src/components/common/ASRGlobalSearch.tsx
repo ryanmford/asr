@@ -89,7 +89,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
           onKeyDown={handleSearchKeyDown}
-          placeholder="Search players, courses, gyms..."
+          placeholder="Search players, courses, gyms, & teams..."
           theme={theme}
           className="w-full text-xs sm:text-sm"
       />

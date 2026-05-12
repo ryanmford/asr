@@ -45,6 +45,8 @@ interface ASRDataState {
   hasError: boolean;
   hasPartialError: boolean;
   lastUpdated: number | null;
+  refreshTrigger: number;
+  triggerRefresh: () => void;
   
   setData: (payload: Partial<ASRDataState>) => void;
   setFetchStatus: (status: { isLoading?: boolean; isSyncing?: boolean; hasError?: boolean; hasPartialError?: boolean }) => void;
@@ -121,7 +123,9 @@ export const useDataStore = create<ASRDataState>((set) => {
     hasError: false,
     hasPartialError: false,
     lastUpdated: null,
+    refreshTrigger: 0,
 
+    triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
     setData: (payload) => set((state) => ({ ...state, ...payload })),
     setFetchStatus: (status) => set((state) => ({ ...state, ...status })),
   };

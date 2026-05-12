@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User, Users, MapPin, Trophy, Home } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "../../lib/asr-utils";
+import { useDataStore } from "../../store/useDataStore";
 
 interface ASRNavDockProps {
   currentView: string;
@@ -13,6 +14,7 @@ export const ASRNavDock = React.memo(
   ({ currentView, setView, theme }: ASRNavDockProps) => {
     const [isCompact, setIsCompact] = useState(false);
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+    const triggerRefresh = useDataStore((s) => s.triggerRefresh);
 
     useEffect(() => {
       const handleResize = () => {
@@ -96,7 +98,14 @@ export const ASRNavDock = React.memo(
                 <motion.button
                   key={item.id}
                   aria-label={`View ${item.label}`}
-                  onClick={() => setView(item.id)}
+                  onClick={() => {
+                    if (isActive) {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      triggerRefresh();
+                    } else {
+                      setView(item.id);
+                    }
+                  }}
                   whileTap={{ scale: 0.82 }}
                   style={{ WebkitTapHighlightColor: "transparent" }}
                   className={cn(

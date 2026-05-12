@@ -24,12 +24,11 @@ export const ASRWeeklyActivityChart = ({
     y: number;
   } | null>(null);
 
-  const { weeks, totalRuns, totalColumns } = useMemo(() => {
+  const { weeks, totalRuns } = useMemo(() => {
     const today = new Date();
     // Reset today to midnight for precise math
     today.setHours(0, 0, 0, 0);
 
-    const cols = 13;
     const finalTotalWeeks = 52;
 
     const weekCounts = new Array(finalTotalWeeks).fill(0).map((_, i) => {
@@ -70,7 +69,7 @@ export const ASRWeeklyActivityChart = ({
       }
     });
 
-    return { weeks: weekCounts, totalRuns: runCount, totalColumns: cols };
+    return { weeks: weekCounts, totalRuns: runCount };
   }, [runs]);
 
   const unitMap = {

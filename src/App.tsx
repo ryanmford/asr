@@ -23,7 +23,6 @@ import {
   ASRFooter,
 } from "./components/ASRComponents";
 import { ASRVideoModal } from "./components/common/ASRVideoModal";
-import { ASRGlobalSearch } from "./components/common/ASRGlobalSearch";
 
 const PlayersView = React.lazy(() => import("./components/views/PlayersView").then(m => ({ default: m.PlayersView })));
 const TeamsView = React.lazy(() => import("./components/views/TeamsView").then(m => ({ default: m.TeamsView })));
@@ -162,8 +161,8 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       className={cn(
         "min-h-[100dvh] flex flex-col transition-colors duration-500",
         theme === "dark" 
-          ? "dark theme-bg-secondary text-zinc-100 selection:bg-blue-500/30" 
-          : "theme-bg-secondary text-zinc-900 selection:bg-blue-500/20",
+          ? "dark theme-bg-base text-zinc-100 selection:bg-blue-500/30" 
+          : "theme-bg-base text-zinc-900 selection:bg-blue-500/20",
       )}
     >
       {/* Background Texture/Gradient */}
@@ -174,6 +173,14 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
             ? "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.1),rgba(255,255,255,0))] opacity-100"
             : "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(0,0,0,0))] opacity-100",
         )}
+      />
+      
+      {/* Global Noise Texture */}
+      <div 
+        className={cn(
+          "fixed inset-0 pointer-events-none textured-surface transition-opacity duration-500",
+          theme === "dark" ? "opacity-[0.03] mix-blend-screen" : "opacity-[0.04] mix-blend-multiply"
+        )} 
       />
 
       <RouteScrollRestoration />

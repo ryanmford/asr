@@ -134,7 +134,7 @@ export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: 
         radius={isBanner ? "none" : "2xl"}
         effect="metallic"
         className={cn(
-          "w-full flex items-center px-6 h-[64px] !text-white",
+          "w-full flex items-center px-6 h-[64px]",
           theme === "dark"
             ? "shadow-[0_0_30px_rgba(251,191,36,0.15)] group-hover:shadow-[0_0_40px_rgba(251,191,36,0.25)]"
             : "shadow-[0_10px_30px_rgba(251,191,36,0.15)]",
@@ -144,19 +144,19 @@ export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: 
           <div className="flex items-center gap-4">
             <div
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-black italic shadow-[0_4px_10px_rgba(0,0,0,0.3)] uppercase shrink-0 transition-opacity",
+                "w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-black italic shadow-sm uppercase shrink-0 transition-opacity",
                 "bg-amber-500 text-white",
               )}
             >
               {getInitials(sponsorName)}
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/80 leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+              <span className="text-[8px] font-black uppercase tracking-widest opacity-80 leading-none">
                 OFFICIAL COURSE SPONSOR
               </span>
               <span
                 className={cn(
-                  "text-[14px] font-black uppercase tracking-widest mt-0.5 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]",
+                  "text-[14px] font-black uppercase tracking-widest mt-0.5",
                 )}
               >
                 {sponsorName}
@@ -165,7 +165,7 @@ export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: 
           </div>
           <ArrowRight
             size={16}
-            className="shrink-0 opacity-80 group-hover:opacity-100 transition-all group-hover:translate-x-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+            className="shrink-0 opacity-80 group-hover:opacity-100 transition-all group-hover:translate-x-1"
           />
         </div>
       </ASRPremiumButton>
@@ -182,7 +182,7 @@ export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: 
       theme={theme}
       radius={isBanner ? "none" : "2xl"}
       className={cn(
-        "w-full flex items-center px-6 h-[64px] !text-white",
+        "w-full flex items-center px-6 h-[64px]",
         theme === "dark"
           ? "shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           : "shadow-[0_4px_10px_rgba(0,0,0,0.1)]",
@@ -190,14 +190,14 @@ export const ASRPatronPill = React.memo(({ course, theme, isBanner }: { course: 
     >
       <div className="flex items-center justify-between w-full opacity-80 group-hover:opacity-100 transition-opacity min-w-0">
         <div className="flex items-center gap-3 min-w-0 pr-2">
-          <Building2 className="w-5 h-5 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]" />
-          <span className="text-[9px] font-black uppercase tracking-wider transition-colors text-left drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] break-words whitespace-normal leading-tight">
+          <Building2 className="w-5 h-5 shrink-0" />
+          <span className="text-[9px] font-black uppercase tracking-wider transition-colors text-left break-words whitespace-normal leading-tight">
             ADOPT A COURSE, SUPPORT THE PROJECT
           </span>
         </div>
         <ArrowRight
           size={16}
-          className="shrink-0 transition-all group-hover:translate-x-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
+          className="shrink-0 transition-all group-hover:translate-x-1"
         />
       </div>
     </ASRPremiumButton>

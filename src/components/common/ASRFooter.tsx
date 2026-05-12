@@ -83,8 +83,6 @@ export const ASRFooter = React.memo(() => {
         <div className="w-full max-w-7xl flex flex-col-reverse md:flex-row items-center justify-between pt-8 border-t border-current/10 text-[10px] font-bold uppercase tracking-widest opacity-40 gap-4">
           <div className="flex items-center gap-2">
             <span>© {new Date().getFullYear()} APEX SPEED RUN</span>
-            <span className="opacity-50">|</span>
-            <span>v1.0.0-beta</span>
           </div>
 
           <div className="flex items-center gap-2 relative">
@@ -96,7 +94,7 @@ export const ASRFooter = React.memo(() => {
             ) : lastUpdated ? (
               <div className="flex items-center gap-2 text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-full">
                 <CheckCircle2 className="w-3 h-3" />
-                <span>Updated: {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <span>STATS UPDATED: {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
             ) : null}
           </div>
