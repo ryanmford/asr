@@ -13,6 +13,7 @@ interface ASRHeaderProps {
   setEventType: (type: "open" | "all-time") => void;
   onHome: () => void;
   hideTabs?: boolean;
+  centerSlot?: React.ReactNode;
 }
 
 export const ASRHeader = React.memo(
@@ -23,6 +24,7 @@ export const ASRHeader = React.memo(
     setEventType,
     onHome,
     hideTabs,
+    centerSlot,
   }: ASRHeaderProps) => {
     const isSyncing = useDataStore((s) => s.isSyncing);
     const hasError = useDataStore((s) => s.hasError);
@@ -54,7 +56,7 @@ export const ASRHeader = React.memo(
           </button>
         </div>
 
-        {!hideTabs && (
+        {!hideTabs ? (
           <div className="flex-1 flex justify-center max-w-[200px] sm:max-w-none">
             <ASRNeonToggle
               options={[
@@ -68,7 +70,11 @@ export const ASRHeader = React.memo(
               className="w-full sm:w-44"
             />
           </div>
-        )}
+        ) : centerSlot ? (
+          <div className="flex-1 flex justify-center px-4 max-w-[400px]">
+            {centerSlot}
+          </div>
+        ) : <div className="flex-1" />}
 
         <div className="flex items-center gap-2 shrink-0">
           {hasError ? (

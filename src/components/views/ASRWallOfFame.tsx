@@ -242,10 +242,11 @@ export const ASRWallOfFame = React.memo(
  <table className="w-full text-left border-collapse min-w-[280px] table-fixed">
  <thead
  className={cn(
- "border-b backdrop-blur-xl sticky top-0 z-10",
+ "border-b backdrop-blur-xl sticky z-10",
  theme === "dark"
  ? "bg-black/90 border-zinc-800/50"
  : "bg-white border-zinc-200",
+ "top-[calc(68px+env(safe-area-inset-top,0px))] sm:top-[calc(76px+env(safe-area-inset-top,0px))]"
  )}
  >
  <tr>

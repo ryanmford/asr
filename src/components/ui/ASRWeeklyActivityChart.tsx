@@ -29,31 +29,8 @@ export const ASRWeeklyActivityChart = ({
     // Reset today to midnight for precise math
     today.setHours(0, 0, 0, 0);
 
-    let maxDiffWeeks = 51;
-    runs.forEach((r) => {
-      if (!r.date) return;
-      const d = new Date(r.date);
-      if (isNaN(d.getTime())) return;
-      d.setHours(0, 0, 0, 0);
-
-      const runStartOfWeek = new Date(d);
-      runStartOfWeek.setDate(d.getDate() - d.getDay());
-
-      const todayStartOfWeek = new Date(today);
-      todayStartOfWeek.setDate(today.getDate() - today.getDay());
-
-      const diffTime = todayStartOfWeek.getTime() - runStartOfWeek.getTime();
-      if (diffTime >= 0) {
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const diffWeeks = Math.round(diffDays / 7);
-        if (diffWeeks > maxDiffWeeks) {
-          maxDiffWeeks = diffWeeks;
-        }
-      }
-    });
-
-    const cols = Math.max(13, Math.ceil((maxDiffWeeks + 1) / 4));
-    const finalTotalWeeks = cols * 4;
+    const cols = 13;
+    const finalTotalWeeks = 52;
 
     const weekCounts = new Array(finalTotalWeeks).fill(0).map((_, i) => {
       const diffWeeks = (finalTotalWeeks - 1) - i;
@@ -95,12 +72,6 @@ export const ASRWeeklyActivityChart = ({
 
     return { weeks: weekCounts, totalRuns: runCount, totalColumns: cols };
   }, [runs]);
-
-  React.useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
-    }
-  }, [totalColumns]);
 
   const unitMap = {
     run: "run",
@@ -162,18 +133,13 @@ export const ASRWeeklyActivityChart = ({
 
       <div 
         ref={scrollContainerRef}
-        className={cn(
-          "w-full relative overflow-x-auto overflow-y-hidden pb-1 no-scrollbar scroll-smooth",
-          totalColumns > 13 ? "cursor-ew-resize" : ""
-        )}
+        className="w-full relative overflow-hidden pb-1 no-scrollbar"
       >
         <div
           ref={containerRef}
-          className="grid gap-1 relative"
+          className="grid gap-[2px] sm:gap-1 relative w-full"
           style={{
-            gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
-            width: `${(totalColumns / 13) * 100}%`,
-            minWidth: "100%",
+            gridTemplateColumns: `repeat(13, minmax(0, 1fr))`,
           }}
           onMouseLeave={() => setHoverData(null)}
         >

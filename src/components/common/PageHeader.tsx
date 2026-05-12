@@ -11,19 +11,21 @@ export const PageHeader = ({ title, theme, children }: any) => {
           {title}
         </h1>
       </div>
-      <div
-        className={cn(
-          "px-4 py-3 sm:py-4 mb-2 sticky z-[50] backdrop-blur-3xl border-b -mx-4 left-0 right-0 transition-all shadow-sm",
-          theme === "dark"
-            ? "border-white/5 bg-zinc-950/80"
-            : "border-black/5 bg-white/80",
-          "top-[55px] sm:top-[66px]",
-        )}
-      >
-        <div className="flex items-center gap-2 w-full max-w-7xl mx-auto px-4">
-          {children}
+      {children && (
+        <div
+          className={cn(
+            "py-3 sm:py-4 mb-2 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm",
+            theme === "dark"
+              ? "border-white/5 bg-zinc-950/80"
+              : "border-black/5 bg-white/80",
+            "top-[calc(68px+env(safe-area-inset-top,0px))] sm:top-[calc(76px+env(safe-area-inset-top,0px))]",
+          )}
+        >
+          <div className="flex items-center gap-2 w-full max-w-7xl mx-auto px-4">
+            {children}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

@@ -12,10 +12,10 @@ export interface ASRPremiumButtonProps {
  target?: string;
  rel?: string;
  variant?: "premium" | "solid";
- color?: "blue" | "red" | "gold" | "purple-blue";
+ color?: "blue" | "red" | "gold" | "purple-blue" | "emerald" | "pink";
  disabled?: boolean;
  radius?: "none" | "2xl" | "3xl" | "full";
- effect?: "neon" | "metallic";
+ effect?: "neon" | "metallic" | "none";
 }
 
 export const ASRPremiumButton = ({

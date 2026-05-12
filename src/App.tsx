@@ -24,6 +24,7 @@ import {
   ASRFooter,
 } from "./components/ASRComponents";
 import { ASRVideoModal } from "./components/common/ASRVideoModal";
+import { ASRGlobalSearch } from "./components/common/ASRGlobalSearch";
 
 const PlayersView = React.lazy(() => import("./components/views/PlayersView").then(m => ({ default: m.PlayersView })));
 const TeamsView = React.lazy(() => import("./components/views/TeamsView").then(m => ({ default: m.TeamsView })));
@@ -42,6 +43,7 @@ import {
   CONFIG,
   cn,
   trackEvent,
+  trackPageview,
 } from "./lib/asr-utils";
 
 // --- CONTEXT & UTILS ---
@@ -206,6 +208,10 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
 
   const activeLocation = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackPageview(activeLocation.pathname);
+  }, [activeLocation.pathname]);
 
   let backgroundLocation = activeLocation;
   while (backgroundLocation.state && (backgroundLocation.state as { backgroundLocation?: typeof activeLocation }).backgroundLocation) {

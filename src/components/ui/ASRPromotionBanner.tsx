@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React from "react";
-import { Zap, ChevronsRight, Award, PenTool, Rocket } from "lucide-react";
+import { Zap, ChevronsRight, Award, MapPin, Rocket } from "lucide-react";
 import { cn, CONFIG } from "../../lib/asr-utils";
 import { ASRPremiumButton } from "./ASRPremiumButton";
 
@@ -66,7 +66,7 @@ export const ASRPromotionBanner = React.memo(
  borderFocus: "border-emerald-500/20",
  borderGhost: "border-emerald-500/10",
  icon: (
- <PenTool className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-emerald-500" />
+ <MapPin className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-emerald-500" />
  ),
  subtitle: "ASR COURSE SETTING TEAM",
  title: (
@@ -80,6 +80,7 @@ export const ASRPromotionBanner = React.memo(
  btnSubText: "DESIGN THE NEXT GENERATION OF COURSES",
  btnProps: {
  variant: "solid" as any,
+          effect: "none" as any,
  className:
  "bg-emerald-600 hover:bg-emerald-500 text-white border-none",
  },
@@ -105,6 +106,7 @@ export const ASRPromotionBanner = React.memo(
  btnSubText: "FUEL THE SPEED PARKOUR MOVEMENT",
  btnProps: {
  variant: "solid" as any,
+          effect: "none" as any,
  className: "bg-pink-600 hover:bg-pink-500 text-white border-none",
  },
  link: CONFIG.SKOOL_LINK,
@@ -129,7 +131,7 @@ export const ASRPromotionBanner = React.memo(
  desc: "Learn the training methods used by the world's fastest athletes and become an officially certified ASR Speed Parkour Coach.",
  btnText: "APPLY",
  btnSubText: "ACCESS ELITE TRAINING NOW",
- btnProps: { variant: "solid" as any },
+ btnProps: { variant: "solid" as any, effect: "none" as any },
  link: CONFIG.SKOOL_LINK,
  };
  }

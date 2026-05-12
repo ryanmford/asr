@@ -11,8 +11,32 @@ interface CountUpProps {
 export const CountUp = React.memo(
   ({ end, duration = 2000 }: CountUpProps) => {
     const nodeRef = useRef<HTMLSpanElement>(null);
+    const [hasTriggered, setHasTriggered] = useState(false);
 
     useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            setHasTriggered(true);
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      if (nodeRef.current) {
+        observer.observe(nodeRef.current);
+      }
+
+      return () => {
+        if (nodeRef.current) {
+          observer.unobserve(nodeRef.current);
+        }
+      };
+    }, []);
+
+    useEffect(() => {
+      if (!hasTriggered) return;
+
       let startTimestamp: number | null = null;
       let animationFrame: number;
 
@@ -35,7 +59,7 @@ export const CountUp = React.memo(
 
       animationFrame = window.requestAnimationFrame(step);
       return () => window.cancelAnimationFrame(animationFrame);
-    }, [end, duration]);
+    }, [end, duration, hasTriggered]);
 
     return (
       <span
