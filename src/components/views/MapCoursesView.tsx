@@ -2,7 +2,6 @@
  
 import React, { useMemo, startTransition, useRef } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
-import { Navigation } from "lucide-react";
 import { ASRDataTable, ASRSearchInput } from "../ASRComponents";
 import { ErrorBoundary } from "../common/ErrorBoundary";
 import { ASRBottomSheet } from "../common/ASRBottomSheet";
@@ -31,7 +30,6 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const scrollContainerRefMobile = React.useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const [visibleBounds, setVisibleBounds] = React.useState<any>(null);
-  const [isLocating, setIsLocating] = React.useState(false);
   
   const setSearch = (val: string) => {
     startTransition(() => {
@@ -41,14 +39,6 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
         return prev;
       }, { replace: true, state: location.state });
     });
-  };
-
-  const handleLocateClick = () => {
-    if (mapRef.current?.locateUser) {
-      setIsLocating(true);
-      mapRef.current.locateUser();
-      setTimeout(() => setIsLocating(false), 2000);
-    }
   };
 
   const debouncedSearch = useDebounce(search, 300);
@@ -84,6 +74,23 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const columns = React.useMemo(() => [{ label: "RUNS", key: "totalAllTimeRuns" }], []);
   const [snap, setSnap] = React.useState<number>(0.3);
   const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (window.innerWidth < 768) {
+      if (snap >= 0.85) {
+        if (containerRef.current) {
+           const top = containerRef.current.getBoundingClientRect().top + window.scrollY;
+           // Scroll so that MapCoursesView is slightly past the sticky header
+           window.scrollTo({ top: top - 44, behavior: "smooth" }); 
+        } else {
+           window.scrollTo({ top: 250, behavior: "smooth" });
+        }
+      } else if (snap < 0.85 && window.scrollY > 0) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  }, [snap]);
 
   const handlePinClick = React.useCallback((c: CourseData) => {
      setSnap(0.5);
@@ -133,8 +140,20 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     </div>
   );
 
+  const renderSearchPill = (forMobile: boolean) => (
+    <div className={cn("w-full transition-all duration-300", forMobile && snap >= 0.85 ? "px-0" : "px-4")}>
+      <ASRSearchInput
+        value={search}
+        onChange={(e: any) => setSearch(e.target.value)}
+        placeholder="search courses..."
+        theme={theme}
+        variant={forMobile && snap >= 0.85 ? "docked" : "pill"}
+      />
+    </div>
+  );
+
   return (
-    <div className="relative w-full h-[calc(100vh-68px)] sm:h-[calc(100vh-76px)] overflow-hidden bg-slate-100 dark:bg-zinc-900">
+    <div ref={containerRef} className="relative w-full h-[calc(100vh-68px)] sm:h-[calc(100vh-76px)] overflow-hidden bg-slate-100 dark:bg-zinc-900">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
         <React.Suspense
@@ -153,37 +172,18 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
             onPinClick={handlePinClick}
             onMapClick={handleMapBackgroundClick}
             onBoundsChange={setVisibleBounds}
-            hideControls={true}
             className="w-full h-full rounded-none border-none"
           />
         </React.Suspense>
       </div>
 
-      {/* Floating Search Pill */}
-      <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 md:ml-[208px] lg:ml-[233px] z-[100] w-[90%] max-w-[400px] pointer-events-none drop-shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-        <div className="pointer-events-auto">
-          <ASRSearchInput
-            value={search}
-            onChange={(e: any) => setSearch(e.target.value)}
-            placeholder="search courses..."
-            theme={theme}
-            variant="pill"
-            rightElement={
-              <button
-                onClick={handleLocateClick}
-                className={cn(
-                  "min-w-[40px] min-h-[40px] flex items-center justify-center rounded-[2rem] transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
-                  theme === "dark" ? "text-zinc-300 hover:text-white" : "text-zinc-600 hover:text-zinc-900"
-                )}
-                title="Find my location"
-              >
-                <div className={cn("flex items-center justify-center w-8 h-8 rounded-full", theme === "dark" ? "bg-white/10" : "bg-black/5")}>
-                  <Navigation size={16} strokeWidth={2.5} className={cn(isLocating ? "animate-pulse text-blue-500" : "")} />
-                </div>
-              </button>
-            }
-          />
-        </div>
+      {/* Desktop Floating Search Pill */}
+      <div 
+        className={cn(
+          "hidden md:block absolute top-8 left-1/2 -translate-x-1/2 ml-[208px] lg:ml-[233px] z-[100] w-[90%] max-w-[400px] drop-shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300 opacity-100 pointer-events-auto"
+        )}
+      >
+        {renderSearchPill(false)}
       </div>
 
       {/* Desktop Panel */}
@@ -194,11 +194,17 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
       {/* Mobile Bottom Sheet */}
       <div className="md:hidden pointer-events-none absolute inset-0 z-50">
         <ASRBottomSheet
-          snapPoints={[0.2, 0.5, 0.9]}
+          snapPoints={[0.2, 0.5, 0.92]}
           activeSnap={snap as number}
           onSnapChange={setSnap}
         >
-          <div className="flex-1 overflow-hidden h-[90vh]">
+          <div className={cn(
+            "w-full pt-1 pb-3 flex justify-center sticky top-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
+             snap >= 0.85 ? (theme === "dark" ? "bg-zinc-950/90 border-white/5" : "bg-white/90 border-black/5") : "bg-transparent border-transparent"
+          )}>
+            {renderSearchPill(true)}
+          </div>
+          <div className="flex-1 overflow-hidden h-full">
             {renderListContent(snap as number, scrollContainerRefMobile, listRefMobile)}
           </div>
         </ASRBottomSheet>

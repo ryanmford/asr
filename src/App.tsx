@@ -200,7 +200,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       />
 
       <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)]">
-        {!isLoading && (
+        {!isLoading && view !== "courses" && (
           <div className="flex flex-col">
             <ASRLiveTicker
               theme={theme}

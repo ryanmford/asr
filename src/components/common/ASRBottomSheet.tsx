@@ -36,6 +36,11 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
 
   const bgOpacity = useTransform(y, [H * 0.1, H * 0.8], [0.4, 0]);
 
+  // Flatten border radius near the highest snap point to seal off "little holes"
+  const maxSnap = Math.max(...snapPoints);
+  const highestY = H * (1 - maxSnap);
+  const borderRadius = useTransform(y, [highestY, highestY + 40], [0, 32], { clamp: true }); // 0 to 32px
+
   // Sync external activeSnap control
   useEffect(() => {
     if (activeSnap !== undefined && activeSnap !== null && height > 0) {
@@ -88,16 +93,18 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
     <>
       {/* Optional backdrop: uses backdrop-blur and a subtle dark tint */}
       <motion.div 
-         className="absolute inset-0 z-40 pointer-events-none backdrop-blur-[2px]"
+         className="fixed inset-0 z-40 pointer-events-none backdrop-blur-[2px]"
          style={{ opacity: bgOpacity, backgroundColor: 'rgba(0,0,0,0.3)' }} 
       />
 
       <motion.div
         ref={containerRef}
-        className="fixed left-0 right-0 bottom-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl rounded-t-[2rem] border-t border-black/10 dark:border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col pointer-events-auto overflow-hidden"
+        className="fixed left-0 right-0 bottom-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-black/10 dark:border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex flex-col pointer-events-auto overflow-hidden"
         style={{ 
            y, 
-           height: H // sheet is full height but pushed down via Y
+           height: H, // sheet is full height but pushed down via Y
+           borderTopLeftRadius: borderRadius,
+           borderTopRightRadius: borderRadius
         }}
         drag="y"
         dragConstraints={{ top: H * (1 - Math.max(...snapPoints)), bottom: H * (1 - Math.min(...snapPoints)) }}

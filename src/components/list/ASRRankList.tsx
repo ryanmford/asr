@@ -69,21 +69,25 @@ export const ASRRankList = ({
     return { finalAthletes: _finalAthletes, listRenderKey: _listRenderKey };
   }, [athletes, limit, padTo]);
 
-  const estimateSize = React.useCallback(() => isCompact ? 80 : 100, [isCompact]);
-  const windowVirtualizer = useWindowVirtualizer({
-    count: finalAthletes.length,
-    estimateSize,
-    overscan: 5,
-  });
+  const [visibleCount, setVisibleCount] = React.useState(20);
+  const loaderRef = React.useRef<HTMLDivElement>(null);
 
-  const elementVirtualizer = useVirtualizer({
-    count: finalAthletes.length,
-    getScrollElement: () => activeScrollRef?.current || null,
-    estimateSize,
-    overscan: 5,
-  });
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [finalAthletes]);
 
-  const virtualizer = activeScrollRef ? elementVirtualizer : windowVirtualizer;
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 20, finalAthletes.length));
+        }
+      },
+      { root: activeScrollRef ? activeScrollRef.current : null, rootMargin: "200px" }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [finalAthletes.length, activeScrollRef]);
 
  return (
  <div className={cn("space-y-6 text-left overflow-visible", className)}>
@@ -92,10 +96,8 @@ export const ASRRankList = ({
  )}
  <motion.div key={listRenderKey} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3 overflow-visible">
  {finalAthletes && finalAthletes.length > 0 ? (
-          <div style={{ position: 'relative', width: '100%', height: `${virtualizer.getTotalSize()}px` }}>
-            {virtualizer.getVirtualItems().map((virtualRow) => {
-              const i = virtualRow.index;
-              const item = finalAthletes[i];
+          <div className="flex flex-col">
+            {finalAthletes.slice(0, visibleCount).map((item, i) => {
  const isArray = Array.isArray(item);
  const pKey = isArray
  ? item[0]
@@ -173,18 +175,7 @@ export const ASRRankList = ({
  ).toUpperCase();
 
  return (
-            <div
-              key={virtualRow.key}
-              data-index={virtualRow.index}
-              ref={virtualizer.measureElement}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                transform: `translateY(${virtualRow.start}px)`,
-              }}
-            >
+            <div key={`${pKey}-${i}`} data-index={i}>
               <div className="pb-3">
                 <ASRListItem
  variant="card"
@@ -243,9 +234,14 @@ export const ASRRankList = ({
               </div>
             </div>
           );
-        })}
-      </div>
-    ) : (
+         })}
+         {visibleCount < finalAthletes.length && (
+           <div ref={loaderRef} className="h-20 w-full flex items-center justify-center">
+             <div className="animate-pulse w-8 h-8 rounded-full border-2 text-zinc-500" />
+           </div>
+         )}
+       </div>
+     ) : (
  <div
  className={cn(
  "p-8 sm:p-12 w-full max-w-sm mx-auto mt-4 rounded-[2rem] border border-dashed flex flex-col items-center justify-center text-center gap-4 transition-colors",

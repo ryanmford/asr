@@ -14,7 +14,7 @@ interface ASRSearchInputProps {
   theme: "light" | "dark";
   placeholder?: string;
   className?: string;
-  variant?: "default" | "pill";
+  variant?: "default" | "pill" | "docked";
   rightElement?: React.ReactNode;
 }
 
@@ -30,7 +30,7 @@ export const ASRSearchInput = React.memo(
     rightElement,
   }: ASRSearchInputProps) => {
     const [isFocused, setIsFocused] = React.useState(false);
-    const radiusClass = variant === "pill" ? "rounded-full" : "rounded-2xl";
+    const radiusClass = variant === "docked" ? "rounded-none" : variant === "pill" ? "rounded-full" : "rounded-2xl";
 
     return (
       <div className={cn("relative group", className)}>
@@ -40,8 +40,9 @@ export const ASRSearchInput = React.memo(
             theme === "dark"
               ? "bg-zinc-900/40 border-white/[0.05] focus-within:border-transparent focus-within:bg-zinc-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]"
               : "bg-white border-slate-200 focus-within:border-transparent focus-within:bg-white shadow-xl shadow-black/5",
-            variant === "pill" && (theme === "dark" ? "backdrop-blur-md bg-zinc-900/70 border border-white/10" : "backdrop-blur-md bg-white/70 border border-black/5"),
-            variant === "pill" && "shadow-none"
+            (variant === "pill" || variant === "docked") && (theme === "dark" ? "backdrop-blur-md bg-zinc-900/70 border border-white/10" : "backdrop-blur-md bg-white/70 border border-black/5"),
+            (variant === "pill" || variant === "docked") && "shadow-none",
+            variant === "docked" && "border-x-0 border-t-0 bg-transparent dark:bg-transparent backdrop-blur-none"
           )}
         >
           {/* Moving Neon Border Effect when focused */}

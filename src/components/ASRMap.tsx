@@ -68,6 +68,11 @@ export const ASRMap = forwardRef(({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const isMobile = window.innerWidth < 768;
+    // Set map to focus on Americas and Hawaii on mobile, keep original for desktop
+    const defaultCenter: L.LatLngTuple = isMobile ? [38, -100] : [15, -90];
+    const defaultZoom = isMobile ? 2 : 3;
+
     const map = L.map(mapContainerRef.current, {
       zoomControl: false,
       attributionControl: false,
@@ -80,7 +85,7 @@ export const ASRMap = forwardRef(({
       doubleClickZoom: true,
       boxZoom: true,
       keyboard: true,
-    }).setView([20, 0], 2);
+    }).setView(defaultCenter, defaultZoom);
 
     const lightTile = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
     const darkTile = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
@@ -375,10 +380,15 @@ export const ASRMap = forwardRef(({
   useEffect(() => {
     if (!mapReady || !mapRef.current || !courses) return;
 
-    if (courses.length === totalCourses || courses.length === 0) {
-      if (mapRef.current.getZoom() > 3) {
-        mapRef.current.flyTo([20, 0], 2, { duration: 1.5 });
-      }
+    const activeCoursesCount = courses.filter((c: any) => c && !c.isDivider).length;
+    
+    // If we're showing all courses (or near all, assuming some courses might not have coords), use the default center
+    // We check if we're showing almost everything by comparing to a high threshold, or if no search is active
+    if (activeCoursesCount >= totalCourses * 0.95 || courses.length === 0) {
+      const isMobile = window.innerWidth < 768;
+      const defaultCenter: L.LatLngTuple = isMobile ? [38, -100] : [15, -90];
+      const defaultZoom = isMobile ? 2 : 3;
+      mapRef.current.flyTo(defaultCenter, defaultZoom, { duration: 1.5 });
       return;
     }
 
@@ -471,7 +481,23 @@ export const ASRMap = forwardRef(({
       <div ref={mapContainerRef} className="absolute inset-0 z-[10]" />
 
       {/* Map Controls - Top Right */}
-      <div className="absolute top-24 md:top-4 right-4 z-[40] flex flex-col gap-3 pointer-events-none">
+      <div className="absolute top-4 right-2 sm:right-4 z-[40] flex flex-col gap-3 pointer-events-none">
+        {/* Locate Me Button */}
+        {!hideControls && (
+           <button
+              onClick={handleFindMe}
+              title="Find my location"
+              className={cn(
+                "pointer-events-auto p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+                isDark
+                  ? "bg-black border-zinc-800 text-white hover:bg-zinc-900 focus-visible:ring-offset-[#030303] shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+                  : "bg-white border-slate-200 text-black shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:bg-slate-50 theme-focus"
+              )}
+           >
+              <Navigation size={18} strokeWidth={2.5} className={cn(isLocating ? "animate-pulse text-blue-500" : "")} />
+           </button>
+        )}
+
         {/* Zoom Controls (Desktop Only) */}
         <div className={cn(
           "pointer-events-auto relative flex flex-col items-center p-0.5 rounded-[2rem] transition-all duration-300 group hidden md:flex",
@@ -507,25 +533,6 @@ export const ASRMap = forwardRef(({
             <Minus size={18} strokeWidth={2.5}/>
           </button>
         </div>
-
-        {/* Locate Me Button */}
-        {!hideControls && (
-          <div className={cn(
-            "pointer-events-auto flex flex-col rounded-full backdrop-blur-md border shadow-lg overflow-hidden transition-colors mt-2 md:mt-0",
-             isDark ? "border-white/10 bg-zinc-900/90 shadow-[0_4px_12px_rgba(0,0,0,0.6)]" : "border-black/5 bg-white/90 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-          )}>
-             <button
-                onClick={handleFindMe}
-                className={cn(
-                  "relative p-3 md:p-2.5 transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                  isDark ? "text-zinc-300 hover:bg-white/10 hover:text-white" : "text-zinc-600 hover:bg-black/5 hover:text-zinc-900"
-                )}
-                title="Find my location"
-             >
-                <Navigation size={18} strokeWidth={2.5} className={cn(isLocating ? "animate-pulse text-blue-500" : "")} />
-             </button>
-          </div>
-        )}
       </div>
     </div>
   );
