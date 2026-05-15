@@ -205,19 +205,19 @@ export const CourseDetails = React.memo(
     const urlTab = searchParams.get("tab");
     const validTabs = ["stats", "men", "women"];
     
-    const [activeTab, setActiveTab] = useState<string>(
-      validTabs.includes(urlTab as string)
+    const initialTabSafe = validTabs.includes(urlTab as string)
         ? (urlTab as "stats" | "men" | "women")
-        : "stats"
-    );
+        : "stats";
+    const [uiTab, setUiTab] = useState<string>(initialTabSafe);
+    const [contentTab, setContentTab] = useState<string>(initialTabSafe);
 
-    const [activeMode, setActiveMode] = useState<"open" | "all-time">(
-      (searchParams.get("mode") as "open" | "all-time") || "open"
-    );
+    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") || "open";
+    const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
+    const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
     const recordsM = useMemo(() => {
-      const source = activeMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = activeMode === "all-time" ? atRawBest : opRawBest;
+      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
+      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
       const sourceM = source?.M[cName] || {};
       const times = Object.values(sourceM) as number[];
       const record = times.length > 0 ? Math.min(...times) : 0;
@@ -242,11 +242,11 @@ export const CourseDetails = React.memo(
         }
         return { ...r, rank: currentRank };
       });
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, activeMode]);
+    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
 
     const recordsF = useMemo(() => {
-      const source = activeMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = activeMode === "all-time" ? atRawBest : opRawBest;
+      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
+      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
       const sourceF = source?.F[cName] || {};
       const times = Object.values(sourceF) as number[];
       const record = times.length > 0 ? Math.min(...times) : 0;
@@ -271,7 +271,7 @@ export const CourseDetails = React.memo(
         }
         return { ...r, rank: currentRank };
       });
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, activeMode]);
+    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
 
     const stats = [
       {
@@ -413,8 +413,13 @@ export const CourseDetails = React.memo(
                 { label: "WOMEN", value: "women" },
                 { label: "BIO", value: "stats" },
               ]}
-              activeOption={activeTab}
-              onChange={(t) => setActiveTab(t)}
+              activeOption={uiTab}
+              onChange={(t) => {
+                setUiTab(t);
+                React.startTransition(() => {
+                  setContentTab(t);
+                });
+              }}
               layoutId="course-tabs"
               theme={theme}
               className="w-full"
@@ -428,7 +433,7 @@ export const CourseDetails = React.memo(
             theme === "dark" ? "bg-[#030303]" : "bg-white",
           )}
         >
-          {activeTab === "men" && (
+          {contentTab === "men" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -443,15 +448,21 @@ export const CourseDetails = React.memo(
                     { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
                   ]}
-                  activeOption={activeMode}
-                  onChange={(m) => setActiveMode(m as "open" | "all-time")}
+                  activeOption={uiMode}
+                  onChange={(m) => {
+                    const nextMode = m as "open" | "all-time";
+                    setUiMode(nextMode);
+                    React.startTransition(() => {
+                      setContentMode(nextMode);
+                    });
+                  }}
                   layoutId="course-mode-pill-m"
                   theme={theme}
                   className="w-full max-w-[280px]"
                 />
               </div>
               <div className="px-4 py-6 overflow-visible min-h-[500px]">
-                {activeMode === "open" && !meta.is2026 ? (
+                {contentMode === "open" && !meta.is2026 ? (
                   <div className="text-center text-zinc-500 py-10 px-4 text-sm max-w-sm mx-auto">
                     * Course not included in the 2026 ASR Open.
                   </div>
@@ -476,7 +487,7 @@ export const CourseDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "women" && (
+          {contentTab === "women" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -491,15 +502,21 @@ export const CourseDetails = React.memo(
                     { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
                   ]}
-                  activeOption={activeMode}
-                  onChange={(m) => setActiveMode(m as "open" | "all-time")}
+                  activeOption={uiMode}
+                  onChange={(m) => {
+                    const nextMode = m as "open" | "all-time";
+                    setUiMode(nextMode);
+                    React.startTransition(() => {
+                      setContentMode(nextMode);
+                    });
+                  }}
                   layoutId="course-mode-pill-f"
                   theme={theme}
                   className="w-full max-w-[280px]"
                 />
               </div>
               <div className="px-4 py-6 overflow-visible min-h-[500px]">
-                {activeMode === "open" && !meta.is2026 ? (
+                {contentMode === "open" && !meta.is2026 ? (
                   <div className="text-center text-zinc-500 py-10 px-4 text-sm max-w-sm mx-auto">
                     This course is not included in the 2026 ASR OPEN.
                   </div>
@@ -524,7 +541,7 @@ export const CourseDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "stats" && (
+          {contentTab === "stats" && (
             <InspectorTabContainer tight>
               <div className="flex flex-col gap-4">
                 <SectionTitle>STATS</SectionTitle>

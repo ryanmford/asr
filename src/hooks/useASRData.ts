@@ -31,20 +31,31 @@ export const useFetchASRData = () => {
         }
       }
 
+      const RAW_CSV_KEY = `${CONFIG.SNAPSHOT_KEY}_raw_csvs`;
+
       if (isInitialFetch) {
         try {
           const cached = await localforage.getItem(CONFIG.SNAPSHOT_KEY);
           if (cached) {
             setData({ ...(cached as ASRDataContext), isLoading: false });
           } else {
-            const localCached = localStorage.getItem(CONFIG.SNAPSHOT_KEY);
-            if (localCached) {
-              const parsedLocal = JSON.parse(localCached);
-              setData({ ...parsedLocal, isLoading: false });
-              try {
-                await localforage.setItem(CONFIG.SNAPSHOT_KEY, parsedLocal);
-              } catch (e) {
-                console.warn("Could not write cache to localforage.", e);
+            // Check for raw cached CSVs
+            const rawCached = await localforage.getItem(RAW_CSV_KEY) as Record<string, string>;
+            if (rawCached && rawCached.rM && rawCached.rF && rawCached.rLive && dataWorker) {
+               dataWorker.postMessage({
+                 type: "PROCESS_AND_COMPUTE",
+                 payload: { ...rawCached, hasTotalError: false, hasPartialError: false },
+               });
+            } else {
+              const localCached = localStorage.getItem(CONFIG.SNAPSHOT_KEY);
+              if (localCached) {
+                const parsedLocal = JSON.parse(localCached);
+                setData({ ...parsedLocal, isLoading: false });
+                try {
+                  await localforage.setItem(CONFIG.SNAPSHOT_KEY, parsedLocal);
+                } catch (e) {
+                  console.warn("Could not write cache to localforage.", e);
+                }
               }
             }
           }
@@ -102,6 +113,14 @@ export const useFetchASRData = () => {
           // If it's a polling retry and totally failed, don't overwrite current state with empty.
           setFetchStatus({ isSyncing: false, hasError: true });
           return;
+        }
+
+        if (!hasTotalError) {
+          try {
+            await localforage.setItem(RAW_CSV_KEY, { rM, rF, rLive, rSet });
+          } catch(e) {
+            console.warn("Could not cache raw CSVs to localforage.", e);
+          }
         }
 
         // Spin up the worker to do heavy lifting mapping

@@ -1,116 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
-import React, { useState, useEffect, useRef, useContext } from "react";
-import {
-  ChevronsRight,
-  Navigation,
-  Plus,
-  Minus
-} from "lucide-react";
+import React, { useState, useEffect, useRef, useContext, forwardRef, useImperativeHandle } from "react";
+import { ChevronsRight, Navigation, Plus, Minus } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 import { trackEvent, cn } from "../lib/asr-utils";
 import { ThemeContext } from "../theme-context";
+import { useAppStore } from "../store/useAppStore";
 
-declare global {
-  interface Window {
-    L: any;
-  }
-}
-
-export const ASRMap = ({
+export const ASRMap = forwardRef(({
   courses = [],
   totalCourses = 0,
   onCourseClick,
+  onPinClick,
+  onBoundsChange,
+  onMapClick,
   theme: propTheme,
-}: any) => {
+  className,
+  hideControls = false,
+}: any, ref: any) => {
   const contextTheme = useContext(ThemeContext);
   const theme = propTheme || contextTheme;
   const isDark = theme === "dark";
 
-  const [isScriptsLoaded, setIsScriptsLoaded] = useState(false);
+  const activeCourseId = useAppStore(s => s.activeCourseId);
   
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const clusterGroupRef = useRef<any>(null);
-  const tileLayerRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
+  const tileLayersRef = useRef<{ light?: L.TileLayer; dark?: L.TileLayer }>({});
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const userMarkerRef = useRef<L.Marker | null>(null);
 
   const [isLocating, setIsLocating] = useState(false);
   const [mapReady, setMapReady] = useState(false);
-  const userMarkerRef = useRef<any>(null);
 
+  // Expose methods to parent
+  useImperativeHandle(ref, () => ({
+    locateUser: handleFindMe,
+  }));
+
+  const onCourseClickRef = useRef(onCourseClick);
+  const onPinClickRef = useRef(onPinClick);
+  const onBoundsChangeRef = useRef(onBoundsChange);
+  const onMapClickRef = useRef(onMapClick);
+
+  useEffect(() => { onCourseClickRef.current = onCourseClick; }, [onCourseClick]);
+  useEffect(() => { onPinClickRef.current = onPinClick; }, [onPinClick]);
+  useEffect(() => { onBoundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
+  useEffect(() => { onMapClickRef.current = onMapClick; }, [onMapClick]);
+
+  // Keep a ref of isDark for the cluster icon creator
   const isDarkRef = useRef(isDark);
   useEffect(() => {
     isDarkRef.current = isDark;
+    
+    // Attempt to force clusters to redraw to apply the new theme
+    if (clusterGroupRef.current) {
+        clusterGroupRef.current.refreshClusters();
+    }
   }, [isDark]);
 
-  const onCourseClickRef = useRef(onCourseClick);
+  // Map Initialization
   useEffect(() => {
-    onCourseClickRef.current = onCourseClick;
-  }, [onCourseClick]);
+    if (!mapContainerRef.current || mapRef.current) return;
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const loadLeaflet = async () => {
-      if (typeof window === "undefined") return;
-
-      const loadStyle = (href: string) => {
-        return new Promise((resolve) => {
-          if (document.querySelector(`link[href="${href}"]`)) return resolve(true);
-          const link = document.createElement("link");
-          link.rel = "stylesheet";
-          link.href = href;
-          link.onload = resolve;
-          document.head.appendChild(link);
-        });
-      };
-
-      const loadScript = (src: string) => {
-        return new Promise((resolve) => {
-          if (document.querySelector(`script[src="${src}"]`)) return resolve(true);
-          const script = document.createElement("script");
-          script.src = src;
-          script.onload = resolve;
-          document.head.appendChild(script);
-        });
-      };
-
-      try {
-        await Promise.all([
-          loadStyle("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"),
-          loadStyle("https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"),
-          loadStyle("https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css")
-        ]);
-        
-        await loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js");
-        if (window.L) {
-          await loadScript("https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js");
-        }
-        
-        if (isMounted) setIsScriptsLoaded(true);
-      } catch (e) {
-        console.error("Failed to load map scripts", e);
-      }
-    };
-
-    if (window.L && window.L.markerClusterGroup) {
-      if (isMounted) setIsScriptsLoaded(true);
-    } else {
-      loadLeaflet();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isScriptsLoaded || !window.L || !mapContainerRef.current) return;
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
-    }
-
-    const map = window.L.map(mapContainerRef.current, {
+    const map = L.map(mapContainerRef.current, {
       zoomControl: false,
       attributionControl: false,
       minZoom: 2,
@@ -127,139 +85,145 @@ export const ASRMap = ({
     const lightTile = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
     const darkTile = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
-    const lightLayer = window.L.tileLayer(lightTile, {
+    const lightLayer = L.tileLayer(lightTile, {
       subdomains: "abcd",
       maxZoom: 20,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
-    const darkLayer = window.L.tileLayer(darkTile, {
+    const darkLayer = L.tileLayer(darkTile, {
       subdomains: "abcd",
       maxZoom: 20,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
-    lightLayer.setOpacity(isDark ? 0 : 1);
-    darkLayer.setOpacity(isDark ? 1 : 0);
+    lightLayer.setOpacity(isDarkRef.current ? 0 : 1);
+    darkLayer.setOpacity(isDarkRef.current ? 1 : 0);
+    tileLayersRef.current = { light: lightLayer, dark: darkLayer };
 
-    tileLayerRef.current = { light: lightLayer, dark: darkLayer };
+    const getClusterIcon = (cluster: any) => {
+      const count = cluster.getChildCount();
+      let conicGradientStr = "from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6";
+      
+      if (count > 50) {
+        conicGradientStr = "from_0deg,#a855f7,#7e22ce,#581c87,#7e22ce,#a855f7";
+      }
+      if (count > 200) {
+        conicGradientStr = "from_0deg,#f43f5e,#e11d48,#9f1239,#e11d48,#f43f5e";
+      }
 
-    if (window.L.markerClusterGroup) {
-      clusterGroupRef.current = window.L.markerClusterGroup({
-        chunkedLoading: false,
-        maxClusterRadius: 50,
-        showCoverageOnHover: false,
-        spiderfyOnMaxZoom: true,
-        zoomToBoundsOnClick: true,
-        iconCreateFunction: (cluster: any) => {
-          const count = cluster.getChildCount();
-          let conicGradientStr = "from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6";
-          
-          if (count > 50) {
-            conicGradientStr = "from_0deg,#a855f7,#7e22ce,#581c87,#7e22ce,#a855f7";
-          }
-          if (count > 200) {
-            conicGradientStr = "from_0deg,#f43f5e,#e11d48,#9f1239,#e11d48,#f43f5e";
-          }
+      const currentIsDark = isDarkRef.current;
+      const outerShadow = currentIsDark ? 'shadow-[0_4px_12px_rgba(0,0,0,0.6)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.2)]';
+      const innerSurface = currentIsDark 
+        ? 'bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]' 
+        : 'bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]';
+      const textColor = currentIsDark ? 'text-white' : 'text-zinc-900';
 
-          const currentIsDark = isDarkRef.current;
-          const outerShadow = currentIsDark ? 'shadow-[0_4px_12px_rgba(0,0,0,0.6)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.2)]';
-          const innerSurface = currentIsDark 
-            ? 'bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]' 
-            : 'bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]';
-          const textColor = currentIsDark ? 'text-white' : 'text-zinc-900';
-
-          return window.L.divIcon({
-            html: `
-              <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
-                <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                  <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                     <div class="w-full h-full neon-border-rotate bg-[conic-gradient(${conicGradientStr})] opacity-90"></div>
-                  </div>
-                  <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
-                </div>
-                
-                <!-- cluster color inner glow -->
-                <div class="absolute inset-[3px] rounded-full z-10 transition-colors shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"></div>
-                
-                <span class="relative z-20 ${textColor} font-black text-xs sm:text-sm tracking-tighter drop-shadow-md">
-                   ${count}
-                </span>
+      return L.divIcon({
+        html: `
+          <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
+            <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+              <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                 <div class="w-full h-full neon-border-rotate bg-[conic-gradient(${conicGradientStr})] opacity-90"></div>
               </div>
-            `,
-            className: "bg-transparent",
-            iconSize: [50, 50],
-          });
-        },
+              <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
+            </div>
+            <div class="absolute inset-[3px] rounded-full z-10 transition-colors shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"></div>
+            <span class="relative z-20 ${textColor} font-black text-xs sm:text-sm tracking-tighter drop-shadow-md">
+               ${count}
+            </span>
+          </div>
+        `,
+        className: "bg-transparent",
+        iconSize: [50, 50],
       });
-      map.addLayer(clusterGroupRef.current);
-    }
+    };
+
+    const clusterGroup = L.markerClusterGroup({
+      chunkedLoading: false,
+      maxClusterRadius: 50,
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      zoomToBoundsOnClick: true,
+      iconCreateFunction: getClusterIcon,
+    });
+    map.addLayer(clusterGroup);
+    clusterGroupRef.current = clusterGroup;
 
     mapRef.current = map;
     setMapReady(true);
-    
-    // Call invalidate multiple times to ensure layout is correct after transition finishes
-    const invalidate = () => {
-      if (mapRef.current) mapRef.current.invalidateSize();
-    };
-    setTimeout(invalidate, 100);
-    setTimeout(invalidate, 400);
-    setTimeout(invalidate, 800);
-
-    window.addEventListener("resize", invalidate);
 
     return () => {
-      window.removeEventListener("resize", invalidate);
+      // Map cleanup
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
       setMapReady(false);
     };
-  }, [isScriptsLoaded]);
+  }, []); // Run once on mount
 
-  // Handle map clicks to dismiss panels/previews
+  // Map Event Handlers
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
-    const mapInstance = mapRef.current;
+    const map = mapRef.current;
     
-    // Add a flag to prevent map click from immediately hiding the preview
-    // if we just clicked a marker.
-    const onMapClick = () => {
-      if ((window as any)._markerClicked) {
-        (window as any)._markerClicked = false;
-        return;
+    const handleMapClick = (e: any) => {
+      if ((e.originalEvent as any)._markerClicked) return;
+      if (onMapClickRef.current) {
+        onMapClickRef.current();
       }
     };
-    mapInstance.on('click', onMapClick);
+    
+    const triggerBounds = () => {
+      if (onBoundsChangeRef.current) {
+         const bounds = map.getBounds();
+         onBoundsChangeRef.current({
+            north: bounds.getNorth(),
+            south: bounds.getSouth(),
+            east: bounds.getEast(),
+            west: bounds.getWest()
+         });
+      }
+    };
+
+    map.on('click', handleMapClick);
+    map.on('moveend', triggerBounds);
+    triggerBounds();
+
     return () => {
-       if (mapInstance && mapInstance.off) {
-          mapInstance.off('click', onMapClick);
-       }
+      map.off('click', handleMapClick);
+      map.off('moveend', triggerBounds);
     };
   }, [mapReady]);
 
-  // Watch for container resizes
+  // ResizeObserver for Container
   useEffect(() => {
-    if (!mapRef.current || !mapContainerRef.current) return;
-    let timeout: ReturnType<typeof setTimeout>;
-    const observer = new ResizeObserver(() => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (mapRef.current) mapRef.current.invalidateSize();
-      }, 100);
+    if (!mapReady || !mapContainerRef.current || !mapRef.current) return;
+    
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+         if (entry.target === mapContainerRef.current) {
+            requestAnimationFrame(() => {
+              if (mapRef.current) {
+                mapRef.current.invalidateSize();
+              }
+            });
+         }
+      }
     });
-    observer.observe(mapContainerRef.current);
-    return () => {
-      clearTimeout(timeout);
-      observer.disconnect();
-    };
-  }, [isScriptsLoaded]);
 
-  // Update tiles on theme switch
+    observer.observe(mapContainerRef.current);
+    
+    return () => {
+       observer.disconnect();
+    };
+  }, [mapReady]);
+
+  // Theme synchronization for Tiles
   useEffect(() => {
-    if (!mapRef.current || !tileLayerRef.current) return;
-    const { light, dark } = tileLayerRef.current;
+    if (!tileLayersRef.current) return;
+    const { light, dark } = tileLayersRef.current;
     if (light && dark) {
       if (isDark) {
         dark.setOpacity(1);
@@ -271,80 +235,145 @@ export const ASRMap = ({
     }
   }, [isDark]);
 
-  // Marker Management
-  useEffect(() => {
-    if (!mapReady || !mapRef.current || !clusterGroupRef.current || !window.L) return;
-    clusterGroupRef.current.clearLayers();
+  // Helper to create marker icon
+  const createPinIcon = (isActive: boolean) => {
+    const currentIsDark = isDarkRef.current;
+    const outerShadow = currentIsDark ? 'shadow-[0_4px_12px_rgba(0,0,0,0.6)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.2)]';
+    const innerSurface = currentIsDark 
+      ? 'bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]' 
+      : 'bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]';
 
-    (courses || []).forEach((c: any) => {
+    const activeOuterClasses = isActive ? 'scale-[1.5] z-[1000] brightness-125' : 'hover:scale-[1.15] active:scale-95 drop-shadow-lg';
+    
+    return L.divIcon({
+      html: `
+        <div class="asr-pin relative flex flex-col items-center justify-center group transition-all duration-300 cursor-pointer ${activeOuterClasses}" style="width: 44px; height: 44px;">
+          <div class="absolute inset-0 bg-transparent"></div>
+          <div class="relative flex flex-col items-center mt-2">
+            <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
+              <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+                  <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90"></div>
+                </div>
+                <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
+              </div>
+              <div class="relative z-20 w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] ${isActive ? 'scale-125' : 'group-hover:scale-125'} transition-all"></div>
+            </div>
+            <div class="w-[2px] h-[8px] bg-gradient-to-b from-blue-500/80 to-transparent rounded-b-full"></div>
+          </div>
+        </div>
+      `,
+      className: "bg-transparent",
+      iconSize: [44, 44],
+      iconAnchor: [22, 38],
+    });
+  };
+
+  // Marker Syncing
+  useEffect(() => {
+    if (!mapReady || !clusterGroupRef.current) return;
+    
+    const currentCourseIds = new Set(courses.map((c: any) => c.name));
+    
+    // Remove markers that are no longer in `courses`
+    const markersToRemove: L.Marker[] = [];
+    for (const [id, marker] of markersRef.current.entries()) {
+       if (!currentCourseIds.has(id)) {
+          markersToRemove.push(marker);
+          markersRef.current.delete(id);
+       }
+    }
+
+    if (markersToRemove.length > 0) {
+       clusterGroupRef.current.removeLayers(markersToRemove);
+    }
+
+    // Add or update markers Let's add new markers without blowing up the whole cluster.
+    const newMarkers: L.Marker[] = [];
+
+    courses.forEach((c: any) => {
+      const id = c.name;
       if (!c.parsedCoords) return;
 
-      const currentIsDark = isDarkRef.current;
-      const outerShadow = currentIsDark ? 'shadow-[0_4px_12px_rgba(0,0,0,0.6)]' : 'shadow-[0_4px_12px_rgba(0,0,0,0.2)]';
-      const innerSurface = currentIsDark 
-        ? 'bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]' 
-        : 'bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]';
+      const isActive = activeCourseId === id;
 
-      const marker = window.L.marker(c.parsedCoords, {
-        icon: window.L.divIcon({
+      if (!markersRef.current.has(id)) {
+         const marker = L.marker(c.parsedCoords, {
+            icon: createPinIcon(isActive)
+         });
+
+         marker.on("click", (e) => {
+            (e.originalEvent as any)._markerClicked = true;
+            if (!mapRef.current) return;
+
+            // Intelligent Panning
+            const currentZoom = Math.max(mapRef.current.getZoom(), 12);
+            const pt = mapRef.current.project(c.parsedCoords, currentZoom);
+            const isDesktop = window.innerWidth >= 768;
+            
+            if (!isDesktop) {
+               const targetLatLng = mapRef.current.unproject({ x: pt.x, y: pt.y + (window.innerHeight * 0.22) }, currentZoom);
+               mapRef.current.flyTo(targetLatLng, currentZoom, { duration: 1.0 });
+            } else {
+               const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
+               const targetLatLng = mapRef.current.unproject({ x: pt.x - (panelWidth / 2), y: pt.y }, currentZoom);
+               mapRef.current.flyTo(targetLatLng, currentZoom, { duration: 1.0 });
+            }
+
+            if (onPinClickRef.current) onPinClickRef.current(c);
+            else if (onCourseClickRef.current) onCourseClickRef.current(c);
+         });
+
+         markersRef.current.set(id, marker);
+         newMarkers.push(marker);
+      }
+    });
+
+    if (newMarkers.length > 0) {
+      clusterGroupRef.current.addLayers(newMarkers);
+    }
+
+  }, [courses, mapReady]); 
+
+  // Active Pin State AND Theme updates (re-render icons)
+  useEffect(() => {
+    if (!mapReady) return;
+    for (const [id, marker] of markersRef.current.entries()) {
+      const isActive = activeCourseId === id;
+      marker.setIcon(createPinIcon(isActive));
+      
+      // Feature: push to top visually
+      if (isActive) {
+        marker.setZIndexOffset(1000);
+      } else {
+        marker.setZIndexOffset(0);
+      }
+    }
+  }, [activeCourseId, isDark, mapReady]); // Depends on isDark so markers redraw with theme
+
+  // User Marker theming
+  useEffect(() => {
+    if (userMarkerRef.current) {
+        const currentIsDark = isDarkRef.current;
+        userMarkerRef.current.setIcon(L.divIcon({
           html: `
-            <div class="relative flex flex-col items-center justify-center group transition-transform duration-300 cursor-pointer hover:scale-[1.15] active:scale-95 drop-shadow-lg" style="width: 44px; height: 44px;">
-              <div class="absolute inset-0 bg-transparent"></div>
-              <div class="relative flex flex-col items-center mt-2">
-                <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
-                  <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                    <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                      <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90"></div>
-                    </div>
-                    <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
-                  </div>
-                  <div class="relative z-20 w-1.5 h-1.5 ${currentIsDark ? 'bg-blue-500' : 'bg-blue-500'} rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] group-hover:scale-125 transition-all"></div>
-                </div>
-                <div class="w-[2px] h-[8px] ${currentIsDark ? 'bg-gradient-to-b from-blue-500/80 to-transparent' : 'bg-gradient-to-b from-blue-500/80 to-transparent'} rounded-b-full"></div>
+            <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
+              <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
+              <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${currentIsDark ? 'border-zinc-900' : 'border-white'}">
+                <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
               </div>
             </div>
           `,
           className: "bg-transparent",
-          iconSize: [44, 44],
-          iconAnchor: [22, 38],
-        }),
-      });
-
-      marker.on("click", () => {
-        (window as any)._markerClicked = true;
-        if (!mapRef.current) return;
-        
-        if (onCourseClickRef.current) {
-          onCourseClickRef.current(c);
-        }
-      });
-      clusterGroupRef.current.addLayer(marker);
-    });
-  }, [courses, isScriptsLoaded, mapReady, isDark]);
-
-  // Update user marker if it exists when theme changes
-  useEffect(() => {
-    if (userMarkerRef.current && window.L) {
-      const currentIsDark = isDark;
-          userMarkerRef.current.setIcon(window.L.divIcon({
-        html: `
-          <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
-            <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
-            <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${currentIsDark ? 'border-zinc-900' : 'border-white'}">
-              <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
-            </div>
-          </div>
-        `,
-        className: "bg-transparent",
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      }));
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        }));
     }
   }, [isDark]);
 
   // CAMERA DIRECTOR: Automatic Map Framing
   useEffect(() => {
-    if (!mapReady || !mapRef.current || !window.L || !courses || !isScriptsLoaded) return;
+    if (!mapReady || !mapRef.current || !courses) return;
 
     if (courses.length === totalCourses || courses.length === 0) {
       if (mapRef.current.getZoom() > 3) {
@@ -353,7 +382,7 @@ export const ASRMap = ({
       return;
     }
 
-    const bounds = window.L.latLngBounds();
+    const bounds = L.latLngBounds([]);
     let validCoordsCount = 0;
     let lastValidCoord = null;
 
@@ -365,18 +394,27 @@ export const ASRMap = ({
       }
     });
 
-    if (validCoordsCount === 1) {
-      mapRef.current.flyTo(lastValidCoord, 14, { duration: 1.5 });
+    if (validCoordsCount === 1 && lastValidCoord) {
+      const isDesktop = window.innerWidth >= 768;
+      const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
+      const pt = mapRef.current.project(lastValidCoord, 14);
+      if (isDesktop) pt.x -= (panelWidth / 2);
+      else pt.y += (window.innerHeight * 0.15); // Offset for mobile bottom drawer
+      const targetLatLng = mapRef.current.unproject(pt, 14);
+      mapRef.current.flyTo(targetLatLng, 14, { duration: 1.5 });
     } else if (validCoordsCount > 1) {
       if (bounds.isValid()) {
+        const isDesktop = window.innerWidth >= 768;
+        const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
         mapRef.current.fitBounds(bounds, {
-          padding: [50, 50],
+          paddingTopLeft: isDesktop ? [panelWidth + 16, 50] : [16, 50],
+          paddingBottomRight: isDesktop ? [50, 50] : [16, window.innerHeight * 0.3 + 50],
           maxZoom: 12,
           duration: 1.5,
         });
       }
     }
-  }, [courses, totalCourses, isScriptsLoaded, mapReady]);
+  }, [courses, totalCourses, mapReady]);
 
   const handleFindMe = () => {
     if (!mapRef.current || !navigator.geolocation) return;
@@ -388,27 +426,26 @@ export const ASRMap = ({
         const { latitude, longitude } = pos.coords;
         mapRef.current.flyTo([latitude, longitude], 13, { duration: 1.5 });
         
-        if (window.L) {
-          if (userMarkerRef.current) {
-             userMarkerRef.current.setLatLng([latitude, longitude]);
-          } else {
-              userMarkerRef.current = window.L.marker([latitude, longitude], {
-                icon: window.L.divIcon({
-                  html: `
-                    <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
-                      <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
-                      <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${isDarkRef.current ? 'border-zinc-900' : 'border-white'}">
-                        <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
-                      </div>
+        if (userMarkerRef.current) {
+           userMarkerRef.current.setLatLng([latitude, longitude]);
+        } else {
+            const currentIsDark = isDarkRef.current;
+            userMarkerRef.current = L.marker([latitude, longitude], {
+              icon: L.divIcon({
+                html: `
+                  <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
+                    <div class="absolute inset-[-60%] bg-blue-500/20 rounded-full" style="will-change: transform; transform: translateZ(0); pointer-events: none;"></div>
+                    <div class="relative w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.6)] border-[2.5px] ${currentIsDark ? 'border-zinc-900' : 'border-white'}">
+                      <div class="relative w-1.5 h-1.5 bg-white rounded-full"></div>
                     </div>
-                  `,
-                  className: "bg-transparent",
-                  iconSize: [24, 24],
-                  iconAnchor: [12, 12]
-                }),
-                interactive: false
-             }).addTo(mapRef.current!);
-          }
+                  </div>
+                `,
+                className: "bg-transparent",
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+              }),
+              interactive: false
+           }).addTo(mapRef.current);
         }
 
         setIsLocating(false);
@@ -422,116 +459,74 @@ export const ASRMap = ({
   const handleZoomIn = () => mapRef.current?.zoomIn();
   const handleZoomOut = () => mapRef.current?.zoomOut();
 
-  if (!isScriptsLoaded) {
-    return (
-      <div
-        className={cn(
-          "w-full h-[60vh] sm:h-[75vh] min-h-[500px] flex flex-col items-center justify-center rounded-[2.5rem] sm:rounded-[3.5rem] border shadow-2xl",
-          isDark
-            ? "bg-zinc-900/40 border-zinc-800 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-            : "bg-slate-100 border-slate-200 text-black"
-        )}
-      >
-        <div className="animate-spin opacity-70 mb-4">
-          <ChevronsRight
-            className="w-6 h-6 text-blue-500"
-            strokeWidth={2.5}
-            style={{ transform: "skewX(-18deg)" }}
-          />
-        </div>
-        <div className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] animate-pulse opacity-70">
-          ACCESSING ASR MAP SOURCE...
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       id="asr-map-container"
       className={cn(
-        "relative w-full h-[60vh] sm:h-[75vh] min-h-[500px] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden shadow-2xl border",
-        isDark
-          ? "border-zinc-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-          : "border-slate-200"
+        "relative w-full overflow-hidden shadow-2xl transition-colors duration-500",
+        isDark ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]" : "",
+        className || "h-[60vh] sm:h-[75vh] min-h-[500px] rounded-[2.5rem] sm:rounded-[3.5rem] border border-slate-200 dark:border-zinc-800"
       )}
     >
       <div ref={mapContainerRef} className="absolute inset-0 z-[10]" />
 
-      {/* Top Left: Find Course Near Me */}
-      <div className="absolute top-4 left-4 z-[40] pointer-events-none">
+      {/* Map Controls - Top Right */}
+      <div className="absolute top-24 md:top-4 right-4 z-[40] flex flex-col gap-3 pointer-events-none">
+        {/* Zoom Controls (Desktop Only) */}
         <div className={cn(
-          "pointer-events-auto relative rounded-full transition-all duration-300 flex items-center p-0.5 group",
-          isDark 
-            ? "shadow-[0_4px_12px_rgba(0,0,0,0.6)]" 
-            : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+          "pointer-events-auto relative flex flex-col items-center p-0.5 rounded-[2rem] transition-all duration-300 group hidden md:flex",
+          isDark ? "shadow-[0_4px_12px_rgba(0,0,0,0.6)]" : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
         )}>
-          <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+          <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
             <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
               <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
             </div>
             <div className={cn(
-              "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
-              isDark 
-                ? "bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]" 
-                : "bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]"
+              "absolute inset-[1.5px] rounded-[2rem] z-10 backdrop-blur-md transition-colors",
+              isDark ? "bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]" : "bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]"
             )} />
           </div>
 
           <button
-            onClick={handleFindMe}
-            className="relative z-20 flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            onClick={handleZoomIn}
+            className={cn(
+              "relative z-20 p-2.5 rounded-t-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+              isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
+            )}
           >
-            <Navigation size={14} strokeWidth={2.5} className={cn(isDark ? "text-white" : "text-zinc-900", isLocating && "animate-spin")} />
-            <span className={isDark ? "text-white" : "text-zinc-900"}>Find Course Near Me</span>
+            <Plus size={18} strokeWidth={2.5}/>
+          </button>
+          <div className={cn("relative z-20 w-4 h-px my-0.5", isDark ? "bg-white/10" : "bg-black/10")} />
+          <button
+            onClick={handleZoomOut}
+            className={cn(
+              "relative z-20 p-2.5 rounded-b-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+              isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
+            )}
+          >
+            <Minus size={18} strokeWidth={2.5}/>
           </button>
         </div>
-      </div>
 
-      {/* Top Right: Zoom Controls */}
-      <div className="absolute top-4 right-4 z-[40] pointer-events-none">
-        <div className={cn(
-          "pointer-events-auto relative flex flex-col items-center p-0.5 rounded-full transition-all duration-300 group",
-          isDark 
-            ? "shadow-[0_4px_12px_rgba(0,0,0,0.6)]" 
-            : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-        )}>
-          <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
-            </div>
-            <div className={cn(
-              "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors",
-              isDark 
-                ? "bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]" 
-                : "bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]"
-            )} />
+        {/* Locate Me Button */}
+        {!hideControls && (
+          <div className={cn(
+            "pointer-events-auto flex flex-col rounded-full backdrop-blur-md border shadow-lg overflow-hidden transition-colors mt-2 md:mt-0",
+             isDark ? "border-white/10 bg-zinc-900/90 shadow-[0_4px_12px_rgba(0,0,0,0.6)]" : "border-black/5 bg-white/90 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+          )}>
+             <button
+                onClick={handleFindMe}
+                className={cn(
+                  "relative p-3 md:p-2.5 transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                  isDark ? "text-zinc-300 hover:bg-white/10 hover:text-white" : "text-zinc-600 hover:bg-black/5 hover:text-zinc-900"
+                )}
+                title="Find my location"
+             >
+                <Navigation size={18} strokeWidth={2.5} className={cn(isLocating ? "animate-pulse text-blue-500" : "")} />
+             </button>
           </div>
-
-           <button
-              onClick={handleZoomIn}
-              className={cn(
-                "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
-              )}
-           >
-              <Plus size={18} strokeWidth={2.5}/>
-           </button>
-           <div className={cn(
-             "relative z-20 w-4 h-px my-0.5",
-             isDark ? "bg-white/10" : "bg-black/10"
-           )} />
-           <button
-              onClick={handleZoomOut}
-              className={cn(
-                "relative z-20 p-2.5 rounded-full transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                isDark ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5"
-              )}
-           >
-              <Minus size={18} strokeWidth={2.5}/>
-           </button>
-        </div>
+        )}
       </div>
     </div>
   );
-};
+});

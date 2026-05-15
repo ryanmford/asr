@@ -3,9 +3,10 @@ import { Activity } from "lucide-react";
 import { motion } from "motion/react";
 import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
+import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRListItem } from "../ASRListItems";
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useWindowVirtualizer, useVirtualizer } from '@tanstack/react-virtual';
 
 import { ASRDataContext } from "../../types";
 
@@ -22,6 +23,7 @@ interface ASRRankListProps {
  entityType?: "player" | "setter" | "course" | "team" | "region";
  padTo?: number;
  isCompact?: boolean;
+ scrollElementRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const ASRRankList = ({
@@ -37,8 +39,11 @@ export const ASRRankList = ({
  entityType,
  padTo = 0,
  isCompact = true,
+ scrollElementRef,
 }: ASRRankListProps) => {
  const theme = useContext(ThemeContext);
+ const modalScrollRef = useContext(ModalScrollContext);
+ const activeScrollRef = scrollElementRef || (modalScrollRef.current ? modalScrollRef : null);
  const { atMet = {}, cMet = {} } = dataContext;
 
   const { finalAthletes, listRenderKey } = React.useMemo(() => {
@@ -65,11 +70,20 @@ export const ASRRankList = ({
   }, [athletes, limit, padTo]);
 
   const estimateSize = React.useCallback(() => isCompact ? 80 : 100, [isCompact]);
-  const virtualizer = useWindowVirtualizer({
+  const windowVirtualizer = useWindowVirtualizer({
     count: finalAthletes.length,
     estimateSize,
     overscan: 5,
   });
+
+  const elementVirtualizer = useVirtualizer({
+    count: finalAthletes.length,
+    getScrollElement: () => activeScrollRef?.current || null,
+    estimateSize,
+    overscan: 5,
+  });
+
+  const virtualizer = activeScrollRef ? elementVirtualizer : windowVirtualizer;
 
  return (
  <div className={cn("space-y-6 text-left overflow-visible", className)}>

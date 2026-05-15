@@ -82,7 +82,7 @@ export const ASRListItem = React.memo(
  mapUrl,
  showVideoIcon = false,
  isUnclaimed = false,
- isCompact = false, onHover,
+ isCompact = false, onHover, isHighlighted,
  }: {
    rank?: string | number | null;
    title?: React.ReactNode;
@@ -100,7 +100,8 @@ export const ASRListItem = React.memo(
    showVideoIcon?: boolean;
    isUnclaimed?: boolean;
    isCompact?: boolean;
-   onHover?: () => void;
+   onHover?: (isHovering: boolean) => void;
+   isHighlighted?: boolean;
  }) => {
  const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
  const theme = useContext(ThemeContext);
@@ -111,8 +112,17 @@ export const ASRListItem = React.memo(
  : "hover:bg-black/[0.05]";
  const cardHover =
  theme === "dark" 
- ? "hover:bg-white/5 hover:border-white/20 transition-colors duration-150" 
- : "hover:bg-black/5 hover:border-black/20 transition-colors duration-150";
+ ? "hover:bg-white/5 hover:border-blue-500/50 transition-colors duration-150" 
+ : "hover:bg-black/5 hover:border-blue-500/50 transition-colors duration-150";
+
+ const getHighlightClass = () => {
+   if (!isHighlighted) return "";
+   return theme === "dark" ? "!bg-white/10 !ring-2 !ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] !scale-[1.02] z-10 relative" : "!bg-black/5 !ring-2 !ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] !scale-[1.02] z-10 relative";
+ };
+ const getTableHighlightClass = () => {
+   if (!isHighlighted) return "";
+   return theme === "dark" ? "!bg-white/[0.12] scale-[1.01] z-10 relative" : "!bg-blue-500/10 scale-[1.01] z-10 relative";
+ };
 
  const ItemWrapper: React.ElementType = 'div';
 
@@ -120,7 +130,11 @@ export const ASRListItem = React.memo(
  return (
  <ItemWrapper
  onClick={onClick}
- role={onClick ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
+ role={onClick ? "button" : undefined} 
+ onMouseEnter={() => onHover && onHover(true)} 
+ onMouseLeave={() => onHover && onHover(false)}
+ onTouchStart={() => onHover && onHover(true)}
+ onTouchEnd={() => onHover && onHover(false)}
  tabIndex={onClick ? 0 : undefined}
  onKeyDown={(e) => {
  if (onClick && (e.key === "Enter" || e.key === " ")) {
@@ -133,6 +147,7 @@ export const ASRListItem = React.memo(
  onClick
  ? `cursor-pointer active:scale-95 active:bg-blue-500/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-500/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
  : "cursor-default",
+ getTableHighlightClass(),
  shouldFade ? "opacity-40 grayscale" : "opacity-100",
  )}
  >
@@ -273,7 +288,11 @@ export const ASRListItem = React.memo(
  return (
  <ItemWrapper
  onClick={isUnclaimed ? undefined : onClick}
- role={onClick && !isUnclaimed ? "button" : undefined} onMouseEnter={() => onHover && onHover()} onTouchStart={() => onHover && onHover()}
+ role={onClick && !isUnclaimed ? "button" : undefined} 
+ onMouseEnter={() => onHover && onHover(true)} 
+ onMouseLeave={() => onHover && onHover(false)}
+ onTouchStart={() => onHover && onHover(true)}
+ onTouchEnd={() => onHover && onHover(false)}
  tabIndex={onClick && !isUnclaimed ? 0 : undefined}
  onKeyDown={(e) => {
  if (onClick && !isUnclaimed && (e.key === "Enter" || e.key === " ")) {
@@ -295,6 +314,7 @@ export const ASRListItem = React.memo(
  theme === "dark" ? "border-white/10" : "border-black/10",
  )
  : THEME.CARD(theme),
+ getHighlightClass(),
  shouldFade ? "opacity-40 grayscale" : "opacity-100",
  )}
  >

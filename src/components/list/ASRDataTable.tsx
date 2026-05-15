@@ -3,8 +3,9 @@ import { Search, CloudOff } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
 import { ASRListItem } from "../ASRListItems";
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer, useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useDataStore } from "../../store/useDataStore";
+import { useAppStore } from "../../store/useAppStore";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 
 interface ColumnDef<T> {
@@ -26,6 +27,7 @@ interface ASRDataTableProps<T = Record<string, unknown>> {
  isLoading?: boolean;
  visibleCount?: number;
  observerTarget?: React.RefObject<HTMLDivElement> | null;
+ scrollElementRef?: React.RefObject<HTMLElement | null>;
  showRankings?: boolean;
  hideSubtitle?: boolean;
  middleLabel?: string;
@@ -40,7 +42,8 @@ interface MemoizedVirtualRowProps<T> {
   columns: ColumnDef<T>[];
   showVideoColumn: boolean;
   onItemClick?: (item: T) => void;
-  onItemHover?: () => void;
+  onItemHover?: (item: T, isHovering: boolean) => void;
+  activeCourseId?: string | null;
   measureElement: (node: Element | null) => void;
 }
 
@@ -53,11 +56,13 @@ const MemoizedVirtualRow = React.memo(({
   showVideoColumn,
   onItemClick,
   onItemHover,
+  activeCourseId,
   measureElement
 }: MemoizedVirtualRowProps<Record<string, unknown>>) => {
   const absoluteTransform = `translateY(${virtualRow.start}px)`;
 
   const stats = React.useMemo(() => {
+    if (!item) return [];
     return statColumns.map((c) => ({
       value: typeof c.getValue === "function" ? c.getValue(item) : item[c.key as keyof typeof item],
       color: c.color,
@@ -68,6 +73,8 @@ const MemoizedVirtualRow = React.memo(({
   const handleClick = React.useCallback(() => {
     if (onItemClick) onItemClick(item);
   }, [onItemClick, item]);
+
+  if (!item) return null;
 
   if (item.isDivider) {
     return (
@@ -115,27 +122,44 @@ const MemoizedVirtualRow = React.memo(({
         shouldFade={item.shouldFade}
         badgeContent={item.badgeContent}
         onClick={handleClick}
-        onHover={onItemHover}
+        onHover={(isHovering) => onItemHover && onItemHover(item, isHovering)}
+        isHighlighted={!!(activeCourseId && (item.id === activeCourseId || item.pKey === activeCourseId || item.name === activeCourseId))}
         showVideoIcon={showVideoColumn}
       />
     </div>
   );
 });
 
+export interface ASRDataTableRef {
+  scrollToIndex: (index: number, align?: 'start' | 'center' | 'end' | 'auto') => void;
+}
+
 export const ASRDataTable = React.memo(
- ({
+ React.forwardRef<ASRDataTableRef, ASRDataTableProps>(({
  data,
- columns,
+ columns = [],
  viewType = "table",
  onItemClick,
  isLoading = false,
  showRankings = true,
  middleLabel = "PLAYER / DATA",
  showVideoColumn = false,
- }: ASRDataTableProps) => {
+ scrollElementRef,
+ }, ref) => {
  const theme = useContext(ThemeContext);
  const hasError = useDataStore(s => s.hasError);
  const { prefetchEntity } = useAppNavigation();
+ const activeCourseId = useAppStore(s => s.activeCourseId);
+ const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
+
+ const handleItemHover = React.useCallback((item: any, isHovering: boolean) => {
+   if (isHovering) {
+     prefetchEntity(item);
+     setActiveCourseId(item?.id || item?.pKey || null);
+   } else {
+     setActiveCourseId(null);
+   }
+ }, [prefetchEntity, setActiveCourseId]);
  
  const estimateSize = React.useCallback(() => {
    return viewType === "card" 
@@ -143,12 +167,35 @@ export const ASRDataTable = React.memo(
      : (window.innerWidth >= 1024 ? 80 : 64);
  }, [viewType]);
 
- const virtualizer = useWindowVirtualizer({
- count: data?.length || 0,
+ const windowVirtualizer = useWindowVirtualizer({
+ count: !scrollElementRef ? (data?.length || 0) : 0,
  estimateSize,
  overscan: 5,
- getItemKey: (index) => data[index]?.id || data[index]?.pKey || data[index]?.name || index,
+ getItemKey: (index) => `${data[index]?.id || data[index]?.pKey || data[index]?.name || 'item'}_${index}`,
  });
+
+ const [isElementReady, setIsElementReady] = React.useState(false);
+ React.useEffect(() => {
+   if (scrollElementRef?.current) {
+     setIsElementReady(true);
+   }
+ }, [scrollElementRef?.current]);
+
+ const elementVirtualizer = useVirtualizer({
+   count: scrollElementRef && isElementReady ? (data?.length || 0) : 0,
+   getScrollElement: () => scrollElementRef?.current || null,
+   estimateSize,
+   overscan: 5,
+   getItemKey: (index) => `${data[index]?.id || data[index]?.pKey || data[index]?.name || 'item'}_${index}`,
+ });
+
+ const virtualizer = scrollElementRef ? elementVirtualizer : windowVirtualizer;
+
+ React.useImperativeHandle(ref, () => ({
+   scrollToIndex: (index, align = 'center') => {
+     virtualizer.scrollToIndex(index, { align });
+   }
+ }), [virtualizer]);
 
  const statColumns = React.useMemo(() => columns.filter((c) => !c.isRank && c.type !== "profile"), [columns]);
 
@@ -335,7 +382,8 @@ export const ASRDataTable = React.memo(
      columns={columns}
      showVideoColumn={showVideoColumn}
      onItemClick={onItemClick}
-     onItemHover={prefetchEntity}
+     onItemHover={handleItemHover}
+     activeCourseId={activeCourseId}
      measureElement={virtualizer.measureElement}
    />
  );
@@ -343,5 +391,5 @@ export const ASRDataTable = React.memo(
  </div>
  </div>
  );
- },
+ }),
 );

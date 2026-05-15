@@ -62,12 +62,13 @@ export const PlayerDetails = React.memo(
     const validTabs = ["runs", "sets", "vault", "bio"];
     
     // Use local state so modal updates don't trigger global tree re-renders
-    const [activeTab, setActiveTab] = useState<string>(
-      validTabs.includes(urlTab as string) ? (urlTab as string) : initialTab || "runs"
-    );
-    const [activeMode, setActiveMode] = useState<"open" | "all-time">(
-      (searchParams.get("mode") as "open" | "all-time") || "open"
-    );
+    const initialTabSafe = validTabs.includes(urlTab as string) ? (urlTab as string) : initialTab || "runs";
+    const [uiTab, setUiTab] = useState<string>(initialTabSafe);
+    const [contentTab, setContentTab] = useState<string>(initialTabSafe);
+
+    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") || "open";
+    const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
+    const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
     const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);
 
@@ -89,7 +90,7 @@ export const PlayerDetails = React.memo(
       vitals,
       rankListRuns,
       vaultItems,
-    } = usePlayerDetailsData(player, activeMode, dataContext);
+    } = usePlayerDetailsData(player, contentMode, dataContext);
 
     return (
       <div
@@ -126,8 +127,13 @@ export const PlayerDetails = React.memo(
                 { label: "RUNS", value: "runs" },
                 { label: "SETS", value: "sets" },
               ]}
-              activeOption={activeTab}
-              onChange={(t) => setActiveTab(t)}
+              activeOption={uiTab}
+              onChange={(t) => {
+                setUiTab(t);
+                React.startTransition(() => {
+                  setContentTab(t);
+                });
+              }}
               layoutId="profile-tabs"
               theme={theme}
               className="w-full"
@@ -141,7 +147,7 @@ export const PlayerDetails = React.memo(
             theme === "dark" ? "bg-[#050505]" : "bg-[#FAFAFA]",
           )}
         >
-          {activeTab === "runs" && (
+          {contentTab === "runs" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -156,8 +162,14 @@ export const PlayerDetails = React.memo(
                     { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
                   ]}
-                  activeOption={activeMode}
-                  onChange={(m) => setActiveMode(m as "open" | "all-time")}
+                  activeOption={uiMode}
+                  onChange={(m) => {
+                    const nextMode = m as "open" | "all-time";
+                    setUiMode(nextMode);
+                    React.startTransition(() => {
+                      setContentMode(nextMode);
+                    });
+                  }}
                   layoutId="player-mode-pill"
                   theme={theme}
                   className="w-full max-w-[280px]"
@@ -213,7 +225,7 @@ export const PlayerDetails = React.memo(
                 </div>
               </div>
 
-              {activeMode === "all-time" && (
+              {contentMode === "all-time" && (
                 <div className="px-6 pb-2">
                   <ASRWeeklyActivityChart runs={allRuns} />
                 </div>
@@ -263,7 +275,7 @@ export const PlayerDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "sets" && (
+          {contentTab === "sets" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -368,7 +380,7 @@ export const PlayerDetails = React.memo(
             </div>
           )}
 
-          {activeTab === "vault" && (
+          {contentTab === "vault" && (
             <InspectorTabContainer className="gap-14 text-center">
               <div className="flex flex-col gap-8">
                 <SectionTitle noPadding>TOKENS</SectionTitle>
@@ -451,7 +463,7 @@ export const PlayerDetails = React.memo(
             </InspectorTabContainer>
           )}
 
-          {activeTab === "bio" && (
+          {contentTab === "bio" && (
             <InspectorTabContainer>
               <div className="flex flex-col gap-4">
                 <SectionTitle>SEND TIP</SectionTitle>

@@ -40,19 +40,19 @@ export const TeamDetails = React.memo(
     const validTabs = ["players", "athletes", "setters", "vault", "bio"];
     
     // Use local state so modal updates don't trigger global tree re-renders
-    const [activeTab, setActiveTab] = useState<string>(
-      validTabs.includes(urlTab as string)
+    const initialTabSafe = validTabs.includes(urlTab as string)
         ? urlTab === "athletes"
           ? "players"
           : (urlTab as string)
-        : "players"
-    );
+        : "players";
+    const [uiTab, setUiTab] = useState<string>(initialTabSafe);
+    const [contentTab, setContentTab] = useState<string>(initialTabSafe);
     
-    const [mode, setMode] = useState<"open" | "all-time">(
-      (searchParams.get("mode") as "open" | "all-time") ||
+    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") ||
       initialMode ||
-      "open"
-    );
+      "open";
+    const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
+    const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
     const {
       tMeta,
@@ -63,7 +63,7 @@ export const TeamDetails = React.memo(
       playerTuples,
       setterTuples,
       vaultItems,
-    } = useTeamDetailsData(team, mode, dataContext);
+    } = useTeamDetailsData(team, contentMode, dataContext);
 
     const randomPlayersPromo = useMemo(() => {
       const types: PromoType[] = ["coach"];
@@ -112,8 +112,13 @@ export const TeamDetails = React.memo(
                 { label: "PLAYERS", value: "players" },
                 { label: "SETTERS", value: "setters" },
               ]}
-              activeOption={activeTab}
-              onChange={(t) => setActiveTab(t)}
+              activeOption={uiTab}
+              onChange={(t) => {
+                setUiTab(t);
+                React.startTransition(() => {
+                  setContentTab(t);
+                });
+              }}
               layoutId="team-tabs"
               theme={theme}
               className="w-full"
@@ -127,7 +132,7 @@ export const TeamDetails = React.memo(
             theme === "dark" ? "bg-[#030303]" : "bg-white",
           )}
         >
-          {activeTab === "bio" && (
+          {contentTab === "bio" && (
             <InspectorTabContainer>
               <div className="flex flex-col gap-4">
                 <SectionTitle>GYM PROFILE</SectionTitle>
@@ -172,7 +177,7 @@ export const TeamDetails = React.memo(
               </div>
             </InspectorTabContainer>
           )}
-          {activeTab === "players" && (
+          {contentTab === "players" && (
             <div className="animate-in fade-in duration-300 flex flex-col h-full overflow-visible">
               <div
                 className={cn(
@@ -187,8 +192,14 @@ export const TeamDetails = React.memo(
                     { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
                   ]}
-                  activeOption={mode}
-                  onChange={(m) => setMode(m as "open" | "all-time")}
+                  activeOption={uiMode}
+                  onChange={(m) => {
+                    const nextMode = m as "open" | "all-time";
+                    setUiMode(nextMode);
+                    React.startTransition(() => {
+                      setContentMode(nextMode);
+                    });
+                  }}
                   layoutId="team-mode-pill"
                   theme={theme}
                   className="w-full max-w-[280px]"
@@ -219,7 +230,7 @@ export const TeamDetails = React.memo(
               </div>
             </div>
           )}
-          {activeTab === "setters" && (
+          {contentTab === "setters" && (
             <InspectorTabContainer>
               <div className="grid grid-cols-2 gap-4">
                 <ASRStatCard label="IMPACT" value={setterStats.impact} />
@@ -244,7 +255,7 @@ export const TeamDetails = React.memo(
             </InspectorTabContainer>
           )}
 
-          {activeTab === "vault" && (
+          {contentTab === "vault" && (
             <InspectorTabContainer className="gap-14 text-center">
               <div className="flex flex-col gap-8">
                 <SectionTitle noPadding>MEDALS</SectionTitle>

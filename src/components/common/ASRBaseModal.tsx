@@ -21,6 +21,8 @@ interface ASRBaseModalProps {
 
 import { motion, AnimatePresence } from "motion/react";
 
+export const ModalScrollContext = React.createContext<React.RefObject<HTMLDivElement | null>>({ current: null });
+
 export const ASRBaseModal = React.memo(
   ({
     isOpen,
@@ -306,7 +308,9 @@ export const ASRBaseModal = React.memo(
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     className="flex-1 shrink-0 w-full flex flex-col h-fit"
                   >
-                    {children}
+                    <ModalScrollContext.Provider value={scrollContainerRef}>
+                      {children}
+                    </ModalScrollContext.Provider>
                   </motion.div>
                 </AnimatePresence>
               </div>

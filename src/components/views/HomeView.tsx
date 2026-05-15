@@ -292,7 +292,7 @@ export const HomeView = React.memo(() => {
           "top-[calc(68px+env(safe-area-inset-top,0px))] sm:top-[calc(76px+env(safe-area-inset-top,0px))]",
         )}
       >
-        <div className="flex items-center gap-2 w-full max-w-7xl mx-auto px-4">
+        <div className="flex items-center gap-2 w-full max-w-2xl mx-auto px-4">
           <ASRGlobalSearch theme={theme} />
         </div>
       </motion.div>
@@ -343,7 +343,7 @@ export const HomeView = React.memo(() => {
 
         <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-2 sm:space-y-6 w-full mx-auto">
           <h1 className="text-3xl md:text-5xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.1] sm:leading-none uppercase flex flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-            <span className={cn("italic transform -skew-x-6 pb-1 sm:pb-2 pr-2 sm:pr-8 break-words text-balance", theme === "dark" ? "text-white" : "text-zinc-900")}>
+            <span className={cn("italic transform -skew-x-6 pb-1 sm:pb-2 pr-2 sm:pr-8 md:whitespace-nowrap", theme === "dark" ? "text-white" : "text-zinc-900")}>
               Apex Speed Run
             </span>
           </h1>

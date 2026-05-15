@@ -11,6 +11,8 @@ export interface AppState {
   setPlayingVideoUrl: (url: string | null) => void;
   showOnboarding: boolean;
   setShowOnboarding: (show: boolean) => void;
+  activeCourseId: string | null;
+  setActiveCourseId: (id: string | null) => void;
 }
 
 const getInitialGen = () => {
@@ -47,4 +49,6 @@ export const useAppStore = create<AppState>((set) => ({
   setPlayingVideoUrl: (playingVideoUrl) => set({ playingVideoUrl }),
   showOnboarding: false,
   setShowOnboarding: (showOnboarding) => set({ showOnboarding }),
+  activeCourseId: null,
+  setActiveCourseId: (activeCourseId) => set({ activeCourseId }),
 }));
