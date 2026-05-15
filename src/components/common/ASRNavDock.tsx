@@ -34,10 +34,9 @@ export const ASRNavDock = React.memo(
       let lastScrollY = window.scrollY;
       let ticking = false;
 
-      const handleScroll = () => {
+      const performScrollCheck = (currentScrollY: number) => {
         if (!ticking) {
           window.requestAnimationFrame(() => {
-            const currentScrollY = window.scrollY;
             // Scroll down threshold to shrink
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
               setIsCompact(true);
@@ -53,8 +52,20 @@ export const ASRNavDock = React.memo(
         }
       };
 
+      const handleScroll = () => performScrollCheck(window.scrollY);
+      const handleCustomScroll = (e: Event) => {
+        const ce = e as CustomEvent<{ scrollTop: number }>;
+        if (ce.detail && typeof ce.detail.scrollTop === 'number') {
+           performScrollCheck(ce.detail.scrollTop);
+        }
+      };
+
       window.addEventListener("scroll", handleScroll, { passive: true });
-      return () => window.removeEventListener("scroll", handleScroll);
+      window.addEventListener("asr-scroll", handleCustomScroll, { passive: true });
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("asr-scroll", handleCustomScroll);
+      };
     }, []);
 
     const navItems = [

@@ -45,8 +45,13 @@ export const AnimatedListView = React.memo(({
   const setSearch = (val: string) => {
     startTransition(() => {
       setSearchParams(prev => {
-        if (val) prev.set(searchKey, val);
-        else prev.delete(searchKey);
+        if (val) {
+          prev.set(searchKey, val);
+          prev.delete("q");
+        } else {
+          prev.delete(searchKey);
+          prev.delete("q");
+        }
         return prev;
       }, { replace: true, state: location.state });
     });

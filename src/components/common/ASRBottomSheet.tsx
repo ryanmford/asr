@@ -36,10 +36,10 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
 
   const bgOpacity = useTransform(y, [H * 0.1, H * 0.8], [0.4, 0]);
 
-  // Flatten border radius near the highest snap point to seal off "little holes"
+  // Flatten border radius near the highest snap point to seal off "little holes" (only if it hits the top notch)
   const maxSnap = Math.max(...snapPoints);
   const highestY = H * (1 - maxSnap);
-  const borderRadius = useTransform(y, [highestY, highestY + 40], [0, 32], { clamp: true }); // 0 to 32px
+  const borderRadius = useTransform(y, [highestY, highestY + 40], [maxSnap >= 0.95 ? 0 : 32, 32], { clamp: true }); // 0 to 32px
 
   // Sync external activeSnap control
   useEffect(() => {
@@ -121,7 +121,7 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
            onPointerDown={(e) => {
              // Only allow scrolling (by stopping drag propagation) if fully expanded.
              // If not fully expanded, swiping the list drags the drawer instead!
-             if (activeSnap !== undefined && activeSnap >= 0.85) {
+             if (activeSnap !== undefined && activeSnap >= 0.8) {
                e.stopPropagation();
              }
            }}

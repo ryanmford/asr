@@ -39,8 +39,13 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const setSearch = (val: string) => {
     startTransition(() => {
       setSearchParams(prev => {
-        if (val) prev.set(searchKey, val);
-        else prev.delete(searchKey);
+        if (val) {
+          prev.set(searchKey, val);
+          prev.delete("q");
+        } else {
+          prev.delete(searchKey);
+          prev.delete("q");
+        }
         return prev;
       }, { replace: true, state: location.state });
     });
@@ -120,7 +125,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
 
   React.useEffect(() => {
     if (window.innerWidth < 768) {
-      if (snap >= 0.85) {
+      if (snap >= 0.8) {
         if (containerRef.current) {
            const top = containerRef.current.getBoundingClientRect().top + window.scrollY;
            // Scroll so that MapCoursesView is slightly past the sticky header
@@ -128,7 +133,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
         } else {
            window.scrollTo({ top: 250, behavior: "smooth" });
         }
-      } else if (snap < 0.85 && window.scrollY > 0) {
+      } else if (snap < 0.8 && window.scrollY > 0) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
@@ -148,8 +153,14 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     <div className="flex flex-col h-full bg-white dark:bg-zinc-950">
       <div 
         ref={scrollRef}
+        onScroll={(e) => {
+          if (window.innerWidth < 768) {
+            const target = e.target as HTMLDivElement;
+            window.dispatchEvent(new CustomEvent("asr-scroll", { detail: { scrollTop: target.scrollTop } }));
+          }
+        }}
         className="flex-1 px-4 pb-4 pt-4 overflow-y-auto overscroll-none"
-        style={{ touchAction: currentSnap >= 0.85 ? 'pan-y' : 'none' }}
+        style={{ touchAction: currentSnap >= 0.8 ? 'pan-y' : 'none' }}
       >
         <ErrorBoundary fallbackMessage="Failed to render the data list.">
           <ASRDataTable
@@ -169,13 +180,13 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   );
 
   const renderSearchPill = (forMobile: boolean) => (
-    <div className={cn("w-full transition-all duration-300", forMobile && snap >= 0.85 ? "px-0" : "px-4")}>
+    <div className={cn("w-full transition-all duration-300", forMobile && snap >= 0.8 ? "px-0" : "px-4")}>
       <ASRSearchInput
         value={search}
         onChange={(e: any) => setSearch(e.target.value)}
         placeholder="search courses..."
         theme={theme}
-        variant={forMobile && snap >= 0.85 ? "docked" : "pill"}
+        variant={forMobile && snap >= 0.8 ? "docked" : "pill"}
       />
     </div>
   );
@@ -223,13 +234,13 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
       {/* Mobile Bottom Sheet */}
       <div className="md:hidden pointer-events-none absolute inset-0 z-50">
         <ASRBottomSheet
-          snapPoints={[0.2, 0.5, 0.92]}
+          snapPoints={[0.2, 0.5, 0.85]}
           activeSnap={snap as number}
           onSnapChange={setSnap}
         >
           <div className={cn(
             "w-full pt-1 pb-3 flex justify-center sticky top-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
-             snap >= 0.85 ? (theme === "dark" ? "bg-zinc-950/90 border-white/5" : "bg-white/90 border-black/5") : "bg-transparent border-transparent"
+             snap >= 0.8 ? (theme === "dark" ? "bg-zinc-950/90 border-white/5" : "bg-white/90 border-black/5") : "bg-transparent border-transparent"
           )}>
             {renderSearchPill(true)}
           </div>

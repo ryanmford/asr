@@ -87,11 +87,11 @@ export const ASRSearchInput = React.memo(
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => onChange({ target: { value: "" } } as any)}
                   className={cn(
-                    "min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg opacity-40 hover:opacity-100 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
-                    theme === "dark" ? "hover:bg-white/10" : "hover:bg-black/5",
+                    "w-8 h-8 mr-1 flex flex-shrink-0 items-center justify-center rounded-full opacity-40 hover:opacity-80 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
+                    theme === "dark" ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5",
                   )}
                 >
-                  <X size={14} strokeWidth={3} />
+                  <X size={14} strokeWidth={2.5} />
                 </motion.button>
               )}
             </AnimatePresence>
