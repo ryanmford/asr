@@ -166,7 +166,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
           <ASRMap
             ref={mapRef}
             courses={searchedData}
-            totalCourses={masterCourseList.length}
+            totalCourses={courseList.filter((c: any) => c && !c.isDivider).length}
             theme={theme}
             onCourseClick={handleItemClick}
             onPinClick={handlePinClick}

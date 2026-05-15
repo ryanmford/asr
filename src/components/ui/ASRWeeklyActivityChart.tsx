@@ -24,6 +24,25 @@ export const ASRWeeklyActivityChart = ({
     y: number;
   } | null>(null);
 
+  React.useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent | TouchEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setHoverData(null);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleGlobalClick);
+    document.addEventListener("touchstart", handleGlobalClick, { passive: true });
+    
+    return () => {
+      document.removeEventListener("mousedown", handleGlobalClick);
+      document.removeEventListener("touchstart", handleGlobalClick);
+    };
+  }, []);
+
   const { weeks, totalRuns } = useMemo(() => {
     const today = new Date();
     // Reset today to midnight for precise math
@@ -158,12 +177,37 @@ export const ASRWeeklyActivityChart = ({
               key={i}
               className={cn(
                 "w-full aspect-square rounded-[2px] transition-all duration-200 cursor-crosshair z-10",
-                "hover:ring-2 hover:ring-opacity-50 hover:scale-125 hover:z-20",
+                "md:hover:ring-2 md:hover:ring-opacity-50 md:hover:scale-125 md:hover:z-20",
                 theme === "dark"
-                  ? "hover:ring-blue-500"
-                  : "hover:ring-blue-500",
+                  ? "md:hover:ring-blue-500"
+                  : "md:hover:ring-blue-500",
+                hoverData?.weekIdx === i && "ring-2 ring-opacity-50 scale-125 z-20 ring-blue-500",
                 levelClass,
               )}
+              onClick={(e) => {
+                if (!wrapperRef.current) return;
+                const outerRect = wrapperRef.current.getBoundingClientRect();
+                const rect = e.currentTarget.getBoundingClientRect();
+
+                // Keep tooltip safely inside the container bounds horizontally
+                const rawX = rect.left - outerRect.left + rect.width / 2;
+                const clampedX = Math.max(
+                  75,
+                  Math.min(outerRect.width - 75, rawX),
+                );
+
+                if (hoverData?.weekIdx === i) {
+                  setHoverData(null);
+                } else {
+                  setHoverData({
+                    count: week.count,
+                    weekIdx: i,
+                    dateStr: week.dateStr,
+                    x: clampedX,
+                    y: rect.top - outerRect.top - 8,
+                  });
+                }
+              }}
               onMouseEnter={(e) => {
                 if (!wrapperRef.current) return;
                 const outerRect = wrapperRef.current.getBoundingClientRect();

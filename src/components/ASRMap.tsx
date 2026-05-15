@@ -70,7 +70,7 @@ export const ASRMap = forwardRef(({
 
     const isMobile = window.innerWidth < 768;
     // Set map to focus on Americas and Hawaii on mobile, keep original for desktop
-    const defaultCenter: L.LatLngTuple = isMobile ? [38, -100] : [15, -90];
+    const defaultCenter: L.LatLngTuple = isMobile ? [28, -100] : [15, -90];
     const defaultZoom = isMobile ? 2 : 3;
 
     const map = L.map(mapContainerRef.current, {
@@ -386,7 +386,7 @@ export const ASRMap = forwardRef(({
     // We check if we're showing almost everything by comparing to a high threshold, or if no search is active
     if (activeCoursesCount >= totalCourses * 0.95 || courses.length === 0) {
       const isMobile = window.innerWidth < 768;
-      const defaultCenter: L.LatLngTuple = isMobile ? [38, -100] : [15, -90];
+      const defaultCenter: L.LatLngTuple = isMobile ? [28, -100] : [15, -90];
       const defaultZoom = isMobile ? 2 : 3;
       mapRef.current.flyTo(defaultCenter, defaultZoom, { duration: 1.5 });
       return;
