@@ -289,7 +289,7 @@ export const ASRBaseModal = React.memo(
               {/* Content */}
               <div
                 ref={scrollContainerRef}
-                className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain [-webkit-overflow-scrolling:touch] touch-pan-y flex flex-col relative pb-[env(safe-area-inset-bottom)]"
+                className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-none [-webkit-overflow-scrolling:touch] touch-pan-y flex flex-col relative pb-[env(safe-area-inset-bottom)]"
               >
                 <AnimatePresence
                   mode="popLayout"

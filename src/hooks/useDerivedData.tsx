@@ -94,6 +94,18 @@ export const useAppNavigation = () => {
           if (type === "setter") prefix = "setters";
           if (type === "team") prefix = "teams";
 
+          if (type === "location") {
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.set("q", entityName);
+            navigate(`/courses?${searchParams.toString()}`, {
+              state: {
+                customIdx: (location.state?.customIdx || 0) + 1,
+              },
+              replace: false,
+            });
+            return;
+          }
+
           // We preserve the current search params (like eventType)
           const search = location.search;
 

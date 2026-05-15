@@ -330,9 +330,6 @@ const TokenDisc = ({
               <line x1="12" y1="100" x2="28" y2="100" stroke={isDark ? "white" : "black"} strokeWidth="0.75" opacity="0.3" />
               <line x1="172" y1="100" x2="188" y2="100" stroke={isDark ? "white" : "black"} strokeWidth="0.75" opacity="0.3" />
            </svg>
-           <div className={cn("absolute top-[38%] left-4 text-[6px] font-mono rotate-90 origin-left tracking-[0.2em] opacity-40", isDark ? "text-white" : "text-black")}>SEQ-A99</div>
-           <div className={cn("absolute bottom-[38%] right-4 text-[6px] font-mono -rotate-90 origin-right tracking-[0.2em] opacity-40", isDark ? "text-white" : "text-black")}>VR-10.4</div>
-           <div className={cn("absolute top-5 left-1/2 -translate-x-1/2 text-[5px] font-mono tracking-[0.4em] opacity-30", isDark ? "text-white" : "text-black")}>84.091.X</div>
         </div>
 
         {/* Shimmer */}

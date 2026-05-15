@@ -11,6 +11,7 @@ import { useAppNavigation, useCourseList, useMasterCourseList } from "../../hook
 import { useDebounce } from "../../hooks/useDataHooks";
 import { useAppStore } from "../../store/useAppStore";
 import { cn } from "../../lib/asr-utils";
+import { normalizeForSearch } from "../../lib/utils";
 
 const ASRMap = React.lazy(() => import("../ASRMap").then((m) => ({ default: m.ASRMap })));
 
@@ -30,6 +31,10 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const scrollContainerRefMobile = React.useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const [visibleBounds, setVisibleBounds] = React.useState<any>(null);
+  const [snap, setSnap] = React.useState<number>(0.3);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
+  const columns = React.useMemo(() => [{ label: "RUNS", key: "totalAllTimeRuns" }], []);
   
   const setSearch = (val: string) => {
     startTransition(() => {
@@ -41,13 +46,55 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     });
   };
 
+  const refreshTrigger = useDataStore(s => s.refreshTrigger);
+  const prevRefreshTrigger = useRef(refreshTrigger);
+
+  React.useEffect(() => {
+    if (refreshTrigger > prevRefreshTrigger.current) {
+      prevRefreshTrigger.current = refreshTrigger;
+      // Reset view to default when nav dock button is clicked while active
+      setSearch("");
+      setActiveCourseId(null);
+      setSnap(0.3);
+      if (mapRef.current?.resetView) {
+        mapRef.current.resetView();
+      }
+      if (scrollContainerRefDesktop.current) {
+        scrollContainerRefDesktop.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (scrollContainerRefMobile.current) {
+        scrollContainerRefMobile.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [refreshTrigger, setActiveCourseId, setSnap]);
+
   const debouncedSearch = useDebounce(search, 300);
 
   const searchedData = useMemo(() => {
-    const term = String(debouncedSearch || "").toLowerCase();
+    const term = normalizeForSearch(String(debouncedSearch || ""));
     if (!term) return courseList;
-    return courseList.filter((item: any) => item?.isDivider || (item?.searchKey || "").includes(term));
+    const searchTerms = term.split(/[\s,]+/).filter(Boolean);
+    return courseList.filter((item: any) => {
+      if (item?.isDivider) return true;
+      const key = item?.searchKey || "";
+      return searchTerms.every((t: string) => key.includes(t));
+    });
   }, [debouncedSearch, courseList]);
+
+  const lastAutoOpenedQueryRef = useRef("");
+
+  React.useEffect(() => {
+    if (debouncedSearch && debouncedSearch !== lastAutoOpenedQueryRef.current) {
+      const activeCourses = searchedData.filter((c: any) => c && !c.isDivider);
+      if (activeCourses.length === 1) {
+        lastAutoOpenedQueryRef.current = debouncedSearch;
+        setSnap(0.5);
+        setActiveCourseId(activeCourses[0].name || null);
+      }
+    } else if (!debouncedSearch) {
+      lastAutoOpenedQueryRef.current = "";
+    }
+  }, [debouncedSearch, searchedData, setActiveCourseId, setSnap]);
 
   const visibleData = useMemo(() => {
     if (!visibleBounds) return searchedData;
@@ -71,11 +118,6 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     navigateToEntity("course", c);
   }, [navigateToEntity]);
 
-  const columns = React.useMemo(() => [{ label: "RUNS", key: "totalAllTimeRuns" }], []);
-  const [snap, setSnap] = React.useState<number>(0.3);
-  const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
-  const containerRef = useRef<HTMLDivElement>(null);
-
   React.useEffect(() => {
     if (window.innerWidth < 768) {
       if (snap >= 0.85) {
@@ -93,23 +135,9 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   }, [snap]);
 
   const handlePinClick = React.useCallback((c: CourseData) => {
-     setSnap(0.5);
-     // Highlight the pin and list item briefly
      setActiveCourseId(c.name || null);
-     const index = visibleData.findIndex((item: any) => item.name === c.name);
-     if (index !== -1) {
-        setTimeout(() => {
-           if (listRefMobile.current && window.innerWidth < 768) {
-               listRefMobile.current.scrollToIndex(index, "start");
-           } else if (listRefDesktop.current) {
-               listRefDesktop.current.scrollToIndex(index, "start");
-           }
-           setTimeout(() => setActiveCourseId(null), 1500); // clear highlight after short delay
-        }, 100);
-     } else {
-        setTimeout(() => setActiveCourseId(null), 1500);
-     }
-  }, [visibleData, setActiveCourseId]);
+     navigateToEntity("course", c);
+  }, [navigateToEntity, setActiveCourseId]);
 
   const handleMapBackgroundClick = React.useCallback(() => {
      setSnap(0.2);
@@ -120,7 +148,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     <div className="flex flex-col h-full bg-white dark:bg-zinc-950">
       <div 
         ref={scrollRef}
-        className="flex-1 px-4 pb-4 pt-4 overflow-y-auto overscroll-contain"
+        className="flex-1 px-4 pb-4 pt-4 overflow-y-auto overscroll-none"
         style={{ touchAction: currentSnap >= 0.85 ? 'pan-y' : 'none' }}
       >
         <ErrorBoundary fallbackMessage="Failed to render the data list.">
@@ -167,6 +195,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
             ref={mapRef}
             courses={searchedData}
             totalCourses={courseList.filter((c: any) => c && !c.isDivider).length}
+            searchQuery={debouncedSearch}
             theme={theme}
             onCourseClick={handleItemClick}
             onPinClick={handlePinClick}

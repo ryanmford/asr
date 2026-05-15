@@ -14,6 +14,7 @@ import { useAppStore } from "../store/useAppStore";
 export const ASRMap = forwardRef(({
   courses = [],
   totalCourses = 0,
+  searchQuery = "",
   onCourseClick,
   onPinClick,
   onBoundsChange,
@@ -38,9 +39,60 @@ export const ASRMap = forwardRef(({
   const [isLocating, setIsLocating] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
+  const fitMapToCourses = React.useCallback(() => {
+    if (!mapReady || !mapRef.current || !courses) return;
+
+    const bounds = L.latLngBounds([]);
+    let validCoordsCount = 0;
+    let lastValidCoord = null;
+
+    courses.forEach((c: any) => {
+      if (c.parsedCoords && !c.isDivider) {
+        bounds.extend(c.parsedCoords);
+        validCoordsCount++;
+        lastValidCoord = c.parsedCoords;
+      }
+    });
+
+    if (validCoordsCount === 1 && lastValidCoord) {
+      const isDesktop = window.innerWidth >= 768;
+      const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
+      const pt = mapRef.current.project(lastValidCoord, 14);
+      if (isDesktop) pt.x -= (panelWidth / 2);
+      else pt.y += (window.innerHeight * 0.15); // Offset for mobile bottom drawer
+      const targetLatLng = mapRef.current.unproject(pt, 14);
+      mapRef.current.flyTo(targetLatLng, 14, { duration: 1.5 });
+    } else if (validCoordsCount > 1) {
+      if (bounds.isValid()) {
+        const isDesktop = window.innerWidth >= 768;
+        const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
+        mapRef.current.fitBounds(bounds, {
+          paddingTopLeft: isDesktop ? [panelWidth + 16, 50] : [16, 50],
+          paddingBottomRight: isDesktop ? [50, 50] : [16, window.innerHeight * 0.3 + 50],
+          maxZoom: 12,
+          duration: 1.5,
+        });
+      }
+    } else {
+       const isMobile = window.innerWidth < 768;
+       const defaultCenter: L.LatLngTuple = isMobile ? [28, -100] : [15, -90];
+       const defaultZoom = isMobile ? 2 : 3;
+       mapRef.current.flyTo(defaultCenter, defaultZoom, { duration: 1.5 });
+    }
+  }, [courses, mapReady]);
+
+  const resetViewToDefault = React.useCallback(() => {
+    if (!mapReady || !mapRef.current) return;
+    const isMobile = window.innerWidth < 768;
+    const defaultCenter: L.LatLngTuple = isMobile ? [28, -100] : [15, -90];
+    const defaultZoom = isMobile ? 2 : 3;
+    mapRef.current.flyTo(defaultCenter, defaultZoom, { duration: 1.0 });
+  }, [mapReady]);
+
   // Expose methods to parent
   useImperativeHandle(ref, () => ({
     locateUser: handleFindMe,
+    resetView: resetViewToDefault,
   }));
 
   const onCourseClickRef = useRef(onCourseClick);
@@ -108,13 +160,12 @@ export const ASRMap = forwardRef(({
 
     const getClusterIcon = (cluster: any) => {
       const count = cluster.getChildCount();
-      let conicGradientStr = "from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6";
-      
+      let gradientStyle = "conic-gradient(from 0deg, #3b82f6, #4f46e5, #9333ea, #4f46e5, #3b82f6)";
       if (count > 50) {
-        conicGradientStr = "from_0deg,#a855f7,#7e22ce,#581c87,#7e22ce,#a855f7";
+        gradientStyle = "conic-gradient(from 0deg, #8b5cf6, #d946ef, #f43f5e, #d946ef, #8b5cf6)";
       }
-      if (count > 200) {
-        conicGradientStr = "from_0deg,#f43f5e,#e11d48,#9f1239,#e11d48,#f43f5e";
+      if (count > 150) {
+        gradientStyle = "conic-gradient(from 0deg, #ef4444, #f43f5e, #e11d48, #f43f5e, #ef4444)";
       }
 
       const currentIsDark = isDarkRef.current;
@@ -129,7 +180,7 @@ export const ASRMap = forwardRef(({
           <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
             <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
               <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                 <div class="w-full h-full neon-border-rotate bg-[conic-gradient(${conicGradientStr})] opacity-90"></div>
+                 <div class="w-full h-full neon-border-rotate opacity-90" style="background: ${gradientStyle};"></div>
               </div>
               <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
             </div>
@@ -376,55 +427,31 @@ export const ASRMap = forwardRef(({
     }
   }, [isDark]);
 
+  const prevSearchQueryRef = useRef(searchQuery);
+
   // CAMERA DIRECTOR: Automatic Map Framing
   useEffect(() => {
     if (!mapReady || !mapRef.current || !courses) return;
 
     const activeCoursesCount = courses.filter((c: any) => c && !c.isDivider).length;
+    const isFiltered = activeCoursesCount < totalCourses * 0.95 && activeCoursesCount > 0;
     
-    // If we're showing all courses (or near all, assuming some courses might not have coords), use the default center
-    // We check if we're showing almost everything by comparing to a high threshold, or if no search is active
-    if (activeCoursesCount >= totalCourses * 0.95 || courses.length === 0) {
-      const isMobile = window.innerWidth < 768;
-      const defaultCenter: L.LatLngTuple = isMobile ? [28, -100] : [15, -90];
-      const defaultZoom = isMobile ? 2 : 3;
-      mapRef.current.flyTo(defaultCenter, defaultZoom, { duration: 1.5 });
+    // If we're showing all courses (or near all), we don't force recenter.
+    // Let the user stay where they are reading the map.
+    if (!isFiltered || !searchQuery) {
+      prevSearchQueryRef.current = searchQuery;
       return;
     }
 
-    const bounds = L.latLngBounds([]);
-    let validCoordsCount = 0;
-    let lastValidCoord = null;
-
-    courses.forEach((c: any) => {
-      if (c.parsedCoords) {
-        bounds.extend(c.parsedCoords);
-        validCoordsCount++;
-        lastValidCoord = c.parsedCoords;
-      }
-    });
-
-    if (validCoordsCount === 1 && lastValidCoord) {
-      const isDesktop = window.innerWidth >= 768;
-      const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
-      const pt = mapRef.current.project(lastValidCoord, 14);
-      if (isDesktop) pt.x -= (panelWidth / 2);
-      else pt.y += (window.innerHeight * 0.15); // Offset for mobile bottom drawer
-      const targetLatLng = mapRef.current.unproject(pt, 14);
-      mapRef.current.flyTo(targetLatLng, 14, { duration: 1.5 });
-    } else if (validCoordsCount > 1) {
-      if (bounds.isValid()) {
-        const isDesktop = window.innerWidth >= 768;
-        const panelWidth = window.innerWidth >= 1024 ? 450 : 400;
-        mapRef.current.fitBounds(bounds, {
-          paddingTopLeft: isDesktop ? [panelWidth + 16, 50] : [16, 50],
-          paddingBottomRight: isDesktop ? [50, 50] : [16, window.innerHeight * 0.3 + 50],
-          maxZoom: 12,
-          duration: 1.5,
-        });
-      }
+    // Only recenter if the actual search query caused this filtering change
+    // Don't recenter just because the user toggled the "All Time" / "Open" flag
+    if (searchQuery === prevSearchQueryRef.current) {
+      return;
     }
-  }, [courses, totalCourses, mapReady]);
+    prevSearchQueryRef.current = searchQuery;
+
+    fitMapToCourses();
+  }, [courses, totalCourses, mapReady, searchQuery, fitMapToCourses]);
 
   const handleFindMe = () => {
     if (!mapRef.current || !navigator.geolocation) return;

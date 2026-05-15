@@ -446,8 +446,8 @@ export const ASRListItem = React.memo(
  {showVideoIcon && (
  <div
  className={cn(
- "flex items-center justify-center shrink-0 ml-2",
- isCompact ? "w-10" : "w-10 ",
+ "flex items-center justify-center shrink-0 ml-2 sm:ml-3",
+ isCompact ? "w-10" : "w-12",
  )}
  >
  {videoUrl ? (

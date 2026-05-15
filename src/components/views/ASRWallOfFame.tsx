@@ -132,6 +132,11 @@ export const ASRWallOfFame = React.memo(
 
  return (
  <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700">
+ <div className="px-4 sm:px-6 mt-0 mb-[-1.5rem] w-full max-w-7xl mx-auto">
+  <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+   * RUN 10+ COURSES TO JOIN THE HOF
+  </p>
+ </div>
  {/* Leaderboard Grids */}
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
  {sections.map((sec) => (
@@ -242,11 +247,10 @@ export const ASRWallOfFame = React.memo(
  <table className="w-full text-left border-collapse min-w-[280px] table-fixed">
  <thead
  className={cn(
- "border-b backdrop-blur-xl sticky z-10",
+ "border-b backdrop-blur-xl",
  theme === "dark"
  ? "bg-black/90 border-zinc-800/50"
- : "bg-white border-zinc-200",
- "top-[calc(68px+env(safe-area-inset-top,0px))] sm:top-[calc(76px+env(safe-area-inset-top,0px))]"
+ : "bg-white border-zinc-200"
  )}
  >
  <tr>

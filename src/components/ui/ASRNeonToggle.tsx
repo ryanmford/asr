@@ -55,42 +55,27 @@ export const ASRNeonToggle = ({
  : "text-black/40 hover:text-black",
  )}
  >
- {isActive && (
- <motion.div
- initial={{ opacity: 0 }}
- animate={{ opacity: 1 }}
- className="absolute inset-0 z-0 rounded-full"
- style={{ borderRadius: 9999 }}
- transition={{ duration: 0.15 }}
- >
- {/* Outer Drop Shadow */}
- <div 
- className={cn(
- "absolute inset-0 rounded-full",
- theme === "dark" 
- ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]" 
- : "shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
- )} 
- />
- 
- <div className="absolute inset-0 overflow-hidden rounded-full ios-gpu-fix">
- {/* The Rotating Neon Border - Full Perimeter Gradient */}
- <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
- <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
- </div>
-
- {/* The Inner Surface Fill (with glass effect) */}
- <div
- className={cn(
- "absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md",
- theme === "dark" 
- ? "bg-gradient-to-b from-zinc-800 to-zinc-950 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.8)]" 
- : "bg-gradient-to-b from-white to-white shadow-[inset_0_2px_2px_rgba(255,255,255,0.9),inset_0_-1px_2px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.1)]",
- )}
- />
- </div>
- </motion.div>
- )}
+      {isActive && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={cn(
+            "absolute inset-0 z-0 rounded-full overflow-hidden p-[1.5px]",
+            theme === "dark" ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]" : "shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+          )}
+          transition={{ duration: 0.15 }}
+        >
+          {/* Animated Neon Border */}
+          <div className="absolute -inset-[100%] pointer-events-none neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
+          {/* Inner Surface */}
+          <div
+            className={cn(
+              "relative w-full h-full rounded-full z-10",
+              theme === "dark" ? "bg-zinc-900" : "bg-white"
+            )}
+          />
+        </motion.div>
+      )}
  <span className={cn(
  "relative z-20 whitespace-nowrap transition-transform duration-300",
  isActive && "scale-105"

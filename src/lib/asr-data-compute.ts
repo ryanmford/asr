@@ -8,6 +8,7 @@ import {
   processSetListData,
   processSettersData,
 } from "./asr-data.ts";
+import { normalizeForSearch } from "./utils";
 
 export function computeAllState(payload: { rM: string; rF: string; rLive: string; rSet: string; hasTotalError: boolean; hasPartialError: boolean }) {
   const { rM, rF, rLive, rSet, hasTotalError, hasPartialError } = payload;
@@ -357,7 +358,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
             playersCount: 0,
             bestPlayers: [],
             runsCount: 0,
-            searchKey: `${rawName.toLowerCase()} ${item.flag}`,
+            searchKey: normalizeForSearch(`${rawName} ${item.flag}`),
           };
         }
         if (

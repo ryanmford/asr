@@ -356,12 +356,15 @@ export const ASRDataTable = React.memo(
  {statColumns.map((c, i: number) => (
  <div
  key={i}
- className={`${c.width || "w-20 sm:w-24 lg:w-32"} px-1 sm:px-4 lg:px-6 text-right shrink-0`}
+ className={cn(
+   "flex justify-end text-right shrink-0",
+   c.width ? c.width : viewType === "card" ? "min-w-[50px] sm:min-w-[80px] lg:min-w-[120px]" : "w-20 sm:w-24 lg:w-32 px-1 sm:px-4 lg:px-6"
+ )}
  >
  {c.label}
  </div>
  ))}
- {showVideoColumn && <div className="w-10 sm:w-16 lg:w-20 pr-4 sm:pr-6 lg:pr-8 ml-2 shrink-0" />}
+ {showVideoColumn && <div className={cn("shrink-0", viewType === "card" ? "w-10 sm:w-12 ml-2 sm:ml-3" : "w-10 sm:w-16 lg:w-20 pr-4 sm:pr-6 lg:pr-8 ml-2")} />}
  </div>
  </div>
  )}

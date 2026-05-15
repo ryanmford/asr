@@ -6,6 +6,7 @@ import { useDebounce } from "../../hooks/useDataHooks";
 import { PageHeader } from "../common/PageHeader";
 import { ASRSearchInput, ASRDataTable } from "../ASRComponents";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { normalizeForSearch } from "../../lib/utils";
 
 interface AnimatedListViewProps {
   title: string;
@@ -54,9 +55,14 @@ export const AnimatedListView = React.memo(({
   const debouncedSearch = useDebounce(search, 300);
 
   const searchedData = useMemo(() => {
-    const term = String(debouncedSearch || "").toLowerCase();
+    const term = normalizeForSearch(String(debouncedSearch || ""));
     if (!term) return data;
-    return data.filter((item: any) => item?.isDivider || (item?.searchKey || "").includes(term));
+    const searchTerms = term.split(/[\s,]+/).filter(Boolean);
+    return data.filter((item: any) => {
+      if (item?.isDivider) return true;
+      const key = item?.searchKey || "";
+      return searchTerms.every((t: string) => key.includes(t));
+    });
   }, [debouncedSearch, data]);
 
   return (

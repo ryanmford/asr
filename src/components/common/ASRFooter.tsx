@@ -136,7 +136,7 @@ export const ASRFooter = React.memo(() => {
                   <X size={20} />
                 </button>
               </div>
-              <div className="p-6 overflow-y-auto leading-relaxed">
+              <div className="p-6 overflow-y-auto overscroll-none leading-relaxed">
                 {modalContent[activeModal].content}
               </div>
             </motion.div>

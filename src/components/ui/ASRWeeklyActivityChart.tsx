@@ -159,7 +159,9 @@ export const ASRWeeklyActivityChart = ({
           style={{
             gridTemplateColumns: `repeat(13, minmax(0, 1fr))`,
           }}
-          onMouseLeave={() => setHoverData(null)}
+          onPointerLeave={(e) => {
+            if (e.pointerType === "mouse") setHoverData(null);
+          }}
         >
           {weeks.map((week, i) => {
           let levelClass = "bg-black/5 dark:bg-white/5";
@@ -196,19 +198,16 @@ export const ASRWeeklyActivityChart = ({
                   Math.min(outerRect.width - 75, rawX),
                 );
 
-                if (hoverData?.weekIdx === i) {
-                  setHoverData(null);
-                } else {
-                  setHoverData({
-                    count: week.count,
-                    weekIdx: i,
-                    dateStr: week.dateStr,
-                    x: clampedX,
-                    y: rect.top - outerRect.top - 8,
-                  });
-                }
+                setHoverData({
+                  count: week.count,
+                  weekIdx: i,
+                  dateStr: week.dateStr,
+                  x: clampedX,
+                  y: rect.top - outerRect.top - 8,
+                });
               }}
-              onMouseEnter={(e) => {
+              onPointerEnter={(e) => {
+                if (e.pointerType !== "mouse") return;
                 if (!wrapperRef.current) return;
                 const outerRect = wrapperRef.current.getBoundingClientRect();
                 const rect = e.currentTarget.getBoundingClientRect();

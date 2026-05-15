@@ -10,6 +10,7 @@ import {
   isQualifiedAthlete,
   getNormalizedNameList,
 } from "./asr-utils";
+import { normalizeForSearch } from "./utils";
 
 export const RANKING_MAPPING = {
   name: ["athlete", "name", "player"],
@@ -117,8 +118,9 @@ export const processRankingData = (csv: string, gender: string) => {
       const gymEntity = fixCountryEntity("", gymFlagRaw);
 
       const teamNamesStr = pTeams.map((t) => t.name).join(" ");
-      const searchKey =
-        `${pName} ${fixed.name} ${rawIg} ${pLocation} ${pHomeGym} ${teamNamesStr}`.toLowerCase();
+      const searchKey = normalizeForSearch(
+        `${pName} ${fixed.name} ${rawIg} ${pLocation} ${pHomeGym} ${teamNamesStr}`
+      );
       return {
         id: `${gender}-${normalizeName(pName)}-${i}`,
         name: pName,
@@ -193,7 +195,9 @@ export const processSetListData = (csv: string) => {
         coordinates: (vals.coords || "").trim(),
         sponsorName,
         sponsorLink,
-        searchKey: `${course} ${vals.city} ${fixed.name}`.toLowerCase(),
+        searchKey: normalizeForSearch(
+          `${course} ${vals.city} ${vals.state || ""} ${fixed.name} ${(vals.city || "").replace(/ /g, "")}`
+        ),
       };
     }
   });
@@ -252,8 +256,9 @@ export const processSettersData = (csv: string) => {
         assists: cleanNumeric(vals.assists) || 0,
         contributionScore: cleanNumeric(vals.contribution) || 0,
         certLevel: (vals.cert || "").trim().toUpperCase() || "NONE",
-        searchKey:
-          `${name} ${fixed.name} ${pLocation} ${pHomeGym} ${teamNamesStr}`.toLowerCase(),
+        searchKey: normalizeForSearch(
+          `${name} ${fixed.name} ${pLocation} ${pHomeGym} ${teamNamesStr}`
+        ),
       };
     })
     .filter(Boolean);
@@ -361,7 +366,7 @@ export const processLiveFeedData = (
         homeGym: "",
         teamLocation: "",
         countryName: "",
-        searchKey: pName.toLowerCase(),
+        searchKey: normalizeForSearch(pName),
       };
     } else if (pName.length > (athleteMetadata[pKey].name || "").length) {
       athleteMetadata[pKey].name = pName;
@@ -637,7 +642,7 @@ export const calculateWofStats = (
   try {
     if (!data || !data.length) return null;
     const qualifiedAthletes = data
-      .filter((p) => isQualifiedAthlete(p, true))
+      .filter((p) => !isPlaceholderPlayer(p.name) && (p.runs || 0) >= 10)
       .map((p) => {
         const performances = atPerfs?.[p.pKey] || [];
         const calculatedFires = performances.reduce(
@@ -735,4 +740,22 @@ export const calculateWofStats = (
     console.error("HOF stats calculation failed", e);
     return null;
   }
+};
+
+export const fetchGoogleSheetCSV = async (sheetId: string, gid: string): Promise<string> => {
+  const cacheBucket = Math.floor(Date.now() / 300000); // 5 mins cache bucket for gviz
+  const directUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}&cb=${cacheBucket}`;
+  const proxyUrl = `/api/proxy-sheet?gid=${gid}&cb=${cacheBucket}`;
+
+  let response = await fetch(directUrl).catch(() => null);
+
+  if (!response || !response.ok) {
+    response = await fetch(proxyUrl);
+  }
+
+  if (!response || !response.ok) {
+    throw new Error(`Failed to fetch spreadsheet: ${response?.statusText || 'Unknown Network Error'}`);
+  }
+
+  return response.text();
 };
