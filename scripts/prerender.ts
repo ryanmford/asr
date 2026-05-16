@@ -311,9 +311,9 @@ async function run() {
     const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
     
     // Write HTML
-    const mapDir = path.join(ROOT, 'dist', 'map', slug);
-    await fs.mkdir(mapDir, { recursive: true });
-    await fs.writeFile(path.join(mapDir, 'index.html'), pageHtml);
+    const courseDir = path.join(ROOT, 'dist', 'courses', slug);
+    await fs.mkdir(courseDir, { recursive: true });
+    await fs.writeFile(path.join(courseDir, 'index.html'), pageHtml);
   }
 
   console.log('Prerendering completed!');
