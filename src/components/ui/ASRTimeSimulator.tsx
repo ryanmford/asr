@@ -188,7 +188,7 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
   const globalImpact = useMemo(() => {
      if (!selectedAthlete || !dataContext || !cName) return null;
      
-     const existingTimesList = (dataContext.lbAT?.[gender]?.[cName] || {}) as Record<string, number>;
+     const existingTimesList = (dataContext.lbAT_Courses?.[gender]?.[cName] || {}) as Record<string, number>;
      const originalTime = existingTimesList[selectedAthlete.pKey];
      
      // Determine the new simulated course record
@@ -205,32 +205,33 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
      const simulatedRatings: Record<string, number> = {};
      
      for (const pt of athletePool) {
-         const ptTimeOnCourse = existingTimesList[pt.pKey];
-         const ptTotalPts = (pt as any).pts || ((pt.rating || 0) * (pt.runs || 0));
+         const baseRating = pt.rating || 0;
+         const runs = pt.runs || 1; // Prevent division by zero mathematically
+         const ptOriginalTime = existingTimesList[pt.pKey];
+         
+         let pointsDelta = 0;
+         let runDelta = 0;
          
          if (pt.pKey === selectedAthlete.pKey) {
-             const oldCoursePts = (typeof originalTime === "number" && originalTime > 0) ? Math.min(100, (oldCR / originalTime) * 100) : 0;
+             const oldCoursePts = (typeof ptOriginalTime === "number" && ptOriginalTime > 0) ? Math.min(100, (oldCR / ptOriginalTime) * 100) : 0;
              const newCoursePts = targetTime > 0 ? Math.min(100, (simulatedCR / targetTime) * 100) : 0;
-             const cRuns = pt.runs || 0;
-             let nRuns = cRuns;
-             let nPts = ptTotalPts;
              
-             if (typeof originalTime === "number") {
-                 nPts = nPts - oldCoursePts + newCoursePts;
-             } else {
-                 nRuns += 1;
-                 nPts += newCoursePts;
+             pointsDelta = newCoursePts - oldCoursePts;
+             if (typeof ptOriginalTime !== "number" || ptOriginalTime <= 0) {
+                 runDelta = 1;
              }
-             simulatedRatings[pt.pKey] = nRuns > 0 ? (nPts / nRuns) : 0;
          } else {
-             if (typeof ptTimeOnCourse === "number" && ptTimeOnCourse > 0) {
-                 const oldCoursePts = Math.min(100, (oldCR / ptTimeOnCourse) * 100);
-                 const newCoursePts = Math.min(100, (simulatedCR / ptTimeOnCourse) * 100);
-                 const nPts = ptTotalPts - oldCoursePts + newCoursePts;
-                 simulatedRatings[pt.pKey] = pt.runs && pt.runs > 0 ? (nPts / pt.runs) : 0;
-             } else {
-                 simulatedRatings[pt.pKey] = pt.rating || 0;
+             if (typeof ptOriginalTime === "number" && ptOriginalTime > 0) {
+                 const oldCoursePts = Math.min(100, (oldCR / ptOriginalTime) * 100);
+                 const newCoursePts = Math.min(100, (simulatedCR / ptOriginalTime) * 100);
+                 pointsDelta = newCoursePts - oldCoursePts;
              }
+         }
+         
+         if (runDelta > 0) {
+             simulatedRatings[pt.pKey] = ((baseRating * runs) + pointsDelta) / (runs + runDelta);
+         } else {
+             simulatedRatings[pt.pKey] = baseRating + (pointsDelta / runs);
          }
      }
 
@@ -275,7 +276,7 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
   const handleSliderChange = (val: number) => {
       // Snapping logic near CR and PR
       const range = maxTime - minTime;
-      const snapDist = range * 0.02; // 2% of total slider range required to snap
+      const snapDist = range * 0.005; // 0.5% snap distance so it pops in but lets you pick close numbers
 
       if (Math.abs(val - courseRecord) < snapDist) {
           // If close to both, snap to whichever is closer
@@ -409,7 +410,7 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                                                                 setIsSearching(false);
                                                                 setSearchQuery("");
                                                                 // If they have an existing time, maybe pre-fill the slider with it
-                                                                const existingTime = (dataContext.lbAT?.[gender]?.[cName || ""] || {})[athlete.pKey];
+                                                                const existingTime = (dataContext.lbAT_Courses?.[gender]?.[cName || ""] || {})[athlete.pKey] as number | undefined;
                                                                 if (typeof existingTime === "number") {
                                                                     setTargetTime(existingTime);
                                                                 }
