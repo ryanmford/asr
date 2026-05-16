@@ -262,11 +262,12 @@ async function run() {
     const desc = `Open Season Stats: ${rating} Rating | Open Rank: ${rank} | Gym: ${gym}`;
     
     // Gen OG Image
-    const ogFilename = `player-${slug}.png`;
-    await generateOgImage(title, desc, path.join(ogDir, ogFilename), fontData);
+    // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
+    // We'll fall back to the main logo.
+    const fallbackOgImage = `${BASE_URL}/asr.png`;
     
     // Inj HTML
-    const pageHtml = injectMeta(baseHtml, title, desc, `${BASE_URL}/og/${ogFilename}`);
+    const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
     
     // Write HTML
     const playerDir = path.join(ROOT, 'dist', 'players', slug);
@@ -302,11 +303,12 @@ async function run() {
     const desc = `Fastest Time: ${wrStr} | Total Clears: ${totalClears} | Location: ${locStr}`;
     
     // Gen OG Image
-    const ogFilename = `map-${slug}.png`;
-    await generateOgImage(title, desc, path.join(ogDir, ogFilename), fontData);
+    // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
+    // We'll fall back to the main logo.
+    const fallbackOgImage = `${BASE_URL}/asr.png`;
     
     // Inj HTML
-    const pageHtml = injectMeta(baseHtml, title, desc, `${BASE_URL}/og/${ogFilename}`);
+    const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
     
     // Write HTML
     const mapDir = path.join(ROOT, 'dist', 'map', slug);

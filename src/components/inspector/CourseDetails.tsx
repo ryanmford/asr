@@ -34,6 +34,7 @@ import { ASRPremiumButton } from "../ui/ASRPremiumButton";
 import { CourseChampions } from "../ui/CourseChampions";
 import { ASRStatCard } from "../ui/ASRStatCard";
 import { ASRWeeklyActivityChart } from "../ui/ASRWeeklyActivityChart";
+import { ASRTimeSimulator } from "../ui/ASRTimeSimulator";
 
 import { motion } from "motion/react";
 
@@ -273,6 +274,60 @@ export const CourseDetails = React.memo(
       });
     }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
 
+    const atRecordsM = useMemo(() => {
+      const sourceM = lbAT_Courses?.M[cName] || {};
+      const times = Object.values(sourceM) as number[];
+      const record = times.length > 0 ? Math.min(...times) : 0;
+      const sorted = Object.entries(sourceM)
+        .map(([pKey, time]: [string, unknown]) => {
+          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
+          return {
+            pKey,
+            time: num,
+            pts: num > 0 ? (record / num) * 100 : 0,
+            videoUrl: atRawBest?.[pKey]?.[cName]?.videoUrl,
+          };
+        })
+        .sort((a, b) => b.pts - a.pts);
+
+      let currentRank = 1;
+      let prevPts = -1;
+      return sorted.map((r, i) => {
+        if (r.pts !== prevPts) {
+          currentRank = i + 1;
+          prevPts = r.pts;
+        }
+        return { ...r, rank: currentRank };
+      });
+    }, [lbAT_Courses, cName, atRawBest]);
+
+    const atRecordsF = useMemo(() => {
+      const sourceF = lbAT_Courses?.F[cName] || {};
+      const times = Object.values(sourceF) as number[];
+      const record = times.length > 0 ? Math.min(...times) : 0;
+      const sorted = Object.entries(sourceF)
+        .map(([pKey, time]: [string, unknown]) => {
+          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
+          return {
+            pKey,
+            time: num,
+            pts: num > 0 ? (record / num) * 100 : 0,
+            videoUrl: atRawBest?.[pKey]?.[cName]?.videoUrl,
+          };
+        })
+        .sort((a, b) => b.pts - a.pts);
+
+      let currentRank = 1;
+      let prevPts = -1;
+      return sorted.map((r, i) => {
+        if (r.pts !== prevPts) {
+          currentRank = i + 1;
+          prevPts = r.pts;
+        }
+        return { ...r, rank: currentRank };
+      });
+    }, [lbAT_Courses, cName, atRawBest]);
+
     const stats = [
       {
         label: "CR (M)",
@@ -467,14 +522,24 @@ export const CourseDetails = React.memo(
                     * Course not included in the 2026 ASR Open.
                   </div>
                 ) : (
-                  <ASRRankList
-                    athletes={recordsM}
-                    dataContext={dataContext}
-                    onEntityClick={onEntityClick}
-                    entityType="player"
-                    hideSubtitle={true}
-                    padTo={3}
-                  />
+                  <div className="flex flex-col gap-6">
+                    <ASRTimeSimulator 
+                      theme={theme}
+                      courseRecord={atRecordsM.length > 0 ? Math.min(...atRecordsM.filter(r => r.time > 0).map(r => r.time)) : 0}
+                      records={atRecordsM}
+                      gender="M"
+                      dataContext={dataContext}
+                      cName={cName}
+                    />
+                    <ASRRankList
+                      athletes={recordsM}
+                      dataContext={dataContext}
+                      onEntityClick={onEntityClick}
+                      entityType="player"
+                      hideSubtitle={true}
+                      padTo={3}
+                    />
+                  </div>
                 )}
               </div>
               <div className="pt-4 px-4 pb-8">
@@ -521,14 +586,24 @@ export const CourseDetails = React.memo(
                     This course is not included in the 2026 ASR OPEN.
                   </div>
                 ) : (
-                  <ASRRankList
-                    athletes={recordsF}
-                    dataContext={dataContext}
-                    onEntityClick={onEntityClick}
-                    entityType="player"
-                    hideSubtitle={true}
-                    padTo={3}
-                  />
+                  <div className="flex flex-col gap-6">
+                    <ASRTimeSimulator 
+                      theme={theme}
+                      courseRecord={atRecordsF.length > 0 ? Math.min(...atRecordsF.filter(r => r.time > 0).map(r => r.time)) : 0}
+                      records={atRecordsF}
+                      gender="F"
+                      dataContext={dataContext}
+                      cName={cName}
+                    />
+                    <ASRRankList
+                      athletes={recordsF}
+                      dataContext={dataContext}
+                      onEntityClick={onEntityClick}
+                      entityType="player"
+                      hideSubtitle={true}
+                      padTo={3}
+                    />
+                  </div>
                 )}
               </div>
               <div className="pt-4 px-4 pb-8">
