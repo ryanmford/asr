@@ -264,7 +264,7 @@ async function run() {
     // Gen OG Image
     // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
     // We'll fall back to the main logo.
-    const fallbackOgImage = `${BASE_URL}/asr.png`;
+    const fallbackOgImage = `${BASE_URL}/apexspeedrun.png`;
     
     // Inj HTML
     const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
@@ -305,7 +305,7 @@ async function run() {
     // Gen OG Image
     // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
     // We'll fall back to the main logo.
-    const fallbackOgImage = `${BASE_URL}/asr.png`;
+    const fallbackOgImage = `${BASE_URL}/apexspeedrun.png`;
     
     // Inj HTML
     const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
