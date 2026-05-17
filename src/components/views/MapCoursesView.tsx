@@ -7,24 +7,25 @@ import { ErrorBoundary } from "../common/ErrorBoundary";
 import { ASRBottomSheet } from "../common/ASRBottomSheet";
 import { CourseData } from "../../types";
 import { useDataStore } from "../../store/useDataStore";
-import { useAppNavigation, useCourseList, useMasterCourseList } from "../../hooks/useDerivedData";
+import { useAppNavigation, useCourseList } from "../../hooks/useDerivedData";
 import { useDebounce } from "../../hooks/useDataHooks";
 import { useAppStore } from "../../store/useAppStore";
 import { cn } from "../../lib/asr-utils";
 import { normalizeForSearch } from "../../lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ASRMap = React.lazy(() => import("../ASRMap").then((m) => ({ default: m.ASRMap })));
 
 export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }) => {
   const isLoading = useDataStore(s => s.isLoading);
   const { navigateToEntity } = useAppNavigation();
-  const masterCourseList = useMasterCourseList();
   const courseList = useCourseList();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const searchKey = `q_COURSES`;
   const search = searchParams.get("q") || searchParams.get(searchKey) || "";
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const listRefDesktop = useRef<any>(null);
   const listRefMobile = useRef<any>(null);
   const scrollContainerRefDesktop = React.useRef<HTMLDivElement>(null);
@@ -150,7 +151,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   }, [setActiveCourseId]);
 
   const renderListContent = (currentSnap: number, scrollRef: React.RefObject<HTMLDivElement>, dRef: React.RefObject<any>) => (
-    <div className="flex flex-col h-full bg-white dark:bg-zinc-950">
+    <div className="flex flex-col h-full bg-transparent">
       <div 
         ref={scrollRef}
         onScroll={(e) => {
@@ -159,7 +160,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
             window.dispatchEvent(new CustomEvent("asr-scroll", { detail: { scrollTop: target.scrollTop } }));
           }
         }}
-        className="flex-1 px-4 pb-4 pt-4 overflow-y-auto overscroll-none"
+        className="flex-1 px-4 pb-4 pt-0 overflow-y-auto overscroll-none"
         style={{ touchAction: currentSnap >= 0.8 ? 'pan-y' : 'none' }}
       >
         <ErrorBoundary fallbackMessage="Failed to render the data list.">
@@ -169,6 +170,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
             data={visibleData}
             isLoading={isLoading}
             viewType="card"
+            isCompact={true}
             onItemClick={handleItemClick}
             middleLabel="COURSE"
             columns={columns}
@@ -217,19 +219,37 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
         </React.Suspense>
       </div>
 
-      {/* Desktop Floating Search Pill */}
+      {/* Desktop Panel (Collapsible Glass Sidebar) */}
       <div 
         className={cn(
-          "hidden md:block absolute top-8 left-1/2 -translate-x-1/2 ml-[208px] lg:ml-[233px] z-[100] w-[90%] max-w-[400px] drop-shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300 opacity-100 pointer-events-auto"
+          "hidden md:flex flex-col absolute top-4 bottom-4 left-4 z-10 shadow-2xl rounded-3xl overflow-hidden border transition-all duration-500 ease-in-out",
+          isSidebarOpen ? "w-[400px] lg:w-[450px]" : "w-[0px] opacity-0 -translate-x-full pointer-events-none",
+          theme === "dark" 
+            ? "bg-zinc-950/70 border-white/10 backdrop-blur-xl" 
+            : "bg-white/70 border-black/10 backdrop-blur-xl"
         )}
       >
-        {renderSearchPill(false)}
+        <div className="w-full pt-4 pb-2 sticky top-0 z-20">
+          {renderSearchPill(false)}
+        </div>
+        <div className="flex-1 overflow-hidden h-full">
+          {renderListContent(1, scrollContainerRefDesktop, listRefDesktop)}
+        </div>
       </div>
 
-      {/* Desktop Panel */}
-      <div className="hidden md:flex flex-col absolute top-4 bottom-4 left-4 w-[400px] lg:w-[450px] z-10 shadow-2xl rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-950">
-        {renderListContent(1, scrollContainerRefDesktop, listRefDesktop)}
-      </div>
+      {/* Desktop Sidebar Toggle Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className={cn(
+          "hidden md:flex absolute top-6 z-20 items-center justify-center w-8 h-12 rounded-r-xl border border-l-0 shadow-lg transition-all duration-500 ease-in-out backdrop-blur-xl hover:bg-opacity-100",
+          isSidebarOpen ? "left-[416px] lg:left-[466px]" : "left-0",
+          theme === "dark"
+            ? "bg-zinc-900/80 border-white/10 text-white hover:bg-zinc-800"
+            : "bg-white/80 border-black/10 text-zinc-900 hover:bg-zinc-100"
+        )}
+      >
+        {isSidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      </button>
 
       {/* Mobile Bottom Sheet */}
       <div className="md:hidden pointer-events-none absolute inset-0 z-50">

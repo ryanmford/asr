@@ -55,8 +55,8 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
       const key = normalizeForSearch(`${c.name} ${c.city} ${c.stateProv} ${c.country}`);
       return searchTerms.every(term => key.includes(term));
     });
-    const gymsArr = ((teamsAggregated as any)?.gyms?.allTime || []) as SearchResultTeam[];
-    const teamsArr = ((teamsAggregated as any)?.teams?.allTime || []) as SearchResultTeam[];
+    const gymsArr = ((teamsAggregated as Record<string, Record<string, SearchResultTeam[]>>)?.gyms?.allTime || []);
+    const teamsArr = ((teamsAggregated as Record<string, Record<string, SearchResultTeam[]>>)?.teams?.allTime || []);
 
     const matchedGyms = gymsArr.filter((t: SearchResultTeam) => {
       const name = normalizeForSearch(t.name);
@@ -72,7 +72,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
     masterCourseList.forEach(c => {
       if (!c.isDivider && (c.city || c.stateProv || c.country)) {
         const city = c.city || "";
-        const stateProv = (c as any).stateProv || "";
+        const stateProv = c.stateProv || "";
         const country = c.country || "";
         const locKey = normalizeForSearch(`${city}, ${stateProv}, ${country}`);
         if (!locationMap.has(locKey)) {

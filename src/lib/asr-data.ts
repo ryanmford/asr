@@ -7,7 +7,6 @@ import {
   csvToObjects,
   CONFIG,
   robustSort,
-  isQualifiedAthlete,
   getNormalizedNameList,
 } from "./asr-utils";
 import { normalizeForSearch } from "./utils";

@@ -6,7 +6,6 @@ import { ThemeContext } from "../../theme-context";
 import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRListItem } from "../ASRListItems";
-import { useWindowVirtualizer, useVirtualizer } from '@tanstack/react-virtual';
 
 import { ASRDataContext } from "../../types";
 
@@ -46,12 +45,12 @@ export const ASRRankList = ({
  const activeScrollRef = scrollElementRef || (modalScrollRef.current ? modalScrollRef : null);
  const { atMet = {}, cMet = {} } = dataContext;
 
-  const { finalAthletes, listRenderKey } = React.useMemo(() => {
+    const { finalAthletes, listRenderKey } = React.useMemo(() => {
     const displayAthletes = [...athletes];
     if (padTo > 0 && displayAthletes.length < padTo) {
       const padCount = padTo - displayAthletes.length;
       for (let i = 0; i < padCount; i++) {
-        displayAthletes.push({ pKey: "UNCLAIMED RANK", isUnclaimed: true } as any);
+        displayAthletes.push({ pKey: "UNCLAIMED RANK", isUnclaimed: true } as unknown);
       }
     }
 
@@ -59,10 +58,10 @@ export const ASRRankList = ({
 
     let _listRenderKey = "empty";
     if (displayAthletes && displayAthletes.length > 0) {
-      const firstItem = displayAthletes[0] as any;
+      const firstItem = displayAthletes[0] as Record<string, unknown> | unknown[];
       const topKey = Array.isArray(firstItem)
         ? firstItem[0]
-        : firstItem.pKey || firstItem.label || "unknown";
+        : (firstItem as Record<string, unknown>).pKey || (firstItem as Record<string, unknown>).label || "unknown";
       _listRenderKey = `${topKey}`;
     }
 

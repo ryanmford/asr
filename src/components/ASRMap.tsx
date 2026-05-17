@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useContext, forwardRef, useImperativeHandle } from "react";
-import { ChevronsRight, Navigation, Plus, Minus } from "lucide-react";
+import { Navigation, Plus, Minus } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";

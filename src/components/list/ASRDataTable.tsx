@@ -22,6 +22,7 @@ interface ASRDataTableProps<T = Record<string, unknown>> {
  data: T[];
  columns: ColumnDef<T>[];
  viewType?: "table" | "card";
+ isCompact?: boolean;
  onItemClick?: (item: T) => void;
  emptyMessage?: string;
  isLoading?: boolean;
@@ -38,6 +39,7 @@ interface MemoizedVirtualRowProps<T> {
   virtualRow: import("@tanstack/react-virtual").VirtualItem;
   item: T & { isDivider?: boolean; rank?: number; name?: string; pKey?: string; id?: string };
   viewType: "table" | "card";
+  isCompact?: boolean;
   statColumns: ColumnDef<T>[];
   columns: ColumnDef<T>[];
   showVideoColumn: boolean;
@@ -51,6 +53,7 @@ const MemoizedVirtualRow = React.memo(({
   virtualRow,
   item,
   viewType,
+  isCompact,
   statColumns,
   columns,
   showVideoColumn,
@@ -111,6 +114,7 @@ const MemoizedVirtualRow = React.memo(({
     >
       <ASRListItem
         variant={viewType}
+        isCompact={isCompact}
         rank={item.currentRank}
         title={item.name}
         subtitle={null}
@@ -139,6 +143,7 @@ export const ASRDataTable = React.memo(
  data,
  columns = [],
  viewType = "table",
+ isCompact = false,
  onItemClick,
  isLoading = false,
  showRankings = true,
@@ -152,10 +157,10 @@ export const ASRDataTable = React.memo(
  const activeCourseId = useAppStore(s => s.activeCourseId);
  const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
 
- const handleItemHover = React.useCallback((item: any, isHovering: boolean) => {
+ const handleItemHover = React.useCallback((item: Record<string, unknown>, isHovering: boolean) => {
    if (isHovering) {
      prefetchEntity(item);
-     setActiveCourseId(item?.id || item?.pKey || null);
+     setActiveCourseId((item?.id as string) || (item?.pKey as string) || null);
    } else {
      setActiveCourseId(null);
    }
@@ -163,9 +168,9 @@ export const ASRDataTable = React.memo(
  
  const estimateSize = React.useCallback(() => {
    return viewType === "card" 
-     ? (window.innerWidth >= 1024 ? 120 : window.innerWidth >= 640 ? 100 : 100) 
+     ? (isCompact ? 76 : window.innerWidth >= 1024 ? 120 : window.innerWidth >= 640 ? 100 : 100) 
      : (window.innerWidth >= 1024 ? 80 : 64);
- }, [viewType]);
+ }, [viewType, isCompact]);
 
  const windowVirtualizer = useWindowVirtualizer({
  count: !scrollElementRef ? (data?.length || 0) : 0,
@@ -381,6 +386,7 @@ export const ASRDataTable = React.memo(
      virtualRow={virtualRow}
      item={item}
      viewType={viewType}
+     isCompact={isCompact}
      statColumns={statColumns}
      columns={columns}
      showVideoColumn={showVideoColumn}

@@ -57,8 +57,8 @@ export const useDataStore = create<ASRDataState>((set) => {
   let initialData = {};
   let initialIsLoading = true;
 
-  if (typeof window !== "undefined" && "window" in globalThis && (window as unknown as { __INITIAL_DATA__?: any }).__INITIAL_DATA__) {
-    initialData = (window as unknown as { __INITIAL_DATA__?: any }).__INITIAL_DATA__;
+  if (typeof window !== "undefined" && "window" in globalThis && (window as unknown as { __INITIAL_DATA__?: Record<string, unknown> }).__INITIAL_DATA__) {
+    initialData = (window as unknown as { __INITIAL_DATA__?: Record<string, unknown> }).__INITIAL_DATA__;
     initialIsLoading = false;
   } else if (typeof window !== "undefined") {
     // Fire off async fetch to avoid main thread blockage during boot

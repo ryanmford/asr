@@ -53,7 +53,7 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
     }
   }, [activeSnap, height]);
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const currentY = y.get();
     const velocity = info.velocity.y;
     

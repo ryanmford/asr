@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence, animate, LayoutGroup } from "motion/react";
-import { Calculator, Target, Trophy, ChevronDown, ChevronUp, Search, User, ArrowRight, X } from "lucide-react";
+import { Calculator, Target, Trophy, ChevronDown, ChevronUp, Search, ArrowRight, X } from "lucide-react";
 import { cn, THEME } from "../../lib/asr-utils";
 import { PlayerProfile, ASRDataContext } from "../../types";
 import { useDataStore } from "../../store/useDataStore";
@@ -185,24 +185,35 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
     return 0;
   }, [courseRecord, targetPts]);
 
+  const originalRanks = useMemo(() => {
+     const ranks: Record<string, number> = {};
+     const sorted = [...athletePool]
+         .filter(a => a.currentRank !== "UR" && a.rating !== undefined)
+         .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+     sorted.forEach((a, idx) => ranks[a.pKey] = idx + 1);
+     return ranks;
+  }, [athletePool]);
+
   const globalImpact = useMemo(() => {
      if (!selectedAthlete || !dataContext || !cName) return null;
      
      const existingTimesList = (dataContext.lbAT_Courses?.[gender]?.[cName] || {}) as Record<string, number>;
-     const originalTime = existingTimesList[selectedAthlete.pKey];
      
      // Determine the new simulated course record
-     const timesForCR = Object.entries(existingTimesList)
-         .filter(([pKey]) => pKey !== selectedAthlete.pKey)
-         .map(([_, t]) => t)
-         .filter(t => typeof t === "number" && t > 0);
+     // Calculate the minimal time from all OTHER athletes
+     let minOtherTime = Infinity;
+     for (const pKey in existingTimesList) {
+         const t = existingTimesList[pKey];
+         if (pKey !== selectedAthlete.pKey && typeof t === "number" && t > 0 && t < minOtherTime) {
+             minOtherTime = t;
+         }
+     }
      
-     if (targetTime > 0) timesForCR.push(targetTime);
-     
-     const simulatedCR = timesForCR.length > 0 ? Math.min(...timesForCR) : courseRecord;
+     const simulatedCR = Math.min(minOtherTime !== Infinity ? minOtherTime : courseRecord, targetTime > 0 ? targetTime : courseRecord);
      const oldCR = courseRecord || 1;
 
      const simulatedRatings: Record<string, number> = {};
+     let totalPointsDestroyed = 0;
      
      for (const pt of athletePool) {
          const baseRating = pt.rating || 0;
@@ -225,6 +236,9 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                  const oldCoursePts = Math.min(100, (oldCR / ptOriginalTime) * 100);
                  const newCoursePts = Math.min(100, (simulatedCR / ptOriginalTime) * 100);
                  pointsDelta = newCoursePts - oldCoursePts;
+                 if (pointsDelta < 0) {
+                     totalPointsDestroyed += Math.abs(pointsDelta);
+                 }
              }
          }
          
@@ -251,14 +265,33 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
 
      const currentRating = Math.round((selectedAthlete.rating || 0) * 1000000) / 1000000;
      
+     // New ranks based on simulatedRatings
+     const newRanks: Record<string, number> = {};
+     const sortedNew = [...athletePool]
+         .filter(a => a.currentRank !== "UR" && a.rating !== undefined)
+         .sort((a, b) => simulatedRatings[b.pKey] - simulatedRatings[a.pKey]);
+     sortedNew.forEach((a, idx) => newRanks[a.pKey] = idx + 1);
+
+     let athletesDemoted = 0;
+     for (const pKey of Object.keys(originalRanks)) {
+         if (pKey === selectedAthlete.pKey) continue;
+         if ((newRanks[pKey] || 0) > (originalRanks[pKey] || 0)) {
+             athletesDemoted++;
+         }
+     }
+
      return {
          originalRating: selectedAthlete.rating || 0,
          newRating: mySimRating,
          originalRank: selectedAthlete.currentRank || "UR",
          newRank: simulatedGlobalRank,
-         isImprovement: mySimRating > currentRating
+         isImprovement: mySimRating > currentRating,
+         pointsDestroyed: totalPointsDestroyed,
+         athletesDemoted,
+         beatsCR: targetTime < courseRecord,
+         simulatedCR
      };
-  }, [selectedAthlete, targetTime, dataContext, cName, gender, athletePool, courseRecord]);
+  }, [selectedAthlete, targetTime, dataContext, cName, gender, athletePool, courseRecord, originalRanks]);
 
   if (!courseRecord || records.length === 0) return null;
 
@@ -309,9 +342,9 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
             <Calculator size={16} />
           </div>
           <div className="flex flex-col text-left">
-            <span className={cn("font-black tracking-tight text-[15px]", "theme-text-base")}>TIME SIMULATOR</span>
+            <span className={cn("font-black tracking-tight text-[15px]", "theme-text-base")}>STAT SIMULATOR</span>
             <span className={cn("text-[11px] uppercase tracking-wider font-semibold opacity-60", "theme-text-faint")}>
-              Predict your leaderboard rank
+              Predict your stats
             </span>
           </div>
         </div>
@@ -358,11 +391,11 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                                         <div className="flex flex-col">
                                             <span className="text-sm font-black text-blue-500 uppercase">{selectedAthlete.name}</span>
                                             <span className="text-[10px] opacity-60 font-bold uppercase tracking-widest flex items-center gap-1.5 flex-wrap mt-0.5">
-                                                <span>#{selectedAthlete.currentRank || "UR"}</span>
+                                                <span>{selectedAthlete.currentRank === "UR" || !selectedAthlete.currentRank ? "UR" : `#${selectedAthlete.currentRank}`}</span>
                                                 <span className="opacity-50">|</span>
                                                 <span>LQ: {(selectedAthlete.rating || 0).toFixed(2)}</span>
                                                 <span className="opacity-50">|</span>
-                                                <span>PTS: {Math.round((selectedAthlete as any).pts || ((selectedAthlete.rating || 0) * (selectedAthlete.runs || 0)))}</span>
+                                                <span>PTS: {Math.round((selectedAthlete.rating || 0) * (selectedAthlete.runs || 0))}</span>
                                             </span>
                                         </div>
                                     </div>
@@ -590,7 +623,7 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                             "px-4 py-2 rounded-xl flex items-center gap-3",
                             theme === "dark" ? "bg-zinc-800" : "bg-zinc-100"
                         )}>
-                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Estimated Points</div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Simulated Points</div>
                             <div className="text-xl font-black tabular-nums">
                                 <RollingNumber value={simulatedPts} decimals={2} />
                             </div>
@@ -607,12 +640,12 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                                 theme === "dark" ? "bg-blue-500/10 border-blue-500/20" : "bg-blue-50 border-blue-200"
                             )}>
                                 <div className="text-[11px] font-black uppercase text-blue-500 tracking-wider">
-                                    Global LQ Delta
+                                    All-Time Delta
                                 </div>
                                 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">All-Time LQ</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">LQ</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-black opacity-50 line-through">{globalImpact.originalRating.toFixed(3)}</span>
                                             <ArrowRight size={12} className={globalImpact.isImprovement ? "text-blue-500" : "text-zinc-500"} />
@@ -622,9 +655,11 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Global Rank</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Rank</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm font-black opacity-50 line-through">#{globalImpact.originalRank}</span>
+                                            <span className="text-sm font-black opacity-50 line-through">
+                                                {globalImpact.originalRank === "UR" ? "UR" : `#${globalImpact.originalRank}`}
+                                            </span>
                                             <ArrowRight size={12} className={globalImpact.isImprovement ? "text-blue-500" : "text-zinc-500"} />
                                             <div className={cn("text-lg font-black tabular-nums", globalImpact.isImprovement ? "text-blue-500" : "")}>
                                                 #<RollingNumber value={globalImpact.newRank} decimals={0} />
@@ -632,6 +667,46 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                                         </div>
                                     </div>
                                 </div>
+
+                                <AnimatePresence>
+                                    {globalImpact.beatsCR && globalImpact.pointsDestroyed > 0.1 && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                            animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className={cn(
+                                                "p-3 rounded-lg flex flex-col gap-2 relative overflow-hidden",
+                                                theme === "dark" ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-200"
+                                            )}>
+                                                <div className="absolute -right-2 -bottom-4 text-red-500/10 dark:text-red-500/20 pointer-events-none">
+                                                    <Trophy size={64} className="rotate-12" />
+                                                </div>
+                                                <div className="text-[10px] font-black uppercase text-red-500 tracking-wider flex items-center gap-1.5 z-10">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                                    Collateral Damage
+                                                </div>
+                                                <div className="flex justify-between items-end z-10">
+                                                    <div className="flex flex-col">
+                                                        <span className={cn("text-[10px] font-bold uppercase opacity-60", theme === "dark" ? "text-red-100" : "text-red-900")}>Points Destroyed</span>
+                                                        <span className="text-xl font-black text-red-500 tabular-nums">
+                                                            -<RollingNumber value={globalImpact.pointsDestroyed} decimals={1} /> pts
+                                                        </span>
+                                                    </div>
+                                                    {globalImpact.athletesDemoted > 0 && (
+                                                        <div className="flex flex-col text-right">
+                                                            <span className={cn("text-[10px] font-bold uppercase opacity-60", theme === "dark" ? "text-red-100" : "text-red-900")}>Players Demoted</span>
+                                                            <span className="text-lg font-black text-red-500 tabular-nums">
+                                                                {globalImpact.athletesDemoted}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                         </motion.div>
                     )}
                 </div>
@@ -673,8 +748,8 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
                         <div className="text-4xl font-black tabular-nums tracking-tighter drop-shadow-sm z-10">
                             {requiredTimeForPts.toFixed(2)}s
                         </div>
-                        <div className="text-xs font-bold mt-2 opacity-80 z-10">
-                            {courseRecord * 100 / requiredTimeForPts >= 100 ? "⚠️ This requires breaking the CR!" : `This places you approx #${
+                        <div className="text-xs font-bold mt-2 opacity-80 z-10 text-center">
+                            {targetPts >= 100 ? "⚠️ This requires tying or breaking the CR!" : `This places you approx #${
                                 records.filter(r => r.time <= requiredTimeForPts).length + 1
                             }`}
                         </div>

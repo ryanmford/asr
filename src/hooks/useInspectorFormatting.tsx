@@ -4,7 +4,7 @@ import { Zap, Medal, Waypoints } from "lucide-react";
 import { PlayerProfile, TeamProfile, ASRDataContext } from "../types";
 
 const EMPTY_OBJ = {};
-const EMPTY_ARR: any[] = [];
+const EMPTY_ARR: unknown[] = [];
 const EMPTY_LB = { M: {}, F: {} };
 
 export const usePlayerDetailsData = (

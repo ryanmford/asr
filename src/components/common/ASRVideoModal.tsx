@@ -32,9 +32,8 @@ export const ASRVideoModal = () => {
     }
   }, [playingVideoUrl]);
 
-  // Sync modal with React Router history for back gestures
   useEffect(() => {
-    if (playingVideoUrl && !(location.state as any)?.videoModal) {
+    if (playingVideoUrl && !(location.state as Record<string, unknown>)?.videoModal) {
       navigate(location.pathname + location.search, {
         state: { ...location.state, videoModal: true },
         replace: false
@@ -43,14 +42,14 @@ export const ASRVideoModal = () => {
   }, [playingVideoUrl, location.pathname, location.search, location.state, navigate]);
 
   useEffect(() => {
-    const isVideoModalInHistory = (location.state as any)?.videoModal;
+    const isVideoModalInHistory = (location.state as Record<string, unknown>)?.videoModal;
     if (!isVideoModalInHistory && isOpen) {
       setPlayingVideoUrl(null);
     }
   }, [location.state, isOpen, setPlayingVideoUrl]);
 
   const handleClose = useCallback(() => {
-    const isVideoModalInHistory = (location.state as any)?.videoModal;
+    const isVideoModalInHistory = (location.state as Record<string, unknown>)?.videoModal;
     if (isVideoModalInHistory) {
       navigate(-1);
     } else {

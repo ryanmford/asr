@@ -179,13 +179,13 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   // KPI TRENDS (Sparklines)
-  const allRuns: any[] = [];
+  const allRuns: Record<string, unknown>[] = [];
   Object.values(courseRunsHistory || {}).forEach((runsArray) => {
-    allRuns.push(...(runsArray as any[]));
+    allRuns.push(...(runsArray as Record<string, unknown>[]));
   });
 
-  const undatedRuns = allRuns.filter(r => !r.date || isNaN(new Date(r.date).getTime()));
-  const datedRuns = allRuns.filter(r => r.date && !isNaN(new Date(r.date).getTime())).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const undatedRuns = allRuns.filter(r => !r.date || isNaN(new Date(r.date as string).getTime()));
+  const datedRuns = allRuns.filter(r => r.date && !isNaN(new Date(r.date as string).getTime())).sort((a,b) => new Date(a.date as string).getTime() - new Date(b.date as string).getTime());
 
   const uniquePlayersAtStart = new Set(undatedRuns.map(r => r.pKey).filter(Boolean));
   const uniqueCoursesAtStart = new Set(undatedRuns.map(r => String(r.course).toUpperCase()).filter(Boolean));

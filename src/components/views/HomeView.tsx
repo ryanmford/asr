@@ -42,12 +42,12 @@ export const HomeView = React.memo(() => {
   const atPerfs = useDataStore((s) => s.atPerfs);
 
   const { topPlayer, topCourse, topTeam } = useMemo(() => {
-    let topPlayer: any = null;
-    const taylorIndexF = playerList_F_AT.findIndex((p: any) => String(p.name).toUpperCase().includes("TAYLOR"));
+    let topPlayer: Record<string, unknown> | null = null;
+    const taylorIndexF = playerList_F_AT.findIndex((p: Record<string, unknown>) => String(p.name).toUpperCase().includes("TAYLOR"));
     if (taylorIndexF !== -1) {
       topPlayer = { ...playerList_F_AT[taylorIndexF], _gRank: taylorIndexF + 1 };
     } else {
-      const benatiIndexM = playerList_M_AT.findIndex((p: any) => String(p.name).toUpperCase().includes("BENATI"));
+      const benatiIndexM = playerList_M_AT.findIndex((p: Record<string, unknown>) => String(p.name).toUpperCase().includes("BENATI"));
       if (benatiIndexM !== -1) {
          topPlayer = { ...playerList_M_AT[benatiIndexM], _gRank: benatiIndexM + 1 };
       } else if (playerList_M_AT[0]) {
@@ -56,18 +56,18 @@ export const HomeView = React.memo(() => {
     }
 
     const topCourse =
-      courseList_AT.find((c: any) => {
+      courseList_AT.find((c: Record<string, unknown>) => {
         const n = String(c.name).toUpperCase();
         return n.includes("KANEWAI") || n.includes("KĀNEWAI");
       }) ||
       (courseList_AT.length > 0 ? courseList_AT[0] : null);
 
-    let topTeam: any = null;
-    const gTop = teamList_gyms_AT[0] as any;
-    const tTop = teamList_teams_AT[0] as any;
+    let topTeam: Record<string, unknown> | null = null;
+    const gTop = teamList_gyms_AT[0] as Record<string, unknown>;
+    const tTop = teamList_teams_AT[0] as Record<string, unknown>;
     
     if (gTop && tTop) {
-       topTeam = (gTop.pts >= tTop.pts) ? { ...gTop, _isGym: true } : { ...tTop, _isGym: false };
+       topTeam = ((gTop.pts as number) >= (tTop.pts as number)) ? { ...gTop, _isGym: true } : { ...tTop, _isGym: false };
     } else if (gTop) {
        topTeam = { ...gTop, _isGym: true };
     } else if (tTop) {
@@ -90,7 +90,7 @@ export const HomeView = React.memo(() => {
     const list = [];
     
     // 1. Run of the Month
-    const joeyFundaPerf = (atPerfs?.["joeyjepsen"] as any[])?.find((p) => p.label === "FUNDA");
+    const joeyFundaPerf = (atPerfs?.["joeyjepsen"] as Record<string, unknown>[])?.find((p) => p.label === "FUNDA");
     const runTime = joeyFundaPerf ? Number(joeyFundaPerf.num).toFixed(2) : "17.71";
     const runRank = joeyFundaPerf?.rank || 1;
     const runVideo = joeyFundaPerf?.videoUrl || "https://youtube.com/shorts/ThkpzLI1gIc";
@@ -239,7 +239,7 @@ export const HomeView = React.memo(() => {
     playersTrendData,
     coursesTrendData,
   } = useMemo(() => {
-    const kpiData = (kpiStats as any) || {};
+    const kpiData = (kpiStats as Record<string, unknown>) || {};
 
     const tGyms = Math.max(
       teamList_gyms_AT?.length || 0,
@@ -249,18 +249,18 @@ export const HomeView = React.memo(() => {
       teamList_teams_AT?.length || 0,
       1,
     );
-    const tMedals = masterCourseList.reduce((acc, c: any) => {
-      const mCount = Math.min(3, c.allTimeAthletesM?.length || 0);
-      const fCount = Math.min(3, c.allTimeAthletesF?.length || 0);
+    const tMedals = masterCourseList.reduce((acc, c: Record<string, unknown>) => {
+      const mCount = Math.min(3, (c.allTimeAthletesM as unknown[])?.length || 0);
+      const fCount = Math.min(3, (c.allTimeAthletesF as unknown[])?.length || 0);
       return acc + mCount + fCount;
     }, 0);
 
     const pTrendData = kpiTrends?.players || [];
     const cTrendData = kpiTrends?.courses || [];
 
-    const medalsMultiplier = kpiData.courses ? tMedals / kpiData.courses : 6;
-    const mTrendData = cTrendData.map((d: any) => ({
-      value: Math.round(d.value * medalsMultiplier),
+    const medalsMultiplier = kpiData.courses ? tMedals / (kpiData.courses as number) : 6;
+    const mTrendData = cTrendData.map((d: Record<string, unknown>) => ({
+      value: Math.round((d.value as number) * medalsMultiplier),
     }));
 
     return {
