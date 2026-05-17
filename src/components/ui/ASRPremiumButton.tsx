@@ -68,18 +68,18 @@ export const ASRPremiumButton = ({
  }
  };
 
- const getConicGradient = () => {
+ const getLinearGradient = () => {
  if (disabled)
- return "bg-[conic-gradient(from_0deg,#d4d4d8,#a1a1aa,#71717a,#a1a1aa,#d4d4d8)] opacity-90";
+ return "linear-gradient(90deg, #d4d4d8, #a1a1aa, #71717a, #a1a1aa, #d4d4d8)";
  switch (color) {
  case "red":
- return "bg-[conic-gradient(from_0deg,#ef4444,#f87171,#b91c1c,#f87171,#ef4444)] opacity-90";
+ return "linear-gradient(90deg, #ef4444, #f87171, #b91c1c, #f87171, #ef4444)";
  case "gold":
- return "bg-[conic-gradient(from_0deg,#f59e0b,#fbbf24,#d97706,#fbbf24,#f59e0b)] opacity-90";
+ return "linear-gradient(90deg, #f59e0b, #fbbf24, #d97706, #fbbf24, #f59e0b)";
  case "blue":
- return "bg-[conic-gradient(from_0deg,#3b82f6,#3b82f6,#1d4ed8,#3b82f6,#3b82f6)] opacity-90";
+ return "linear-gradient(90deg, #4f8df0, #4f8df0, #1d4ed8, #4f8df0, #4f8df0)";
  default:
- return "bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90";
+ return "linear-gradient(90deg, #4f8df0, #9670f2, #e35497, #9670f2, #4f8df0)";
  }
  };
 
@@ -145,25 +145,28 @@ export const ASRPremiumButton = ({
  {effect === "neon" && (
  <div
  className={cn(
- "absolute inset-0 z-0 pointer-events-none overflow-hidden",
+ "absolute inset-0 z-0 pointer-events-none",
  getRadiusClass(),
  )}
  >
- {/* The Shimmering Neon Outline - Long Trail */}
- <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
- <div
- className={cn(
- "w-full h-full neon-border-rotate transition-opacity duration-500",
- isSolid ? "opacity-100" : "opacity-0 group-hover:opacity-100",
- )}
- style={{
- animationDelay: animDelay,
- animationDuration: animDuration,
- }}
- >
- <div className={cn("w-full h-full", getConicGradient())} />
- </div>
- </div>
+ {/* Ambient Glow */}
+ <div 
+   className={cn(
+     "absolute inset-0 animate-border-shift blur-[6px] transition-opacity duration-500 z-0",
+     getRadiusClass(),
+     isSolid ? "opacity-30" : "opacity-0 group-hover:opacity-30"
+   )}
+   style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
+ />
+ {/* Sharp Edge Border */}
+ <div 
+   className={cn(
+     "absolute inset-0 animate-border-shift transition-opacity duration-500 z-0",
+     getRadiusClass(),
+     isSolid ? "opacity-60" : "opacity-0 group-hover:opacity-60"
+   )}
+   style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
+ />
  </div>
  )}
 

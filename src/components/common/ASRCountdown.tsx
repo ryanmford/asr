@@ -83,9 +83,12 @@ export const ASRCountdown = React.memo(
               : "bg-white/40 border-black/5 shadow-xl shadow-black/5",
           )}
         >
-          {/* The Rotating Neon Border - Full Wrap */}
-          <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
-            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity neon-border-rotate-x-slow" />
+          {/* The Shimmering Neon Outline - Long Trail */}
+          <div className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500">
+            {/* Ambient Glow */}
+            <div className="absolute inset-0 animate-border-shift neon-gradient-base blur-[6px] opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+            {/* Sharp Edge Border */}
+            <div className="absolute inset-0 animate-border-shift neon-gradient-base opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
           </div>
 
           {/* The Inner Surface Fill (with glass effect) */}
@@ -163,9 +166,12 @@ export const ASRCountdown = React.memo(
               : "bg-white/40 border-black/5 shadow-xl shadow-black/5 text-black",
           )}
         >
-          {/* The Rotating Neon Border - Full Wrap */}
-          <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
-            <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 neon-border-rotate-x-slow" />
+          {/* The Shimmering Neon Outline - Long Trail */}
+          <div className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500">
+            {/* Ambient Glow */}
+            <div className="absolute inset-0 animate-border-shift neon-gradient-base blur-[6px] opacity-30 transition-opacity duration-500" />
+            {/* Sharp Edge Border */}
+            <div className="absolute inset-0 animate-border-shift neon-gradient-base opacity-40 transition-opacity duration-500" />
           </div>
 
           <div
@@ -199,8 +205,11 @@ export const ASRCountdown = React.memo(
             : "bg-white/40 border-black/5 shadow-xl shadow-black/5",
         )}
       >
-        <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 transition-opacity duration-500">
-          <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_45deg,#3b82f6_180deg,transparent_315deg,transparent_360deg)] opacity-40 group-hover:opacity-100 transition-opacity neon-border-rotate-x-slow" />
+        <div className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500">
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 animate-border-shift neon-gradient-base blur-[6px] opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+          {/* Sharp Edge Border */}
+          <div className="absolute inset-0 animate-border-shift neon-gradient-base opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
         </div>
 
         <div
