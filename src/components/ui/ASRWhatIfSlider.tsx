@@ -351,7 +351,9 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
                     step={0.01} 
                     value={rawTargetTime} 
                     onChange={(e) => setRawTargetTime(parseFloat(e.target.value))}
-                    className="absolute inset-0 w-full opacity-0 cursor-ew-resize z-30"
+                    tabIndex={-1}
+                    className="absolute top-1/2 -translate-y-1/2 w-full h-[60px] opacity-0 cursor-ew-resize z-30 touch-none"
+                    style={{ WebkitAppearance: "none" }}
                 />
                 
                 <motion.div 

@@ -67,8 +67,21 @@ export const ASRSearchInput = React.memo(
           <div className="absolute left-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-blue-500 transition-all z-30 pointer-events-none">
             <Search size={16} strokeWidth={3} />
           </div>
+          <style>{`
+            input[type="search"]::-webkit-search-decoration,
+            input[type="search"]::-webkit-search-cancel-button,
+            input[type="search"]::-webkit-search-results-button,
+            input[type="search"]::-webkit-search-results-decoration {
+              -webkit-appearance:none;
+            }
+          `}</style>
           <input
-            type="text"
+            type="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             value={value}
             onChange={onChange}
             onKeyDown={onKeyDown}
@@ -82,7 +95,7 @@ export const ASRSearchInput = React.memo(
             }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
-              "w-full h-full pl-12 bg-transparent outline-none text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal z-30 relative",
+              "w-full h-full pl-12 bg-transparent outline-none text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal z-30 relative appearance-none",
               theme === "dark"
                 ? "text-white placeholder:text-white"
                 : "text-zinc-900 placeholder:text-zinc-900",
