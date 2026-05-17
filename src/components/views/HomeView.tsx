@@ -357,7 +357,7 @@ export const HomeView = React.memo(() => {
                 FINDING THE FASTEST
               </span>
               <span className="block whitespace-nowrap text-[6vw] min-[400px]:text-[6.5vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mt-1 md:mt-3">
-                IN THE REAL WORLD <span className="inline-block transform skew-x-6 ml-1 md:ml-3">🔥</span>
+                IN THE REAL WORLD <span className="inline-block transform skew-x-6 ml-1 md:ml-3 animate-pulse">🔥</span>
               </span>
             </h1>
           </div>
