@@ -516,3 +516,170 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     teamList_teams_OP: computeTeamList("teams", false),
   };
 }
+
+export function computeSimulatedPlacement(targetTime: number, records: Array<{ time: number, rank: number | string }>) {
+  let rank = 1;
+  for (let i = 0; i < records.length; i++) {
+      if (targetTime < records[i].time) {
+          break;
+      }
+      if (targetTime === records[i].time) {
+          rank = Number(records[i].rank);
+          break;
+      }
+      rank++;
+  }
+  return rank;
+}
+
+export function computeOriginalRanks(athletePool: PlayerProfile[]) {
+  const ranks: Record<string, number> = {};
+  const sorted = [...athletePool]
+      .filter(a => a.currentRank !== "UR" && a.rating !== undefined)
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  sorted.forEach((a, idx) => ranks[a.pKey] = idx + 1);
+  return ranks;
+}
+
+export function computeLiveLadderWindow(
+  records: Array<{ pKey: string; time: number; pts: number; rank: number | string }>,
+  myKey: string,
+  myName: string,
+  targetTime: number,
+  simulatedPts: number,
+  athletePool: PlayerProfile[]
+) {
+  const recordsWithMe = [...records];
+  const myIndex = recordsWithMe.findIndex(r => r.pKey === myKey);
+  
+  if (myIndex !== -1) {
+      recordsWithMe[myIndex] = { ...recordsWithMe[myIndex], time: targetTime, pts: simulatedPts };
+  } else {
+      recordsWithMe.push({ pKey: myKey, time: targetTime, pts: simulatedPts, rank: 0 });
+  }
+
+  const namedRecords = recordsWithMe.map(r => ({
+      ...r,
+      name: r.pKey === myKey ? myName : (athletePool.find(a => a.pKey === r.pKey)?.name || "Unknown"),
+      isMe: r.pKey === myKey
+  }));
+
+  namedRecords.sort((a, b) => a.time - b.time);
+
+  let curRank = 1;
+  for (let i = 0; i < namedRecords.length; i++) {
+      if (i > 0 && namedRecords[i].time > namedRecords[i - 1].time) {
+          curRank = i + 1;
+      }
+      namedRecords[i].rank = curRank;
+  }
+
+  const myLiveRankIndex = namedRecords.findIndex(r => r.isMe);
+  const startIdx = Math.max(0, myLiveRankIndex - 1);
+  const endIdx = Math.min(namedRecords.length, startIdx + 3);
+  
+  let finalStart = startIdx;
+  if (endIdx - startIdx < 3) {
+      finalStart = Math.max(0, endIdx - 3);
+  }
+
+  return namedRecords.slice(finalStart, endIdx);
+}
+
+export function computeSimulatedGlobalImpact(
+  selectedAthlete: PlayerProfile,
+  targetTime: number,
+  existingTimesList: Record<string, number>,
+  athletePool: PlayerProfile[],
+  courseRecord: number,
+  originalRanks: Record<string, number>
+) {
+  let minOtherTime = Infinity;
+  for (const pKey in existingTimesList) {
+      const t = existingTimesList[pKey];
+      if (pKey !== selectedAthlete.pKey && typeof t === "number" && t > 0 && t < minOtherTime) {
+          minOtherTime = t;
+      }
+  }
+  
+  const simulatedCR = Math.min(minOtherTime !== Infinity ? minOtherTime : courseRecord, targetTime > 0 ? targetTime : courseRecord);
+  const oldCR = courseRecord || 1;
+
+  const simulatedRatings: Record<string, number> = {};
+  let totalPointsDestroyed = 0;
+  
+  for (const pt of athletePool) {
+      const baseRating = pt.rating || 0;
+      const runs = pt.runs || 1; 
+      const ptOriginalTime = existingTimesList[pt.pKey];
+      
+      let pointsDelta = 0;
+      let runDelta = 0;
+      
+      if (pt.pKey === selectedAthlete.pKey) {
+          const oldCoursePts = (typeof ptOriginalTime === "number" && ptOriginalTime > 0) ? Math.min(100, (oldCR / ptOriginalTime) * 100) : 0;
+          const newCoursePts = targetTime > 0 ? Math.min(100, (simulatedCR / targetTime) * 100) : 0;
+          
+          pointsDelta = newCoursePts - oldCoursePts;
+          if (typeof ptOriginalTime !== "number" || ptOriginalTime <= 0) {
+              runDelta = 1;
+          }
+      } else {
+          if (typeof ptOriginalTime === "number" && ptOriginalTime > 0) {
+              const oldCoursePts = Math.min(100, (oldCR / ptOriginalTime) * 100);
+              const newCoursePts = Math.min(100, (simulatedCR / ptOriginalTime) * 100);
+              pointsDelta = newCoursePts - oldCoursePts;
+              if (pointsDelta < 0) {
+                  totalPointsDestroyed += Math.abs(pointsDelta);
+              }
+          }
+      }
+      
+      if (runDelta > 0) {
+          simulatedRatings[pt.pKey] = ((baseRating * runs) + pointsDelta) / (runs + runDelta);
+      } else {
+          simulatedRatings[pt.pKey] = baseRating + (pointsDelta / runs);
+      }
+  }
+
+  const mySimRating = Math.round(simulatedRatings[selectedAthlete.pKey] * 1000000) / 1000000;
+  let simulatedGlobalRank = 1;
+  
+  for (const pt of athletePool) {
+      if (pt.pKey === selectedAthlete.pKey) continue;
+      if (!pt.currentRank || pt.currentRank === "UR") continue;
+
+      const theirSimRating = Math.round(simulatedRatings[pt.pKey] * 1000000) / 1000000;
+      if (theirSimRating > mySimRating) {
+          simulatedGlobalRank++;
+      }
+  }
+
+  const currentRating = Math.round((selectedAthlete.rating || 0) * 1000000) / 1000000;
+  
+  const newRanks: Record<string, number> = {};
+  const sortedNew = [...athletePool]
+      .filter(a => a.currentRank !== "UR" && a.rating !== undefined)
+      .sort((a, b) => simulatedRatings[b.pKey] - simulatedRatings[a.pKey]);
+  sortedNew.forEach((a, idx) => newRanks[a.pKey] = idx + 1);
+
+  let athletesDemoted = 0;
+  for (const pKey of Object.keys(originalRanks)) {
+      if (pKey === selectedAthlete.pKey) continue;
+      if ((newRanks[pKey] || 0) > (originalRanks[pKey] || 0)) {
+          athletesDemoted++;
+      }
+  }
+
+  return {
+      originalRating: selectedAthlete.rating || 0,
+      newRating: mySimRating,
+      originalRank: selectedAthlete.currentRank || "UR",
+      newRank: simulatedGlobalRank,
+      isImprovement: mySimRating > currentRating,
+      pointsDestroyed: totalPointsDestroyed,
+      athletesDemoted,
+      beatsCR: targetTime < courseRecord,
+      simulatedCR
+  };
+}

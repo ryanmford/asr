@@ -11,6 +11,8 @@ interface ASRSearchInputProps {
     e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
   ) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onFocus?: React.FocusEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
   theme: "light" | "dark";
   placeholder?: string;
   className?: string;
@@ -23,6 +25,8 @@ export const ASRSearchInput = React.memo(
     value,
     onChange,
     onKeyDown,
+    onFocus,
+    onBlur,
     theme,
     placeholder = "",
     className,
@@ -67,8 +71,14 @@ export const ASRSearchInput = React.memo(
             value={value}
             onChange={onChange}
             onKeyDown={onKeyDown}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onFocus={(e) => {
+              setIsFocused(true);
+              if (onFocus) onFocus(e);
+            }}
+            onBlur={(e) => {
+              setIsFocused(false);
+              if (onBlur) onBlur(e);
+            }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
               "w-full h-full pl-12 bg-transparent outline-none text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal z-30 relative",
