@@ -93,6 +93,7 @@ export const ASRSearchInput = React.memo(
               setIsFocused(false);
               if (onBlur) onBlur(e);
             }}
+            style={{ scrollMarginBottom: '120px' }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
               "w-full h-full pl-12 bg-transparent outline-none text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal z-30 relative appearance-none",

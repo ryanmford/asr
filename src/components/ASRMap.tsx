@@ -130,7 +130,12 @@ export const ASRMap = forwardRef(({
       attributionControl: false,
       minZoom: 2,
       maxZoom: 18,
-      worldCopyJump: true,
+      maxBounds: [
+        [-90, -180],
+        [90, 180]
+      ],
+      maxBoundsViscosity: 1.0,
+      worldCopyJump: false,
       dragging: true,
       touchZoom: true,
       scrollWheelZoom: true,
@@ -145,12 +150,14 @@ export const ASRMap = forwardRef(({
     const lightLayer = L.tileLayer(lightTile, {
       subdomains: "abcd",
       maxZoom: 20,
+      noWrap: true,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
     const darkLayer = L.tileLayer(darkTile, {
       subdomains: "abcd",
       maxZoom: 20,
+      noWrap: true,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
@@ -494,7 +501,7 @@ export const ASRMap = forwardRef(({
     <div
       id="asr-map-container"
       className={cn(
-        "relative w-full overflow-hidden shadow-2xl transition-colors duration-500",
+        "relative w-full overflow-hidden shadow-2xl transition-colors duration-500 [&_.leaflet-container]:!bg-transparent",
         isDark ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]" : "",
         className || "h-[60vh] sm:h-[75vh] min-h-[500px] rounded-[2.5rem] sm:rounded-[3.5rem] border border-slate-200 dark:border-zinc-800"
       )}

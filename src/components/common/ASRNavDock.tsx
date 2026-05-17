@@ -17,16 +17,23 @@ export const ASRNavDock = React.memo(
     const triggerRefresh = useDataStore((s) => s.triggerRefresh);
 
     useEffect(() => {
-      const handleResize = () => {
-        if (!window.visualViewport) return;
-        setIsKeyboardOpen(window.visualViewport.height < window.innerHeight - 100);
+      const handleFocusIn = (e: Event) => {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+          setIsKeyboardOpen(true);
+        }
       };
       
-      window.visualViewport?.addEventListener('resize', handleResize);
-      window.visualViewport?.addEventListener('scroll', handleResize);
+      const handleFocusOut = () => {
+        setIsKeyboardOpen(false);
+      };
+      
+      window.addEventListener('focusin', handleFocusIn);
+      window.addEventListener('focusout', handleFocusOut);
+      
       return () => {
-        window.visualViewport?.removeEventListener('resize', handleResize);
-        window.visualViewport?.removeEventListener('scroll', handleResize);
+        window.removeEventListener('focusin', handleFocusIn);
+        window.removeEventListener('focusout', handleFocusOut);
       }
     }, []);
 

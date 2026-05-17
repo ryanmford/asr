@@ -2,11 +2,21 @@ import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, useTransform, animate, PanInfo } from "motion/react";
 
 function useWindowSize() {
-  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [size, setSize] = useState({ 
+    width: window.innerWidth, 
+    height: window.innerHeight 
+  });
   useLayoutEffect(() => {
-    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    const handleResize = () => {
+      setSize({ 
+        width: window.innerWidth, 
+        height: window.innerHeight 
+      });
+    };
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    }
   }, []);
   return size;
 }
@@ -117,7 +127,7 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
         </div>
         
         <div 
-           className="flex-1 w-full overflow-hidden flex flex-col"
+           className="flex-1 w-full overflow-hidden flex flex-col pb-[env(safe-area-inset-bottom)]"
            onPointerDown={(e) => {
              // Only allow scrolling (by stopping drag propagation) if fully expanded.
              // If not fully expanded, swiping the list drags the drawer instead!

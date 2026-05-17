@@ -182,19 +182,23 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   );
 
   const renderSearchPill = (forMobile: boolean) => (
-    <div className={cn("w-full transition-all duration-300", forMobile && snap >= 0.8 ? "px-0" : "px-4")}>
+    <div className="w-full transition-all duration-300 px-4">
       <ASRSearchInput
         value={search}
         onChange={(e: any) => setSearch(e.target.value)}
+        onFocus={() => {
+          if (forMobile && snap < 0.85) {
+            setSnap(0.85);
+          }
+        }}
         placeholder="search courses..."
         theme={theme}
-        variant={forMobile && snap >= 0.8 ? "docked" : "pill"}
       />
     </div>
   );
 
   return (
-    <div ref={containerRef} className="relative w-full h-[calc(100vh-68px)] sm:h-[calc(100vh-76px)] overflow-hidden bg-slate-100 dark:bg-zinc-900">
+    <div ref={containerRef} className="relative w-full h-[calc(100dvh-68px)] sm:h-[calc(100dvh-76px)] overflow-hidden bg-slate-100 dark:bg-zinc-900">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
         <React.Suspense
