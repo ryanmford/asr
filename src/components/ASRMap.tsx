@@ -160,12 +160,12 @@ export const ASRMap = forwardRef(({
 
     const getClusterIcon = (cluster: any) => {
       const count = cluster.getChildCount();
-      let gradientStyle = "conic-gradient(from 0deg, #3b82f6, #4f46e5, #9333ea, #4f46e5, #3b82f6)";
+      let gradientStyle = "linear-gradient(90deg, #3b82f6, #ec4899, #8b5cf6, #3b82f6)";
       if (count > 50) {
-        gradientStyle = "conic-gradient(from 0deg, #8b5cf6, #d946ef, #f43f5e, #d946ef, #8b5cf6)";
+        gradientStyle = "linear-gradient(90deg, #8b5cf6, #d946ef, #f43f5e, #8b5cf6)";
       }
       if (count > 150) {
-        gradientStyle = "conic-gradient(from 0deg, #ef4444, #f43f5e, #e11d48, #f43f5e, #ef4444)";
+        gradientStyle = "linear-gradient(90deg, #ef4444, #f43f5e, #e11d48, #ef4444)";
       }
 
       const currentIsDark = isDarkRef.current;
@@ -178,12 +178,9 @@ export const ASRMap = forwardRef(({
       return L.divIcon({
         html: `
           <div class="relative flex items-center justify-center w-full h-full transition-transform duration-300 hover:scale-110 group cursor-pointer ${outerShadow} rounded-full">
-            <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-              <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                 <div class="w-full h-full neon-border-rotate opacity-90" style="background: ${gradientStyle};"></div>
-              </div>
-              <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
-            </div>
+            <div class="absolute inset-0 rounded-full z-0 animate-border-shift blur-[4px] opacity-60" style="background: ${gradientStyle}; background-size: 200% 100%;"></div>
+            <div class="absolute inset-0 rounded-full z-0 animate-border-shift opacity-90" style="background: ${gradientStyle}; background-size: 200% 100%;"></div>
+            <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
             <div class="absolute inset-[3px] rounded-full z-10 transition-colors shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"></div>
             <span class="relative z-20 ${textColor} font-black text-xs sm:text-sm tracking-tighter drop-shadow-md">
                ${count}
@@ -307,12 +304,9 @@ export const ASRMap = forwardRef(({
           <div class="absolute inset-0 bg-transparent"></div>
           <div class="relative flex flex-col items-center mt-2">
             <div class="relative w-6 h-6 rounded-full flex items-center justify-center ${outerShadow}">
-              <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                <div class="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
-                  <div class="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90"></div>
-                </div>
-                <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
-              </div>
+              <div class="absolute inset-0 rounded-full animate-border-shift neon-gradient-base blur-[4px] opacity-50 z-0"></div>
+              <div class="absolute inset-0 rounded-full animate-border-shift neon-gradient-base opacity-90 z-0"></div>
+              <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
               <div class="relative z-20 w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] ${isActive ? 'scale-125' : 'group-hover:scale-125'} transition-all"></div>
             </div>
             <div class="w-[2px] h-[8px] bg-gradient-to-b from-blue-500/80 to-transparent rounded-b-full"></div>
@@ -530,10 +524,9 @@ export const ASRMap = forwardRef(({
           "pointer-events-auto relative flex flex-col items-center p-0.5 rounded-[2rem] transition-all duration-300 group hidden md:flex",
           isDark ? "shadow-[0_4px_12px_rgba(0,0,0,0.6)]" : "shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
         )}>
-          <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 w-[400%] aspect-square -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-full h-full neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
-            </div>
+          <div className="absolute inset-0 rounded-[2rem] pointer-events-none">
+            <div className="absolute inset-0 rounded-[2rem] neon-gradient-base animate-border-shift blur-[6px] opacity-0 group-hover:opacity-40 transition-opacity duration-300" />
+            <div className="absolute inset-0 rounded-[2rem] neon-gradient-base animate-border-shift opacity-50 group-hover:opacity-90 transition-opacity duration-300" />
             <div className={cn(
               "absolute inset-[1.5px] rounded-[2rem] z-10 backdrop-blur-md transition-colors",
               isDark ? "bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]" : "bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]"

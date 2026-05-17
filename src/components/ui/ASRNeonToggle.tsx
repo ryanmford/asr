@@ -60,17 +60,19 @@ export const ASRNeonToggle = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className={cn(
-            "absolute inset-0 z-0 rounded-full overflow-hidden p-[1.5px]",
+            "absolute inset-0 z-0 rounded-full",
             theme === "dark" ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]" : "shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
           )}
           transition={{ duration: 0.15 }}
         >
-          {/* Animated Neon Border */}
-          <div className="absolute -inset-[100%] pointer-events-none neon-border-rotate bg-[conic-gradient(from_0deg,#3b82f6,#4f46e5,#9333ea,#4f46e5,#3b82f6)] opacity-90" />
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 neon-gradient-base animate-border-shift blur-[6px] opacity-40 rounded-full" />
+          {/* Sharp Edge Border */}
+          <div className="absolute inset-0 neon-gradient-base animate-border-shift opacity-80 rounded-full" />
           {/* Inner Surface */}
           <div
             className={cn(
-              "relative w-full h-full rounded-full z-10",
+              "absolute inset-[1.5px] rounded-full z-10",
               theme === "dark" ? "bg-zinc-900" : "bg-white"
             )}
           />
