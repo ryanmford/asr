@@ -39,83 +39,111 @@ export const HomeView = React.memo(() => {
   const courseList_AT = useDataStore((s) => s.courseList_AT);
   const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
   const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
-  const atPerfs = useDataStore((s) => s.atPerfs);
 
-  const { topPlayer, topCourse, topTeam } = useMemo(() => {
-    let topPlayer: Record<string, unknown> | null = null;
-    const taylorIndexF = playerList_F_AT.findIndex((p: Record<string, unknown>) => String(p.name).toUpperCase().includes("TAYLOR"));
-    if (taylorIndexF !== -1) {
-      topPlayer = { ...playerList_F_AT[taylorIndexF], _gRank: taylorIndexF + 1 };
-    } else {
-      const benatiIndexM = playerList_M_AT.findIndex((p: Record<string, unknown>) => String(p.name).toUpperCase().includes("BENATI"));
-      if (benatiIndexM !== -1) {
-         topPlayer = { ...playerList_M_AT[benatiIndexM], _gRank: benatiIndexM + 1 };
-      } else if (playerList_M_AT[0]) {
-         topPlayer = { ...playerList_M_AT[0], _gRank: 1 };
+  const { topPlayer, topCourse, dailyRecord } = useMemo(() => {
+    // Generate deterministic index based on today's UTC Date.
+    const today = new Date();
+    const seedStr = `${today.getUTCFullYear()}-${today.getUTCMonth()}-${today.getUTCDate()}`;
+
+    const sRandom = (str: string, max: number) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (Math.imul(31, hash) + str.charCodeAt(i)) | 0;
       }
+      const x = Math.sin(hash) * 10000;
+      return Math.floor((x - Math.floor(x)) * max);
+    };
+
+    let pOfDay: Record<string, unknown> | null = null;
+    const topM = playerList_M_AT.slice(0, 30);
+    const topF = playerList_F_AT.slice(0, 20);
+    const combinedP = [...topM, ...topF].filter(Boolean);
+    if (combinedP.length > 0) {
+      const idx = sRandom(seedStr + "player", combinedP.length);
+      pOfDay = combinedP[idx];
+      pOfDay._gRank = pOfDay.gender === "F" 
+          ? playerList_F_AT.indexOf(pOfDay) + 1 
+          : playerList_M_AT.indexOf(pOfDay) + 1;
     }
 
-    const topCourse =
-      courseList_AT.find((c: Record<string, unknown>) => {
-        const n = String(c.name).toUpperCase();
-        return n.includes("KANEWAI") || n.includes("KĀNEWAI");
-      }) ||
-      (courseList_AT.length > 0 ? courseList_AT[0] : null);
-
-    let topTeam: Record<string, unknown> | null = null;
-    const gTop = teamList_gyms_AT[0] as Record<string, unknown>;
-    const tTop = teamList_teams_AT[0] as Record<string, unknown>;
-    
-    if (gTop && tTop) {
-       topTeam = ((gTop.pts as number) >= (tTop.pts as number)) ? { ...gTop, _isGym: true } : { ...tTop, _isGym: false };
-    } else if (gTop) {
-       topTeam = { ...gTop, _isGym: true };
-    } else if (tTop) {
-       topTeam = { ...tTop, _isGym: false };
+    let cOfDay: Record<string, unknown> | null = null;
+    const sortedCourses = [...courseList_AT].sort((a: any, b: any) => 
+       (b.totalAllTimeRuns || b.totalRuns || 0) - (a.totalAllTimeRuns || a.totalRuns || 0)
+    ).slice(0, 50);
+    if (sortedCourses.length > 0) {
+      const idx = sRandom(seedStr + "course", sortedCourses.length);
+      cOfDay = sortedCourses[idx];
     }
 
-    return { topPlayer, topCourse, topTeam };
-  }, [playerList_M_AT, playerList_F_AT, courseList_AT, teamList_gyms_AT, teamList_teams_AT]);
+    let rOfDay: Record<string, unknown> | null = null;
+    const coursesWithRecords = sortedCourses.filter((c: any) => {
+        const atM = c.allTimeAthletesM || [];
+        const atF = c.allTimeAthletesF || [];
+        const mHasVideo = atM.length > 1 && !!atM[0]?.[2];
+        const fHasVideo = atF.length > 1 && !!atF[0]?.[2];
+        return mHasVideo || fHasVideo;
+    });
+
+    if (coursesWithRecords.length > 0) {
+       const idx = sRandom(seedStr + "record", coursesWithRecords.length);
+       const targetCourse = coursesWithRecords[idx] as any;
+       const atM = targetCourse.allTimeAthletesM || [];
+       const atF = targetCourse.allTimeAthletesF || [];
+       const mHasVideo = atM.length > 1 && !!atM[0]?.[2];
+       const fHasVideo = atF.length > 1 && !!atF[0]?.[2];
+       let pickM = mHasVideo;
+       if (mHasVideo && fHasVideo) {
+         pickM = sRandom(seedStr + "record_gender", 2) === 0;
+       }
+       const bestRun = pickM ? atM[0] : atF[0];
+
+       const pObj = [...playerList_M_AT, ...playerList_F_AT].find((p: any) => p.name === bestRun[0]);
+       const pFlag = pObj ? (pObj.townFlag || pObj.gymFlag || pObj.country || pObj.region || "") : "";
+       const pFlagFmt = pFlag ? `${formatFlagsWithSpace(pFlag).trim()} ` : "";
+
+       const cFlag = targetCourse.flag || targetCourse.region || targetCourse.country || "";
+       const cFlagFmt = cFlag ? `${formatFlagsWithSpace(cFlag).trim()} ` : "";
+
+       rOfDay = {
+         athleteName: `${pFlagFmt}${bestRun[0]}`,
+         time: bestRun[1].toFixed(2),
+         videoUrl: bestRun[2],
+         courseName: `${cFlagFmt}${targetCourse.name}`,
+         course: targetCourse,
+       };
+    }
+
+    return { topPlayer: pOfDay, topCourse: cOfDay, dailyRecord: rOfDay };
+  }, [playerList_M_AT, playerList_F_AT, courseList_AT]);
 
   const [carouselIndex, setCarouselIndex] = useState(0);
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => prev + 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const [autoPlayTimer, setAutoPlayTimer] = useState(0);
 
   const featureList = useMemo(() => {
     const list = [];
     
-    // 1. Run of the Month
-    const joeyFundaPerf = (atPerfs?.["joeyjepsen"] as Record<string, unknown>[])?.find((p) => p.label === "FUNDA");
-    const runTime = joeyFundaPerf ? Number(joeyFundaPerf.num).toFixed(2) : "17.71";
-    const runRank = joeyFundaPerf?.rank || 1;
-    const runVideo = joeyFundaPerf?.videoUrl || "https://youtube.com/shorts/ThkpzLI1gIc";
+    // 1. Run of the Day
+    if (dailyRecord) {
+      list.push({
+        type: "video",
+        data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl }, 
+        displayName: dailyRecord.athleteName,
+        label: "Run of the Day",
+        icon: <Timer className="w-4 h-4" />,
+        color: "text-purple-500",
+        shadowColor: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
+        borderHover: "hover:shadow-purple-500/40 ring-1 ring-purple-500/20",
+        bg: "bg-purple-500/10",
+        hoverBg: "group-hover:bg-purple-500",
+        hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
+        metrics: [
+          { label: "Course", value: dailyRecord.courseName },
+          { label: "Time", value: <>{dailyRecord.time} <span className="inline-block animate-bounce ml-0.5">🥇</span></> },
+        ],
+      });
+    }
 
-    list.push({
-      type: "video",
-      data: { name: "Joey Jepsen on FUNDA", videoUrl: runVideo },
-      displayName: "🇺🇸 JOEY JEPSEN",
-      label: "Run of the Month",
-      icon: <Timer className="w-4 h-4" />,
-      color: "text-purple-500",
-      shadowColor: "shadow-[0_0_15px_rgba(168,85,247,0.2)]",
-      borderHover: "hover:shadow-purple-500/20",
-      bg: "bg-purple-500/10",
-      hoverBg: "group-hover:bg-purple-500",
-      hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
-      gradientUrl: "conic-gradient(from 0deg, #a855f7, #d946ef, #9333ea, #d946ef, #a855f7)",
-      metrics: [
-        { label: "Rank", value: runRank },
-        { label: "Time", value: runTime },
-        { label: "Course", value: "🇲🇽 FUNDA" },
-      ],
-    });
-
-    // 2. Player of the Month
+    // 2. Player of the Day
     if (topPlayer) {
       const playerFlag = topPlayer.townFlag || topPlayer.gymFlag;
       list.push({
@@ -124,16 +152,14 @@ export const HomeView = React.memo(() => {
         displayName: playerFlag
           ? `${formatFlagsWithSpace(playerFlag).trim()} ${topPlayer.name}`
           : topPlayer.name,
-        label: "Player of the Month",
+        label: "Player of the Day",
         icon: <User className="w-4 h-4" />,
         color: "text-blue-500",
-        shadowColor: "shadow-[0_0_15px_rgba(59,130,246,0.2)]",
-        borderHover: "hover:shadow-blue-500/20",
+        shadowColor: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+        borderHover: "hover:shadow-blue-500/40 ring-1 ring-blue-500/20",
         bg: "bg-blue-500/10",
         hoverBg: "group-hover:bg-blue-500",
-        hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-500",
-        gradientUrl:
-          "conic-gradient(from 0deg, #3b82f6, #3b82f6, #3b82f6, #3b82f6, #3b82f6)",
+        hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
         metrics: [
           { label: "Rank", value: topPlayer._gRank },
           { label: "LQ", value: topPlayer.rating?.toFixed(2) || "0.00" },
@@ -142,34 +168,7 @@ export const HomeView = React.memo(() => {
       });
     }
 
-    // 3. Team of the Month
-    if (topTeam) {
-      const teamFlag = topTeam.flag;
-      list.push({
-        type: "team",
-        data: topTeam,
-        displayName: teamFlag
-          ? `${formatFlagsWithSpace(teamFlag).trim()} ${topTeam.name}`
-          : topTeam.name,
-        label: topTeam._isGym ? "Gym of the Month" : "Team of the Month",
-        icon: <Users className="w-4 h-4" />,
-        color: "text-amber-500",
-        shadowColor: "shadow-[0_0_15px_rgba(245,158,11,0.2)]",
-        borderHover: "hover:shadow-amber-500/20",
-        bg: "bg-amber-500/10",
-        hoverBg: "group-hover:bg-amber-500",
-        hoverText: "group-hover:text-amber-600 dark:group-hover:text-amber-400",
-        gradientUrl:
-          "conic-gradient(from 0deg, #f59e0b, #fbbf24, #d97706, #fbbf24, #f59e0b)",
-        metrics: [
-          { label: "Rank", value: 1 },
-          { label: "Runs", value: topTeam.runsCount || 0 },
-          { label: "Points", value: Math.floor(topTeam.pts || 0) },
-        ],
-      });
-    }
-
-    // 4. Course of the Month
+    // 3. Course of the Day
     if (topCourse) {
       const courseFlag = topCourse.flag;
       list.push({
@@ -178,17 +177,15 @@ export const HomeView = React.memo(() => {
         displayName: courseFlag
           ? `${formatFlagsWithSpace(courseFlag).trim()} ${topCourse.name}`
           : topCourse.name,
-        label: "Course of the Month",
+        label: "Course of the Day",
         icon: <MapPin className="w-4 h-4" />,
         color: "text-emerald-500",
-        shadowColor: "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
-        borderHover: "hover:shadow-emerald-500/20",
+        shadowColor: "shadow-[0_0_20px_rgba(16,185,129,0.3)]",
+        borderHover: "hover:shadow-emerald-500/40 ring-1 ring-emerald-500/20",
         bg: "bg-emerald-500/10",
         hoverBg: "group-hover:bg-emerald-500",
         hoverText:
           "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-        gradientUrl:
-          "conic-gradient(from 0deg, #10b981, #34d399, #059669, #34d399, #10b981)",
         metrics: [
           {
             label: "Runs",
@@ -207,7 +204,15 @@ export const HomeView = React.memo(() => {
     }
 
     return list;
-  }, [topPlayer, topCourse, topTeam, atPerfs]);
+  }, [topPlayer, topCourse, dailyRecord]);
+
+  React.useEffect(() => {
+    if (featureList.length <= 1) return;
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => prev + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoPlayTimer, featureList.length]);
 
   const currentFeature =
     featureList.length > 0
@@ -341,22 +346,22 @@ export const HomeView = React.memo(() => {
           )}
         ></div>
 
-        <div className="relative z-10 flex flex-col items-center max-w-3xl space-y-2 sm:space-y-6 w-full mx-auto">
-          <h1 className="text-3xl md:text-5xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.1] sm:leading-none uppercase flex flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-            <span className={cn("italic transform -skew-x-6 pb-1 sm:pb-2 pr-2 sm:pr-8 md:whitespace-nowrap", theme === "dark" ? "text-white" : "text-zinc-900")}>
-              Apex Speed Run
-            </span>
-          </h1>
-          <p
-            className={cn(
-              "font-medium text-xs sm:text-xl lg:text-2xl max-w-2xl leading-relaxed mx-auto px-2",
-              theme === "dark" ? "text-zinc-400" : "text-zinc-500",
-            )}
-          >
-            Track your speed runs, compete worldwide, climb the leaderboards,
-            and become unstoppable.
-          </p>
-          <div className="flex w-full sm:max-w-xs mt-1 sm:mt-3 mx-auto">
+        <div className="relative z-10 flex flex-col items-center max-w-5xl space-y-4 sm:space-y-6 w-full mx-auto pb-4">
+          <div className="w-full flex flex-col items-center justify-center">
+            <h1 className={cn(
+              "font-black tracking-tighter leading-[1] uppercase flex flex-col items-center justify-center text-center w-full max-w-full overflow-visible",
+              "italic transform -skew-x-6",
+              theme === "dark" ? "text-white" : "text-zinc-900"
+            )}>
+              <span className="block whitespace-nowrap text-[6vw] min-[400px]:text-[6.5vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+                FINDING THE FASTEST
+              </span>
+              <span className="block whitespace-nowrap text-[6vw] min-[400px]:text-[6.5vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mt-1 md:mt-3">
+                IN THE REAL WORLD <span className="inline-block transform skew-x-6 ml-1 md:ml-3">🔥</span>
+              </span>
+            </h1>
+          </div>
+          <div className="flex w-full sm:max-w-xs mt-4 sm:mt-8 mx-auto">
             <button
               className="group relative px-6 py-3 sm:py-4 w-full overflow-hidden rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg tracking-wide text-white transition-all duration-150 active:scale-[0.98]"
               onClick={() => setShowOnboarding(true)}
@@ -395,6 +400,8 @@ export const HomeView = React.memo(() => {
         currentFeature && (
           <motion.div variants={itemVariants} className="w-full">
             <div
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 if (currentFeature.type === "video") {
                   setPlayingVideoUrl((currentFeature.data as { videoUrl: string }).videoUrl);
@@ -402,9 +409,18 @@ export const HomeView = React.memo(() => {
                   navigateToEntity(currentFeature.type, currentFeature.data);
                 }
               }}
-              onTouchStart={() => {}}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (currentFeature.type === "video") {
+                    setPlayingVideoUrl((currentFeature.data as { videoUrl: string }).videoUrl);
+                  } else {
+                    navigateToEntity(currentFeature.type, currentFeature.data);
+                  }
+                }
+              }}
               className={cn(
-                "relative w-full min-h-[160px] flex flex-row items-center justify-between rounded-[2rem] p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98]",
+                "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-[2rem] p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
               )}
             >
               <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
@@ -428,18 +444,18 @@ export const HomeView = React.memo(() => {
                       </div>
                       <div
                         className={cn(
-                          "font-black tracking-tight text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none truncate w-full",
+                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
                           (
                             currentFeature.displayName ||
                             currentFeature.data.name
                           ).length > 22
-                            ? "text-lg sm:text-xl md:text-2xl"
+                            ? "text-base sm:text-lg md:text-xl"
                             : (
                                   currentFeature.displayName ||
                                   currentFeature.data.name
                                 ).length > 15
-                              ? "text-xl sm:text-2xl md:text-3xl"
-                              : "text-2xl sm:text-3xl md:text-4xl",
+                              ? "text-lg sm:text-xl md:text-2xl"
+                              : "text-xl sm:text-2xl md:text-3xl",
                           currentFeature.hoverText,
                         )}
                       >
@@ -449,18 +465,26 @@ export const HomeView = React.memo(() => {
                     <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
                       {currentFeature.metrics.map(
                         (
-                          m: { label: string; value: string | number },
+                          m: { label: string; value: React.ReactNode },
                           i: number,
-                        ) => (
-                          <div key={i} className="flex flex-col">
-                            <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                        ) => {
+                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
+                          const len = valStr.length || 5; // default to 5 for ReactNode (like time + emoji)
+                          return (
+                          <div key={i} className="flex flex-col min-w-0 flex-shrink">
+                            <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
                               {m.label}
                             </span>
-                            <span className="text-base sm:text-lg md:text-xl font-black text-zinc-900 dark:text-white tabular-nums flex items-center mt-0.5 leading-none">
+                            <span className={cn(
+                              "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
+                              len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
+                              : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
+                              : "text-base sm:text-lg md:text-xl"
+                            )}>
                               {m.value}
                             </span>
                           </div>
-                        ),
+                        )}
                       )}
                     </div>
                   </motion.div>
@@ -479,38 +503,41 @@ export const HomeView = React.memo(() => {
               </div>
 
               {/* Pagination Dots */}
-              <div className="absolute bottom-3 sm:bottom-3 left-0 right-0 flex justify-center gap-1.5 z-40">
-                {featureList.map((_, idx) => {
-                  const isActive =
-                    idx ===
-                    ((carouselIndex % featureList.length) +
-                      featureList.length) %
-                      featureList.length;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCarouselIndex(idx);
-                      }}
-                      className="w-10 h-10 flex items-center justify-center group/dot focus:outline-none"
-                      aria-label={`Go to slide ${idx + 1}`}
-                    >
-                      <div
-                        className={cn(
-                          "h-1.5 rounded-full transition-all duration-300",
-                          isActive
-                            ? cn("w-4", currentFeature.color) // Match dot color to feature text color
-                            : "w-1.5 bg-black/20 dark:bg-white/20 group-hover/dot:bg-black/40 dark:group-hover/dot:bg-white/40",
-                        )}
-                        style={
-                          isActive ? { backgroundColor: "currentColor" } : {}
-                        }
-                      />
-                    </button>
-                  );
-                })}
-              </div>
+              {featureList.length > 1 && (
+                <div className="absolute bottom-3 sm:bottom-3 left-0 right-0 flex justify-center gap-1.5 z-40">
+                  {featureList.map((_, idx) => {
+                    const isActive =
+                      idx ===
+                      ((carouselIndex % featureList.length) +
+                        featureList.length) %
+                        featureList.length;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCarouselIndex(idx);
+                          setAutoPlayTimer(t => t + 1);
+                        }}
+                        className="w-10 h-10 flex items-center justify-center group/dot focus:outline-none"
+                        aria-label={`Go to slide ${idx + 1}`}
+                      >
+                        <div
+                          className={cn(
+                            "h-1.5 rounded-full transition-all duration-300",
+                            isActive
+                              ? cn("w-4", currentFeature.color) // Match dot color to feature text color
+                              : "w-1.5 bg-black/20 dark:bg-white/20 group-hover/dot:bg-black/40 dark:group-hover/dot:bg-white/40",
+                          )}
+                          style={
+                            isActive ? { backgroundColor: "currentColor" } : {}
+                          }
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </motion.div>
         )
