@@ -138,7 +138,7 @@ export const ASRWeeklyActivityChart = ({
             <div
               className={cn(
                 "w-2 h-2 rounded-[1px]",
-                theme === "dark" ? "bg-blue-500" : "bg-blue-500",
+                "bg-blue-500",
               )}
               title="3+"
             />
@@ -171,7 +171,7 @@ export const ASRWeeklyActivityChart = ({
           } else if (week.count === 2) {
             levelClass = theme === "dark" ? "bg-blue-700/80" : "bg-blue-500";
           } else if (week.count >= 3) {
-            levelClass = theme === "dark" ? "bg-blue-500" : "bg-blue-500";
+            levelClass = "bg-blue-500";
           }
 
           return (
@@ -254,7 +254,7 @@ export const ASRWeeklyActivityChart = ({
           >
             <div className="font-bold flex items-center gap-1.5 leading-none mb-1">
               <span
-                className={theme === "dark" ? "text-blue-500" : "text-blue-500"}
+                className="text-blue-500"
               >
                 {hoverData.count} {hoverData.count === 1 ? unit : unitPlural}
               </span>

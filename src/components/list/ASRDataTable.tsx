@@ -293,7 +293,7 @@ export const ASRDataTable = React.memo(
  : "border-red-200 bg-red-50/50",
  )}
  >
- <div className={cn("w-14 h-14 rounded-full flex items-center justify-center mb-1", theme === "dark" ? "bg-red-500/10" : "bg-red-500/10")}>
+ <div className="w-14 h-14 rounded-full flex items-center justify-center mb-1 bg-red-500/10">
  <CloudOff size={24} className="text-red-500" />
  </div>
  <h3 className={cn("text-lg sm:text-xl font-black uppercase tracking-widest", theme === "dark" ? "text-red-400" : "text-red-600")}>

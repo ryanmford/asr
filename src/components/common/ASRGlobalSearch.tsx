@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useMemo } from "react";
 import { useDataStore } from "../../store/useDataStore";
 import { useAppNavigation } from "../../hooks/useDerivedData";
@@ -154,7 +155,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
           value={search}
           onChange={(e: any) => setSearch(e.target.value)}
           onKeyDown={handleSearchKeyDown}
-          placeholder="search players, courses, gyms, & teams..."
+          placeholder="search courses, players, etc..."
           theme={theme}
           className="w-full text-xs sm:text-sm"
       />

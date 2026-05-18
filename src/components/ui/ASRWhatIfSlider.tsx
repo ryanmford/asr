@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState, useEffect, useRef, useDeferredValue } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { Trophy, ArrowRight, X } from "lucide-react";

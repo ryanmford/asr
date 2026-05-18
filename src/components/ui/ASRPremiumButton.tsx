@@ -35,11 +35,6 @@ export const ASRPremiumButton = ({
  const Component = href && !disabled ? "a" : "button";
  const isSolid = variant === "solid";
 
- const [animDelay, animDuration] = React.useMemo(
- () => [`-${Math.random() * 8}s`, `${3 + Math.random() * 3}s`],
- [],
- );
-
  const getRadiusClass = () => {
  switch (radius) {
  case "none":

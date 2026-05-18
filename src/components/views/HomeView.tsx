@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState, useContext } from "react";
 import { useDataStore } from "../../store/useDataStore";
 import { useAppStore } from "../../store/useAppStore";
@@ -349,15 +350,12 @@ export const HomeView = React.memo(() => {
         <div className="relative z-10 flex flex-col items-center max-w-5xl space-y-4 sm:space-y-6 w-full mx-auto pb-4">
           <div className="w-full flex flex-col items-center justify-center">
             <h1 className={cn(
-              "font-black tracking-tighter leading-[1] uppercase flex flex-col items-center justify-center text-center w-full max-w-full overflow-visible",
+              "font-black tracking-tighter leading-[1] uppercase flex flex-row items-center justify-center text-center w-full max-w-full overflow-visible px-4",
               "italic transform -skew-x-6",
               theme === "dark" ? "text-white" : "text-zinc-900"
             )}>
-              <span className="block whitespace-nowrap text-[6vw] min-[400px]:text-[6.5vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-                FINDING THE FASTEST
-              </span>
-              <span className="block whitespace-nowrap text-[6vw] min-[400px]:text-[6.5vw] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mt-1 md:mt-3">
-                IN THE REAL WORLD <span className="inline-block transform skew-x-6 ml-1 md:ml-3 animate-pulse">🔥</span>
+              <span className="flex items-center whitespace-nowrap text-[5.5vw] sm:text-[4.5vw] md:text-[4.5vw] lg:text-[4vw] xl:text-[76px]">
+                FINDING THE FASTEST IRL <span className="inline-block transform skew-x-6 ml-2 md:ml-4 animate-pulse">🔥</span>
               </span>
             </h1>
           </div>
