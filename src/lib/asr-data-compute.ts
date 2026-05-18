@@ -137,10 +137,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
       continentFlag: contData.flag,
       mRecord: mRecs.length ? Math.min(...mRecs) : null,
       fRecord: fRecs.length ? Math.min(...fRecs) : null,
-      totalAthletes: new Set([
-        ...filteredM.map((a) => a[0]),
-        ...filteredF.map((a) => a[0]),
-      ]).size,
+      totalAthletes: filteredM.length + filteredF.length,
       totalRuns: (courseRunsHistory?.[normName] || []).length || (filteredM.length + filteredF.length),
       allTimeMRecord: mRecs.length ? Math.min(...mRecs) : null,
       allTimeFRecord: fRecs.length ? Math.min(...fRecs) : null,
@@ -148,10 +145,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
       allTimeAthletesF: athletesFAll,
       athletesMAll,
       athletesFAll,
-      totalAllTimeAthletes: new Set([
-        ...filteredM.map((a) => a[0]),
-        ...filteredF.map((a) => a[0]),
-      ]).size,
+      totalAllTimeAthletes: filteredM.length + filteredF.length,
       totalAllTimeRuns: (courseRunsHistory?.[normName] || []).length || (filteredM.length + filteredF.length),
       parsedCoords: coordsMatch
         ? [parseFloat(coordsMatch[1]), parseFloat(coordsMatch[2])]
@@ -179,13 +173,18 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   // KPI TRENDS (Sparklines)
-  const allRuns: Record<string, unknown>[] = [];
+  let allRuns: Record<string, unknown>[] = [];
   Object.values(courseRunsHistory || {}).forEach((runsArray) => {
-    allRuns.push(...(runsArray as Record<string, unknown>[]));
+    allRuns = allRuns.concat(runsArray as Record<string, unknown>[]);
   });
 
-  const undatedRuns = allRuns.filter(r => !r.date || isNaN(new Date(r.date as string).getTime()));
-  const datedRuns = allRuns.filter(r => r.date && !isNaN(new Date(r.date as string).getTime())).sort((a,b) => new Date(a.date as string).getTime() - new Date(b.date as string).getTime());
+  const parsedRuns = allRuns.map(r => ({
+    ...r,
+    timeMs: r.date ? new Date(r.date as string).getTime() : NaN
+  }));
+
+  const undatedRuns = parsedRuns.filter(r => isNaN(r.timeMs));
+  const datedRuns = parsedRuns.filter(r => !isNaN(r.timeMs)).sort((a,b) => a.timeMs - b.timeMs);
 
   const uniquePlayersAtStart = new Set(undatedRuns.map(r => r.pKey).filter(Boolean));
   const uniqueCoursesAtStart = new Set(undatedRuns.map(r => String(r.course).toUpperCase()).filter(Boolean));

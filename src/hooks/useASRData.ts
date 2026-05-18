@@ -101,6 +101,14 @@ export const useFetchASRData = () => {
 
         if (!hasTotalError) {
           try {
+            const oldCsvs = await localforage.getItem(RAW_CSV_KEY) as Record<string, unknown>;
+            if (oldCsvs && !isInitialFetch) {
+               if (oldCsvs.rM === rM && oldCsvs.rF === rF && oldCsvs.rLive === rLive && oldCsvs.rSet === rSet) {
+                  // No change in CSVs, bypass recomputation
+                  setFetchStatus({ isSyncing: false });
+                  return;
+               }
+            }
             await localforage.setItem(RAW_CSV_KEY, { rM, rF, rLive, rSet });
           } catch(e) {
             console.warn("Could not cache raw CSVs to localforage.", e);

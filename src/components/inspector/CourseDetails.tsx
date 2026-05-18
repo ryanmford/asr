@@ -216,20 +216,18 @@ export const CourseDetails = React.memo(
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
-    const recordsM = useMemo(() => {
-      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
-      const sourceM = source?.M[cName] || {};
-      const times = Object.values(sourceM) as number[];
+    const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined) => {
+      const source = sourceSector?.[cName] || {} as Record<string, unknown>;
+      const times = Object.values(source) as number[];
       const record = times.length > 0 ? Math.min(...times) : 0;
-      const sorted = Object.entries(sourceM)
+      const sorted = Object.entries(source)
         .map(([pKey, time]: [string, unknown]) => {
           const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
           return {
             pKey,
             time: num,
             pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: rawBest?.[pKey]?.[cName]?.videoUrl,
+            videoUrl: (rawBestSector?.[pKey] as Record<string, any>)?.[cName]?.videoUrl,
           };
         })
         .sort((a, b) => b.pts - a.pts);
@@ -243,89 +241,26 @@ export const CourseDetails = React.memo(
         }
         return { ...r, rank: currentRank };
       });
+    };
+
+    const recordsM = useMemo(() => {
+      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
+      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
+      return computeRecords(source?.M, rawBest);
     }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
 
     const recordsF = useMemo(() => {
       const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
       const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
-      const sourceF = source?.F[cName] || {};
-      const times = Object.values(sourceF) as number[];
-      const record = times.length > 0 ? Math.min(...times) : 0;
-      const sorted = Object.entries(sourceF)
-        .map(([pKey, time]: [string, unknown]) => {
-          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
-          return {
-            pKey,
-            time: num,
-            pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: rawBest?.[pKey]?.[cName]?.videoUrl,
-          };
-        })
-        .sort((a, b) => b.pts - a.pts);
-
-      let currentRank = 1;
-      let prevPts = -1;
-      return sorted.map((r, i) => {
-        if (r.pts !== prevPts) {
-          currentRank = i + 1;
-          prevPts = r.pts;
-        }
-        return { ...r, rank: currentRank };
-      });
+      return computeRecords(source?.F, rawBest);
     }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
 
     const atRecordsM = useMemo(() => {
-      const sourceM = lbAT_Courses?.M[cName] || {};
-      const times = Object.values(sourceM) as number[];
-      const record = times.length > 0 ? Math.min(...times) : 0;
-      const sorted = Object.entries(sourceM)
-        .map(([pKey, time]: [string, unknown]) => {
-          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
-          return {
-            pKey,
-            time: num,
-            pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: atRawBest?.[pKey]?.[cName]?.videoUrl,
-          };
-        })
-        .sort((a, b) => b.pts - a.pts);
-
-      let currentRank = 1;
-      let prevPts = -1;
-      return sorted.map((r, i) => {
-        if (r.pts !== prevPts) {
-          currentRank = i + 1;
-          prevPts = r.pts;
-        }
-        return { ...r, rank: currentRank };
-      });
+      return computeRecords(lbAT_Courses?.M, atRawBest);
     }, [lbAT_Courses, cName, atRawBest]);
 
     const atRecordsF = useMemo(() => {
-      const sourceF = lbAT_Courses?.F[cName] || {};
-      const times = Object.values(sourceF) as number[];
-      const record = times.length > 0 ? Math.min(...times) : 0;
-      const sorted = Object.entries(sourceF)
-        .map(([pKey, time]: [string, unknown]) => {
-          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
-          return {
-            pKey,
-            time: num,
-            pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: atRawBest?.[pKey]?.[cName]?.videoUrl,
-          };
-        })
-        .sort((a, b) => b.pts - a.pts);
-
-      let currentRank = 1;
-      let prevPts = -1;
-      return sorted.map((r, i) => {
-        if (r.pts !== prevPts) {
-          currentRank = i + 1;
-          prevPts = r.pts;
-        }
-        return { ...r, rank: currentRank };
-      });
+      return computeRecords(lbAT_Courses?.F, atRawBest);
     }, [lbAT_Courses, cName, atRawBest]);
 
     const stats = [

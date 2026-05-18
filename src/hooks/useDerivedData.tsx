@@ -221,11 +221,13 @@ const getInspectorDataForPath = (
     // Fast O(1) lookup
     let found = atMet?.[pKey];
     if (!found) {
-      found = Object.values(atMet || {}).find(
-        (a: PlayerProfile) =>
-          a.name?.toLowerCase() === pKey ||
-          a.pKey === pKey,
-      );
+      for (const k in atMet) {
+        const a = atMet[k];
+        if (a.name?.toLowerCase() === pKey || a.pKey === pKey) {
+          found = a;
+          break;
+        }
+      }
     }
     return {
       type: "player",
@@ -236,7 +238,14 @@ const getInspectorDataForPath = (
   }
   if (viewPrefix === "courses") {
     const cKey = entitySlug.toUpperCase();
-    const found = masterCourseList.find((c) => c.pKey === cKey || c.name?.toUpperCase() === cKey);
+    let found = undefined;
+    for (let i = 0; i < masterCourseList.length; i++) {
+      const c = masterCourseList[i];
+      if (c.pKey === cKey || c.name?.toUpperCase() === cKey) {
+        found = c;
+        break;
+      }
+    }
     return {
       type: "course",
       data: found || { name: entitySlug },
@@ -248,11 +257,13 @@ const getInspectorDataForPath = (
     const sKey = entitySlug.toLowerCase();
     let found = setterMet?.[sKey];
     if (!found) {
-      found = settersWithImpact.find(
-        (s: SetterProfile) =>
-          s.name?.toLowerCase() === sKey ||
-          s.pKey === sKey,
-      );
+      for (let i = 0; i < settersWithImpact.length; i++) {
+        const s = settersWithImpact[i];
+        if (s.name?.toLowerCase() === sKey || s.pKey === sKey) {
+          found = s;
+          break;
+        }
+      }
     }
     return {
       type: "setter",

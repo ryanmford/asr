@@ -8,7 +8,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/asr-utils";
 import { normalizeForSearch } from "../../lib/utils";
 
+import { useDebounce } from "../../hooks/useDataHooks";
+
 interface SearchResultPlayer {
+
   pKey?: string;
   name?: string;
   _gRank?: number;
@@ -43,9 +46,11 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
   const playerList_F_AT = useDataStore((s) => s.playerList_F_AT);
   const teamsAggregated = useDataStore((s) => s.teamsAggregated);
 
+  const debouncedSearch = useDebounce(search, 200);
+
   const searchResults = useMemo(() => {
-    if (search.length < 2) return null;
-    const q = normalizeForSearch(search);
+    if (debouncedSearch.length < 2) return null;
+    const q = normalizeForSearch(debouncedSearch);
     const searchTerms = q.split(/[\s,]+/).filter(Boolean);
     
     const players = [...playerList_M_AT, ...playerList_F_AT].filter(p => {
@@ -111,7 +116,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
       teams: isGeoSearch ? [] : matchedTeams, 
       locations 
     };
-  }, [search, playerList_M_AT, playerList_F_AT, masterCourseList, teamsAggregated]);
+  }, [debouncedSearch, playerList_M_AT, playerList_F_AT, masterCourseList, teamsAggregated]);
 
   const allSearchResults = useMemo(() => {
     if (!searchResults) return [];

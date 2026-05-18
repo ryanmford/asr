@@ -52,8 +52,13 @@ export function RouteScrollRestoration() {
       activeLoc = activeLoc.state.backgroundLocation;
     }
     const key = activeLoc.key;
+    let isThrottled = false;
     const handleScroll = () => {
-      sessionStorage.setItem(`scroll-${key}`, window.scrollY.toString());
+      if (!isThrottled) {
+        sessionStorage.setItem(`scroll-${key}`, window.scrollY.toString());
+        isThrottled = true;
+        setTimeout(() => { isThrottled = false; }, 200);
+      }
     };
     
     window.addEventListener("scroll", handleScroll, { passive: true });
