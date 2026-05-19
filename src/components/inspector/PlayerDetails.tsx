@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ASRWeeklyActivityChart } from "../ui/ASRWeeklyActivityChart";
+import { ASRWeeklyActivityChart } from "./ASRWeeklyActivityChart";
 import {
   Video,
   Calendar,
@@ -17,10 +17,10 @@ import {
   formatFlagsWithSpace,
   getSetterLevel,
 } from "../../lib/asr-utils";
-import { ASRStatCard } from "../ui/ASRStatCard";
-import { BioStat, BioRow } from "../ui/BioComponents";
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
-import { FallbackAvatar } from "../ui/FallbackAvatar";
+import { ASRStatCard } from "../common/ASRStatCard";
+import { BioStat, BioRow } from "./BioComponents";
+import { ASRNeonToggle } from "../common/ASRNeonToggle";
+import { FallbackAvatar } from "../common/FallbackAvatar";
 import {
   ProfileHeader,
   SupportLink,
@@ -28,13 +28,13 @@ import {
   InspectorTabContainer,
 } from "./InspectorComponents";
 import { TokenChip, TrophyStand, FlatCard } from "./VaultComponents";
-import { ASRPromotionBanner, PromoType } from "../ui/ASRPromotionBanner";
+import { ASRPromotionBanner, PromoType } from "../common/ASRPromotionBanner";
 import {
   InteractiveCard,
   InteractiveTrophy,
   InteractiveToken,
   InteractiveMedal,
-} from "../ui/InteractiveCollectibles";
+} from "./InteractiveCollectibles";
 import { ASRRankList } from "../list/ASRRankList";
 
 import { ASREmptyState } from "../common/ASREmptyState";

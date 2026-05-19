@@ -10,7 +10,7 @@ import {
  MathOverlay,
  PhysicsOverlay,
  DenseOverlay,
-} from "./VisualEffects";
+} from "../common/VisualEffects";
 
 interface CollectibleProps {
   player: any;

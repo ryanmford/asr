@@ -13,7 +13,7 @@ import {
 } from "../../lib/asr-utils";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRRankBadge } from "../ASRListItems";
-import { ASRPromotionBanner } from "../ui/ASRPromotionBanner";
+import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 
 interface ASRWallOfFameProps {
  onEntityClick: (type: string, data: any, options?: any) => void;

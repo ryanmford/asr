@@ -57,7 +57,7 @@ export const ASRPremiumButton = ({
  case "gold":
  return "text-amber-400";
  case "blue":
- return "text-zinc-700 dark:text-zinc-300";
+ return "text-blue-400";
  default:
  return "text-zinc-700 dark:text-zinc-300";
  }
@@ -66,7 +66,16 @@ export const ASRPremiumButton = ({
  const getLinearGradient = () => {
  if (disabled)
  return "linear-gradient(90deg, #d4d4d8, #a1a1aa, #71717a, #a1a1aa, #d4d4d8)";
+ switch (color) {
+ case "red":
+ return "linear-gradient(90deg, #7f1d1d, #ef4444, #fca5a5, #ef4444, #7f1d1d)";
+ case "blue":
+ return "linear-gradient(90deg, #1e3a8a, #3b82f6, #93c5fd, #3b82f6, #1e3a8a)";
+ case "gold":
+ return "linear-gradient(90deg, #78350f, #f59e0b, #fde68a, #f59e0b, #78350f)";
+ default:
  return "linear-gradient(90deg, #52525b, #a1a1aa, #f4f4f5, #a1a1aa, #52525b)";
+ }
  };
 
  const getSolidBorder = () => {
@@ -76,6 +85,8 @@ export const ASRPremiumButton = ({
  return "border-red-500/20";
  case "gold":
  return "border-amber-500/20";
+ case "blue":
+ return "border-blue-500/20";
  default:
  return "border-zinc-500/20";
  }
@@ -89,6 +100,8 @@ export const ASRPremiumButton = ({
  return "opacity-20 bg-red-500/10";
  case "gold":
  return "opacity-20 bg-amber-500/10";
+ case "blue":
+ return "opacity-20 bg-blue-500/10";
  default:
  return "opacity-20 bg-zinc-500/10";
  }
@@ -98,6 +111,8 @@ export const ASRPremiumButton = ({
  return "opacity-0 group-hover:opacity-10 bg-red-500/10 shadow-[inset_0_0_10px_rgba(239,68,68,0.2)]";
  case "gold":
  return "opacity-0 group-hover:opacity-10 bg-amber-500/10 shadow-[inset_0_0_10px_rgba(245,158,11,0.2)]";
+ case "blue":
+ return "opacity-0 group-hover:opacity-10 bg-blue-500/10 shadow-[inset_0_0_10px_rgba(59,130,246,0.2)]";
  default:
  return "opacity-0 group-hover:opacity-10 bg-zinc-500/10 shadow-[inset_0_0_10px_rgba(113,113,122,0.2)]";
  }

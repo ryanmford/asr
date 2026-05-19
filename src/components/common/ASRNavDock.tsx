@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { User, Users, MapPin, Trophy, Home } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "../../lib/asr-utils";
 import { useDataStore } from "../../store/useDataStore";
+import { useAppStore } from "../../store/useAppStore";
 
 interface ASRNavDockProps {
   currentView: string;
@@ -12,8 +13,10 @@ interface ASRNavDockProps {
 
 export const ASRNavDock = React.memo(
   ({ currentView, setView, theme }: ASRNavDockProps) => {
-    const [isCompact, setIsCompact] = useState(false);
-    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+    const isCompact = useAppStore(s => s.isNavCompact);
+    const setIsCompact = useAppStore(s => s.setIsNavCompact);
+    const isKeyboardOpen = useAppStore(s => s.isKeyboardOpen);
+    const setIsKeyboardOpen = useAppStore(s => s.setIsKeyboardOpen);
     const triggerRefresh = useDataStore((s) => s.triggerRefresh);
 
     useEffect(() => {

@@ -4,10 +4,10 @@ import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { Trophy, ArrowRight, X } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { PlayerProfile, ASRDataContext } from "../../types";
+import { dataWorker } from "../../hooks/useASRData";
 import { ASRSearchInput } from "../common/ASRSearchInput";
 import { 
   computeSimulatedPlacement, 
-  computeLiveLadderWindow, 
   computeOriginalRanks, 
   computeSimulatedGlobalImpact 
 } from "../../lib/asr-data-compute";
@@ -98,10 +98,29 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
       return computeSimulatedPlacement(deferredTargetTime, records);
   }, [deferredTargetTime, records]);
 
-  const liveLadderWindow = useMemo(() => {
+  const [liveLadderWindow, setLiveLadderWindow] = useState<any[]>([]);
+
+  useEffect(() => {
       const myKey = selectedAthlete ? selectedAthlete.pKey : "SIMULATED_USER";
       const myName = selectedAthlete ? selectedAthlete.name : "YOU";
-      return computeLiveLadderWindow(records, myKey, myName, deferredTargetTime, simulatedPts, athletePool);
+      
+      const reqId = Date.now() + Math.random().toString();
+      const handleMessage = (e: MessageEvent) => {
+          if (e.data.type === 'LIVE_LADDER_READY' && e.data.payload.requestId === reqId) {
+              setLiveLadderWindow(e.data.payload.result);
+              dataWorker?.removeEventListener('message', handleMessage);
+          }
+      };
+      
+      dataWorker?.addEventListener('message', handleMessage);
+      dataWorker?.postMessage({
+          type: 'COMPUTE_LIVE_LADDER',
+          payload: { requestId: reqId, records, myKey, myName, deferredTargetTime, simulatedPts, athletePool }
+      });
+      
+      return () => {
+          dataWorker?.removeEventListener('message', handleMessage);
+      };
   }, [records, selectedAthlete, deferredTargetTime, simulatedPts, athletePool]);
 
   const [popEffect, setPopEffect] = useState<"cr" | "pr" | null>(null);

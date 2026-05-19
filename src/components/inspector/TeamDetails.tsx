@@ -1,18 +1,18 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { cn, formatLocation, formatFlagsWithSpace } from "../../lib/asr-utils";
-import { ASRStatCard } from "../ui/ASRStatCard";
-import { BioStat } from "../ui/BioComponents";
-import { FallbackAvatar } from "../ui/FallbackAvatar";
+import { ASRStatCard } from "../common/ASRStatCard";
+import { BioStat } from "./BioComponents";
+import { FallbackAvatar } from "../common/FallbackAvatar";
 import {
   ProfileHeader,
   InspectorTabContainer,
   SectionTitle,
 } from "./InspectorComponents";
 import { ASRRankList } from "../list/ASRRankList";
-import { ASRPromotionBanner, PromoType } from "../ui/ASRPromotionBanner";
+import { ASRPromotionBanner, PromoType } from "../common/ASRPromotionBanner";
 
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
+import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { TokenChip } from "./VaultComponents";
 
 import { TeamProfile, ASRDataContext } from "../../types";

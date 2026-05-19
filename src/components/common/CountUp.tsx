@@ -5,10 +5,11 @@ import { cn } from "../../lib/asr-utils";
 interface CountUpProps {
   end: number;
   duration?: number;
+  decimals?: number;
 }
 
 export const CountUp = React.memo(
-  ({ end, duration = 2000 }: CountUpProps) => {
+  ({ end, duration = 2000, decimals = 0 }: CountUpProps) => {
     const nodeRef = useRef<HTMLSpanElement>(null);
     const [hasTriggered, setHasTriggered] = useState(false);
 
@@ -41,18 +42,29 @@ export const CountUp = React.memo(
 
       const step = (timestamp: number) => {
         if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const currentCount = Math.floor(progress * end);
+        // Ease out quadratic
+        const p = Math.min((timestamp - startTimestamp) / duration, 1);
+        const progress = p * (2 - p);
+        
+        const currentCount = progress * end;
 
         if (nodeRef.current) {
-          nodeRef.current.textContent = currentCount.toLocaleString();
+          if (decimals > 0) {
+            nodeRef.current.textContent = currentCount.toFixed(decimals);
+          } else {
+            nodeRef.current.textContent = Math.floor(currentCount).toLocaleString();
+          }
         }
 
-        if (progress < 1) {
+        if (progress < 1 && p < 1) {
           animationFrame = window.requestAnimationFrame(step);
         } else if (nodeRef.current) {
           // Guarantee final value
-          nodeRef.current.textContent = end.toLocaleString();
+          if (decimals > 0) {
+            nodeRef.current.textContent = end.toFixed(decimals);
+          } else {
+            nodeRef.current.textContent = end.toLocaleString();
+          }
         }
       };
 
@@ -68,7 +80,7 @@ export const CountUp = React.memo(
           "text-current",
         )}
       >
-        0
+        {decimals > 0 ? (0).toFixed(decimals) : "0"}
       </span>
     );
   },

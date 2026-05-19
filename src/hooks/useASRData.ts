@@ -5,7 +5,7 @@ import { trackEvent } from "../lib/asr-utils";
 import { useDataStore } from "../store/useDataStore";
 import { fetchGoogleSheetCSV } from "../lib/asr-data";
 
-let dataWorker: Worker | null = null;
+export let dataWorker: Worker | null = null;
 if (typeof Worker !== "undefined") {
   dataWorker = new Worker(new URL("../workers/dataWorker", import.meta.url), {
     type: "module",

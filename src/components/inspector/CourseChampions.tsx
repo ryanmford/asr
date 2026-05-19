@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { cn, fixCountryEntity, formatFlagsWithSpace, THEME } from "../../lib/asr-utils";
 import { Trophy, Clock } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
+import { ASRLQGauge } from "../common/ASRLQGauge";
 
 interface ChampionsProps {
  runs: any[];
@@ -180,9 +181,15 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  ) : null}
  </span>
  </div>
+ <div className="flex items-center gap-3 shrink-0">
+ <ASRLQGauge
+ lq={i === 0 ? 100 : (champs[0].time / champ.time) * 100}
+ theme={theme}
+ size={44}
+ />
  <div
  className={cn(
- "font-black text-lg tabular-nums tracking-tighter shrink-0",
+ "font-black text-lg tabular-nums tracking-tighter w-12 text-right",
  i === 0
  ? "text-amber-500"
  : theme === "dark"
@@ -191,6 +198,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  )}
  >
  {champ.time.toFixed(2)}
+ </div>
  </div>
  </div>
  </button>

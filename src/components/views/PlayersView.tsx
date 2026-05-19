@@ -1,5 +1,5 @@
 import React from "react";
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
+import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { AnimatedListView } from "../common/AnimatedListView";
 import { PlayerProfile } from "../../types";
 import { useDataStore } from "../../store/useDataStore";

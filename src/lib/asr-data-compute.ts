@@ -82,7 +82,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   const { 
-      cMet, lbAT, atRawBest, dnMap, 
+      cMet, lbAT, lbOpen, atRawBest, opRawBest, dnMap, 
       data, 
       settersData, atMet, 
       openData, atPerfs,
@@ -489,6 +489,46 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const cListOP = masterCourseList.filter((c: CourseData) => c.is2026).sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
   const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
 
+  const courseRecords_M_AT: Record<string, any> = {};
+  const courseRecords_F_AT: Record<string, any> = {};
+  const courseRecords_M_OP: Record<string, any> = {};
+  const courseRecords_F_OP: Record<string, any> = {};
+
+  const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined, cName: string) => {
+    const source = (sourceSector?.[cName] || {}) as Record<string, unknown>;
+    const times = Object.values(source) as number[];
+    const record = times.length > 0 ? Math.min(...times) : 0;
+    const sorted = Object.entries(source)
+      .map(([pKey, time]: [string, unknown]) => {
+        const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
+        return {
+          pKey,
+          time: num,
+          pts: num > 0 ? (record / num) * 100 : 0,
+          videoUrl: (rawBestSector?.[pKey] as Record<string, Record<string, { videoUrl?: string }>>)?.[cName]?.videoUrl,
+        };
+      })
+      .sort((a, b) => b.pts - a.pts);
+
+    let currentRank = 1;
+    let prevPts = -1;
+    return sorted.map((r, i) => {
+      if (r.pts !== prevPts) {
+        currentRank = i + 1;
+        prevPts = r.pts;
+      }
+      return { ...r, rank: currentRank };
+    });
+  };
+
+  masterCourseList.forEach((c) => {
+    const name = c.name;
+    courseRecords_M_AT[name] = computeRecords(lbAT?.M, atRawBest, name);
+    courseRecords_F_AT[name] = computeRecords(lbAT?.F, atRawBest, name);
+    courseRecords_M_OP[name] = computeRecords(lbOpen?.M, opRawBest, name);
+    courseRecords_F_OP[name] = computeRecords(lbOpen?.F, opRawBest, name);
+  });
+
   return {
     ...nextState,
     masterCourseList, 
@@ -513,6 +553,11 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     teamList_teams_AT: computeTeamList("teams", true),
     teamList_gyms_OP: computeTeamList("gyms", false),
     teamList_teams_OP: computeTeamList("teams", false),
+    
+    courseRecords_M_AT,
+    courseRecords_F_AT,
+    courseRecords_M_OP,
+    courseRecords_F_OP,
   };
 }
 

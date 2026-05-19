@@ -1,8 +1,8 @@
 import React from "react";
 import { Building2, ArrowUpRight, ArrowRight } from "lucide-react";
 import { cn, trackEvent } from "../../lib/asr-utils";
-import { ASRPremiumButton } from "../ui/ASRPremiumButton";
-import { FittingHeader } from "../ui/FittingHeader";
+import { ASRPremiumButton } from "../common/ASRPremiumButton";
+import { FittingHeader } from "../common/FittingHeader";
 
 interface ProfileHeaderProps {
   avatar: React.ReactNode;

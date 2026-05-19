@@ -15,7 +15,7 @@ import {
 import { ThemeContext } from "../../theme-context";
 import { CONFIG, trackEvent, cn } from "../../lib/asr-utils";
 
-import { ASRPremiumButton } from "../ui/ASRPremiumButton";
+import { ASRPremiumButton } from "./ASRPremiumButton";
 
 interface ASROnboardingProps {
   isOpen: boolean;

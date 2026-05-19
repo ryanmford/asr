@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { RotatingLogo } from "./RotatingLogo";
 
-import { ASRPremiumButton } from "../ui/ASRPremiumButton";
+import { ASRPremiumButton } from "./ASRPremiumButton";
 
 interface ASRIntroOverlayProps {
   theme: "light" | "dark";

@@ -27,18 +27,18 @@ import {
   SectionTitle,
   InspectorTabContainer,
 } from "./InspectorComponents";
-import { FallbackAvatar } from "../ui/FallbackAvatar";
-import { ASRPromotionBanner } from "../ui/ASRPromotionBanner";
+import { FallbackAvatar } from "../common/FallbackAvatar";
+import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 import { ASRRankList } from "../list/ASRRankList";
-import { ASRPremiumButton } from "../ui/ASRPremiumButton";
-import { CourseChampions } from "../ui/CourseChampions";
-import { ASRStatCard } from "../ui/ASRStatCard";
-import { ASRWeeklyActivityChart } from "../ui/ASRWeeklyActivityChart";
-import { ASRTimeSimulator } from "../ui/ASRTimeSimulator";
+import { ASRPremiumButton } from "../common/ASRPremiumButton";
+import { CourseChampions } from "./CourseChampions";
+import { ASRStatCard } from "../common/ASRStatCard";
+import { ASRWeeklyActivityChart } from "./ASRWeeklyActivityChart";
+import { ASRTimeSimulator } from "./ASRTimeSimulator";
 
 import { motion } from "motion/react";
 
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
+import { ASRNeonToggle } from "../common/ASRNeonToggle";
 
 import { CourseData, ASRDataContext } from "../../types";
 
@@ -216,52 +216,16 @@ export const CourseDetails = React.memo(
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
-    const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined) => {
-      const source = sourceSector?.[cName] || {} as Record<string, unknown>;
-      const times = Object.values(source) as number[];
-      const record = times.length > 0 ? Math.min(...times) : 0;
-      const sorted = Object.entries(source)
-        .map(([pKey, time]: [string, unknown]) => {
-          const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
-          return {
-            pKey,
-            time: num,
-            pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: (rawBestSector?.[pKey] as Record<string, Record<string, { videoUrl?: string }>>)?.[cName]?.videoUrl,
-          };
-        })
-        .sort((a, b) => b.pts - a.pts);
+    const recordsM = contentMode === "all-time" 
+      ? (dataContext.courseRecords_M_AT?.[cName] || [])
+      : (dataContext.courseRecords_M_OP?.[cName] || []);
 
-      let currentRank = 1;
-      let prevPts = -1;
-      return sorted.map((r, i) => {
-        if (r.pts !== prevPts) {
-          currentRank = i + 1;
-          prevPts = r.pts;
-        }
-        return { ...r, rank: currentRank };
-      });
-    };
+    const recordsF = contentMode === "all-time" 
+      ? (dataContext.courseRecords_F_AT?.[cName] || [])
+      : (dataContext.courseRecords_F_OP?.[cName] || []);
 
-    const recordsM = useMemo(() => {
-      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
-      return computeRecords(source?.M, rawBest);
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
-
-    const recordsF = useMemo(() => {
-      const source = contentMode === "all-time" ? lbAT_Courses : lbOP_Courses;
-      const rawBest = contentMode === "all-time" ? atRawBest : opRawBest;
-      return computeRecords(source?.F, rawBest);
-    }, [lbAT_Courses, lbOP_Courses, cName, atRawBest, opRawBest, contentMode]);
-
-    const atRecordsM = useMemo(() => {
-      return computeRecords(lbAT_Courses?.M, atRawBest);
-    }, [lbAT_Courses, cName, atRawBest]);
-
-    const atRecordsF = useMemo(() => {
-      return computeRecords(lbAT_Courses?.F, atRawBest);
-    }, [lbAT_Courses, cName, atRawBest]);
+    const atRecordsM = dataContext.courseRecords_M_AT?.[cName] || [];
+    const atRecordsF = dataContext.courseRecords_F_AT?.[cName] || [];
 
     const stats = [
       {

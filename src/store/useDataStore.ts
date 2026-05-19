@@ -28,6 +28,10 @@ interface ASRDataState {
   playerLB_OP: { M: PlayerProfile[]; F: PlayerProfile[] };
 
   // Pre-computed lists
+  courseRecords_M_AT: Record<string, any>;
+  courseRecords_F_AT: Record<string, any>;
+  courseRecords_M_OP: Record<string, any>;
+  courseRecords_F_OP: Record<string, any>;
   playerList_M_AT: PlayerProfile[];
   playerList_F_AT: PlayerProfile[];
   playerList_M_OP: PlayerProfile[];
@@ -103,6 +107,11 @@ export const useDataStore = create<ASRDataState>((set) => {
     teamsAggregated: [],
     playerLB_AT: { M: {}, F: {} },
     playerLB_OP: { M: {}, F: {} },
+
+    courseRecords_M_AT: {},
+    courseRecords_F_AT: {},
+    courseRecords_M_OP: {},
+    courseRecords_F_OP: {},
 
     playerList_M_AT: [],
     playerList_F_AT: [],

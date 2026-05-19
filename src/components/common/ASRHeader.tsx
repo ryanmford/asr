@@ -3,7 +3,7 @@
 import React from "react";
 import { Moon, Sun, CloudOff, RefreshCw } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
+import { ASRNeonToggle } from "./ASRNeonToggle";
 import { useDataStore } from "../../store/useDataStore";
 
 interface ASRHeaderProps {

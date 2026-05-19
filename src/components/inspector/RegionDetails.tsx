@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { cn, formatLocation, normalizeName } from "../../lib/asr-utils";
-import { ASRStatCard } from "../ui/ASRStatCard";
-import { FallbackAvatar } from "../ui/FallbackAvatar";
+import { ASRStatCard } from "../common/ASRStatCard";
+import { FallbackAvatar } from "../common/FallbackAvatar";
 import { ProfileHeader, InspectorTabContainer } from "./InspectorComponents";
 import { ASRRankList } from "../list/ASRRankList";
 
-import { ASRNeonToggle } from "../ui/ASRNeonToggle";
+import { ASRNeonToggle } from "../common/ASRNeonToggle";
 
 import { ASRDataContext, PlayerProfile } from "../../types";
 

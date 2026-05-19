@@ -13,6 +13,26 @@ export interface AppState {
   setShowOnboarding: (show: boolean) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
+
+  // Global UI Toggles & States
+  isNavCompact: boolean;
+  setIsNavCompact: (val: boolean) => void;
+  isKeyboardOpen: boolean;
+  setIsKeyboardOpen: (val: boolean) => void;
+  isMapLocating: boolean;
+  setIsMapLocating: (val: boolean) => void;
+  isMapReady: boolean;
+  setIsMapReady: (val: boolean) => void;
+  
+  // HomeView Caching & State
+  homeVisibleRuns: number;
+  setHomeVisibleRuns: (val: number) => void;
+  homeVisibleSets: number;
+  setHomeVisibleSets: (val: number) => void;
+  homeCarouselIndex: number;
+  setHomeCarouselIndex: (val: number) => void;
+  homeAutoPlayTimer: number;
+  setHomeAutoPlayTimer: (val: number) => void;
 }
 
 const getInitialGen = () => {
@@ -51,4 +71,22 @@ export const useAppStore = create<AppState>((set) => ({
   setShowOnboarding: (showOnboarding) => set({ showOnboarding }),
   activeCourseId: null,
   setActiveCourseId: (activeCourseId) => set({ activeCourseId }),
+
+  isNavCompact: false,
+  setIsNavCompact: (isNavCompact) => set({ isNavCompact }),
+  isKeyboardOpen: false,
+  setIsKeyboardOpen: (isKeyboardOpen) => set({ isKeyboardOpen }),
+  isMapLocating: false,
+  setIsMapLocating: (isMapLocating) => set({ isMapLocating }),
+  isMapReady: false,
+  setIsMapReady: (isMapReady) => set({ isMapReady }),
+  
+  homeVisibleRuns: 10,
+  setHomeVisibleRuns: (homeVisibleRuns) => set({ homeVisibleRuns }),
+  homeVisibleSets: 10,
+  setHomeVisibleSets: (homeVisibleSets) => set({ homeVisibleSets }),
+  homeCarouselIndex: 0,
+  setHomeCarouselIndex: (homeCarouselIndex) => set({ homeCarouselIndex }),
+  homeAutoPlayTimer: 0,
+  setHomeAutoPlayTimer: (homeAutoPlayTimer) => set({ homeAutoPlayTimer }),
 }));

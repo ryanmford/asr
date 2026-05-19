@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo, useState, useContext } from "react";
+import React, { useMemo, useContext } from "react";
 import { useDataStore } from "../../store/useDataStore";
 import { useAppStore } from "../../store/useAppStore";
 import {
@@ -36,9 +36,11 @@ export const HomeView = React.memo(() => {
   const isLoading = useDataStore((s) => s.isLoading);
   const setShowOnboarding = useAppStore((s) => s.setShowOnboarding);
   const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
+  const homeVisibleRuns = useAppStore((s) => s.homeVisibleRuns);
+  const setHomeVisibleRuns = useAppStore((s) => s.setHomeVisibleRuns);
+  const homeVisibleSets = useAppStore((s) => s.homeVisibleSets);
+  const setHomeVisibleSets = useAppStore((s) => s.setHomeVisibleSets);
   const { navigateToEntity } = useAppNavigation();
-  const [visibleRuns, setVisibleRuns] = useState(10);
-  const [visibleSets, setVisibleSets] = useState(10);
 
   const courseList_AT = useDataStore((s) => s.courseList_AT);
   const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
@@ -136,8 +138,10 @@ export const HomeView = React.memo(() => {
     return { topPlayer: pOfDay, topCourse: cOfDay, dailyRecord: rOfDay };
   }, [playerList_M_AT, playerList_F_AT, courseList_AT]);
 
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const [autoPlayTimer, setAutoPlayTimer] = useState(0);
+  const carouselIndex = useAppStore((s) => s.homeCarouselIndex);
+  const setCarouselIndex = useAppStore((s) => s.setHomeCarouselIndex);
+  const autoPlayTimer = useAppStore((s) => s.homeAutoPlayTimer);
+  const setAutoPlayTimer = useAppStore((s) => s.setHomeAutoPlayTimer);
 
   const featureList = useMemo(() => {
     const list = [];
@@ -895,7 +899,7 @@ export const HomeView = React.memo(() => {
                 : (() => {
                     let currentMonth = "";
                     return recentSets
-                      .slice(0, visibleSets)
+                      .slice(0, homeVisibleSets)
                       .map(
                         (
                           item: any,
@@ -1000,12 +1004,12 @@ export const HomeView = React.memo(() => {
                   })()}
             </div>
 
-            {!isLoading && recentSets && recentSets.length > visibleSets && (
+            {!isLoading && recentSets && recentSets.length > homeVisibleSets && (
               <div className="flex justify-center mt-8">
                 <button
                   className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
-                    setVisibleSets((prev) =>
+                    setHomeVisibleSets((prev) =>
                       Math.min(prev + 10, 100, recentSets.length),
                     )
                   }
@@ -1054,7 +1058,7 @@ export const HomeView = React.memo(() => {
                 : (() => {
                     let currentMonth = "";
                     return recentFeed
-                      .slice(0, visibleRuns)
+                      .slice(0, homeVisibleRuns)
                       .map(
                         (
                           item: { label: string; value: string | number },
@@ -1249,12 +1253,12 @@ export const HomeView = React.memo(() => {
                   })()}
             </div>
 
-            {!isLoading && recentFeed && recentFeed.length > visibleRuns && (
+            {!isLoading && recentFeed && recentFeed.length > homeVisibleRuns && (
               <div className="flex justify-center mt-8">
                 <button
                   className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 active:text-blue-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
-                    setVisibleRuns((prev) =>
+                    setHomeVisibleRuns((prev) =>
                       Math.min(prev + 10, 100, recentFeed.length),
                     )
                   }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect, useRef, useContext, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useRef, useContext, forwardRef, useImperativeHandle } from "react";
 import { Navigation, Plus, Minus } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -28,6 +28,10 @@ export const ASRMap = forwardRef(({
   const isDark = theme === "dark";
 
   const activeCourseId = useAppStore(s => s.activeCourseId);
+  const isLocating = useAppStore(s => s.isMapLocating);
+  const setIsLocating = useAppStore(s => s.setIsMapLocating);
+  const mapReady = useAppStore(s => s.isMapReady);
+  const setMapReady = useAppStore(s => s.setIsMapReady);
   
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -35,9 +39,6 @@ export const ASRMap = forwardRef(({
   const tileLayersRef = useRef<{ light?: L.TileLayer; dark?: L.TileLayer }>({});
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const userMarkerRef = useRef<L.Marker | null>(null);
-
-  const [isLocating, setIsLocating] = useState(false);
-  const [mapReady, setMapReady] = useState(false);
 
   const fitMapToCourses = React.useCallback(() => {
     if (!mapReady || !mapRef.current || !courses) return;
