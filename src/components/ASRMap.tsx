@@ -167,12 +167,12 @@ export const ASRMap = forwardRef(({
 
     const getClusterIcon = (cluster: any) => {
       const count = cluster.getChildCount();
-      let gradientStyle = "linear-gradient(90deg, #3b82f6, #ec4899, #8b5cf6, #3b82f6)";
+      let gradientStyle = "linear-gradient(90deg, #52525b, #a1a1aa, #f4f4f5, #a1a1aa, #52525b)";
       if (count > 50) {
-        gradientStyle = "linear-gradient(90deg, #8b5cf6, #d946ef, #f43f5e, #8b5cf6)";
+        gradientStyle = "linear-gradient(90deg, #52525b, #a1a1aa, #f4f4f5, #a1a1aa, #52525b)";
       }
       if (count > 150) {
-        gradientStyle = "linear-gradient(90deg, #ef4444, #f43f5e, #e11d48, #ef4444)";
+        gradientStyle = "linear-gradient(90deg, #52525b, #a1a1aa, #f4f4f5, #a1a1aa, #52525b)";
       }
 
       const currentIsDark = isDarkRef.current;

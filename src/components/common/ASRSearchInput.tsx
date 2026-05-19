@@ -64,7 +64,10 @@ export const ASRSearchInput = React.memo(
             />
           </div>
 
-          <div className="absolute left-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-blue-500 transition-all z-30 pointer-events-none">
+          <div className={cn(
+            "absolute left-5 opacity-40 group-focus-within:opacity-100 transition-all z-30 pointer-events-none",
+            theme === "dark" ? "group-focus-within:text-white" : "group-focus-within:text-zinc-900"
+          )}>
             <Search size={16} strokeWidth={3} />
           </div>
           <style>{`
@@ -112,7 +115,7 @@ export const ASRSearchInput = React.memo(
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => onChange({ target: { value: "" } } as any)}
                   className={cn(
-                    "w-8 h-8 mr-1 flex flex-shrink-0 items-center justify-center rounded-full opacity-40 hover:opacity-80 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95",
+                    "w-8 h-8 mr-1 flex flex-shrink-0 items-center justify-center rounded-full opacity-40 hover:opacity-80 transition-all outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 active:scale-95",
                     theme === "dark" ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5",
                   )}
                 >

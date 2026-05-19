@@ -179,7 +179,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                  {searchResults.locations.slice(0, 50).map((l, i) => {
                    const isFocused = searchFocusedIndex === i;
                    return (
-                     <button key={l.name || i} onClick={() => { navigateToEntity("location", l); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                     <button key={l.name || i} onClick={() => { navigateToEntity("location", l); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-zinc-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                         <span className="text-base">{l.flag}</span>
                         <div className="flex flex-1 items-center gap-2 overflow-hidden">
                           <span className="font-bold text-sm truncate">{l.name}</span>
@@ -202,7 +202,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                  {searchResults.courses.slice(0, 50).map((c, i) => {
                    const isFocused = searchFocusedIndex === i + searchResults.locations.slice(0, 50).length;
                    return (
-                     <button key={c.name} onClick={() => { navigateToEntity("course", c); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                     <button key={c.name} onClick={() => { navigateToEntity("course", c); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-zinc-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                         <MapPin className="w-4 h-4 opacity-50 flex-shrink-0" />
                         <span className="font-bold flex-1 text-sm truncate">{c.name}</span>
                         <ChevronRight className="w-4 h-4 opacity-30 ml-auto flex-shrink-0" />
@@ -218,7 +218,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                  {searchResults.gyms.slice(0, 50).map((g: SearchResultTeam, i) => {
                    const isFocused = searchFocusedIndex === i + searchResults.locations.slice(0, 50).length + searchResults.courses.slice(0, 50).length;
                    return (
-                     <button key={g.name || i} onClick={() => { navigateToEntity("team", g); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                     <button key={g.name || i} onClick={() => { navigateToEntity("team", g); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-zinc-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                         <Users className="w-4 h-4 opacity-50 flex-shrink-0" />
                         <span className="font-bold flex-1 text-sm truncate">{g.name}</span>
                         <ChevronRight className="w-4 h-4 opacity-30 ml-auto flex-shrink-0" />
@@ -234,7 +234,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                  {searchResults.players.slice(0, 50).map((p, i) => {
                    const isFocused = searchFocusedIndex === i + searchResults.locations.slice(0, 50).length + searchResults.courses.slice(0, 50).length + searchResults.gyms.slice(0, 50).length;
                    return (
-                     <button key={(p as SearchResultPlayer).pKey || p.name || i} onClick={() => { navigateToEntity("player", p); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                     <button key={(p as SearchResultPlayer).pKey || p.name || i} onClick={() => { navigateToEntity("player", p); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-zinc-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                         <User className="w-4 h-4 opacity-50 flex-shrink-0" />
                         <span className="font-bold flex-1 text-sm truncate">{p.name}</span>
                         <ChevronRight className="w-4 h-4 opacity-30 ml-auto flex-shrink-0" />
@@ -250,7 +250,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                  {searchResults.teams.slice(0, 50).map((t: SearchResultTeam, i) => {
                    const isFocused = searchFocusedIndex === i + searchResults.locations.slice(0, 50).length + searchResults.courses.slice(0, 50).length + searchResults.gyms.slice(0, 50).length + searchResults.players.slice(0, 50).length;
                    return (
-                     <button key={t.name || i} onClick={() => { navigateToEntity("team", t); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-blue-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
+                     <button key={t.name || i} onClick={() => { navigateToEntity("team", t); clearSearch(); }} onTouchStart={() => {}} className={cn("w-full flex items-center gap-3 px-3 py-2 text-left rounded-xl transition-all active:scale-[0.98]", isFocused ? "bg-black/10 dark:bg-white/10 ring-1 ring-zinc-500" : "hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10")}>
                         <Users className="w-4 h-4 opacity-50 flex-shrink-0" />
                         <span className="font-bold flex-1 text-sm truncate">{t.name}</span>
                         <ChevronRight className="w-4 h-4 opacity-30 ml-auto flex-shrink-0" />

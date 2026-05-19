@@ -208,7 +208,7 @@ export const ASRWallOfFame = React.memo(
  <div className="flex items-center justify-end gap-2 shrink-0 text-right z-10 relative">
  <span
  className={cn(
- "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-blue-500",
+ "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-zinc-500",
  theme === "dark" ? "text-white" : "text-zinc-900",
  isTop3 ? "scale-110" : "opacity-100",
  i === 0 && ""
@@ -219,8 +219,8 @@ export const ASRWallOfFame = React.memo(
  </div>
  {isTop3 && i === 0 && (
  <>
-   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rotate-45 translate-x-16 -translate-y-16 pointer-events-none blur-xl" />
-   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+   <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-500/10 rotate-45 translate-x-16 -translate-y-16 pointer-events-none blur-xl" />
+   <div className="absolute inset-0 bg-gradient-to-r from-zinc-500/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
  </>
  )}
  </button>

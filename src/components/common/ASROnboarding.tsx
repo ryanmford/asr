@@ -169,7 +169,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-0 left-0 w-96 h-96 bg-zinc-500/10 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
 
             <button
               onClick={step > 0 ? prevStep : onClose}
@@ -244,7 +244,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
                     className={cn(
                       "h-2.5 rounded-full transition-all duration-500",
                       i === step
-                        ? "w-14 bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                        ? "w-14 bg-zinc-300 dark:bg-zinc-500 shadow-[0_0_20px_rgba(113,113,122,0.5)]"
                         : "w-4 bg-current opacity-20",
                     )}
                   />

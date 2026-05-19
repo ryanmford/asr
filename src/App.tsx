@@ -170,8 +170,8 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
         className={cn(
           "fixed inset-0 pointer-events-none transition-opacity duration-1000",
           theme === "dark"
-            ? "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.1),rgba(255,255,255,0))] opacity-100"
-            : "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.15),rgba(0,0,0,0))] opacity-100",
+            ? "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(161,161,170,0.1),rgba(255,255,255,0))] opacity-100" // zinc-400
+            : "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(161,161,170,0.15),rgba(0,0,0,0))] opacity-100",
         )}
       />
       

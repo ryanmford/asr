@@ -37,7 +37,7 @@ export const HomeView = React.memo(() => {
   const setShowOnboarding = useAppStore((s) => s.setShowOnboarding);
   const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
   const { navigateToEntity } = useAppNavigation();
-  const [visibleRuns, setVisibleRuns] = useState(20);
+  const [visibleRuns, setVisibleRuns] = useState(10);
   const [visibleSets, setVisibleSets] = useState(10);
 
   const courseList_AT = useDataStore((s) => s.courseList_AT);
@@ -385,70 +385,47 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden px-4 py-6 sm:py-8 lg:py-12 flex flex-col items-center justify-center gap-2 sm:gap-4 w-full text-center shrink-0 border transition-all duration-500",
-          theme === "dark" ? "bg-[#0A0A0A] border-white/5 shadow-2xl" : "bg-white border-black/5 shadow-xl",
+          "relative min-h-[60vh] sm:min-h-[70vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col items-center justify-center overflow-hidden transition-all duration-500 group",
+          theme === "dark" ? "bg-[#0A0A0A]" : "bg-black",
         )}
       >
-        <div
-          className={cn(
-            "absolute inset-0 pointer-events-none",
-            theme === "dark"
-              ? "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950 to-zinc-950"
-              : "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-white",
-          )}
-        ></div>
+        {/* Full Background Video */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <video 
+            src="/ben-tivoli.mp4"
+            autoPlay 
+            playsInline 
+            muted 
+            loop 
+            className="w-full h-full object-cover opacity-80"
+          />
+          {/* monochromatic minimal overlays for elegant tone */}
+          <div className="absolute inset-0 bg-black/40 pointer-events-none transition-colors duration-700"></div>
+          {/* subtle vignette */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none"></div>
+        </div>
 
-        {/* Animated Mesh / Orbs */}
-        <div
-          className={cn(
-            "absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_8s_ease-in-out_infinite] pointer-events-none",
-            theme === "dark"
-              ? "bg-blue-600/30 mix-blend-screen"
-              : "bg-blue-500/20 mix-blend-multiply",
-          )}
-        ></div>
-        <div
-          className={cn(
-            "absolute bottom-0 left-1/4 w-72 sm:w-96 h-72 sm:h-96 blur-[100px] rounded-full animate-[pulse_12s_ease-in-out_infinite] pointer-events-none",
-            theme === "dark"
-              ? "bg-indigo-600/30 mix-blend-screen"
-              : "bg-indigo-400/20 mix-blend-multiply",
-          )}
-          style={{ animationDelay: "2s" }}
-        ></div>
-        <div
-          className={cn(
-            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none animate-[spin_120s_linear_infinite]",
-            theme === "dark"
-              ? "mix-blend-overlay"
-              : "opacity-[0.03] mix-blend-darken",
-          )}
-        ></div>
-
-        <div className="relative z-10 flex flex-col items-center max-w-5xl space-y-4 sm:space-y-6 w-full mx-auto pb-4">
-          <div className="w-full flex flex-col items-center justify-center">
-            <h1 className={cn(
-              "font-black tracking-tighter leading-[1] uppercase flex flex-row items-center justify-center text-center w-full max-w-full overflow-visible px-4",
-              "italic transform -skew-x-6",
-              theme === "dark" ? "text-white" : "text-zinc-900"
-            )}>
-              <span className="flex items-center whitespace-nowrap text-[5.5vw] sm:text-[4.5vw] md:text-[4.5vw] lg:text-[4vw] xl:text-[76px]">
-                FINDING THE FASTEST IRL <span className="inline-block transform skew-x-6 ml-2 md:ml-4 animate-pulse">🔥</span>
-              </span>
-            </h1>
-          </div>
-          <div className="flex w-full sm:max-w-xs mt-4 sm:mt-8 mx-auto">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full max-w-5xl mx-auto px-4 py-8 pointer-events-none">
+          <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
-              className="group relative px-6 py-3 sm:py-4 w-full overflow-hidden rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg tracking-wide text-white transition-all duration-150 active:scale-[0.98]"
+              className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/20 backdrop-blur-md"
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_50%)]"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <span className="relative z-10 flex items-center justify-center gap-2 uppercase drop-shadow-sm">
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500 z-10"></div>
+              
+              {/* Monochromatic Neon Hover Effect */}
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500 z-0 rounded-full">
+                <div className="absolute inset-0 rounded-full neon-gradient-base animate-border-shift blur-[6px] opacity-40" />
+                <div className="absolute inset-0 rounded-full neon-gradient-base animate-border-shift opacity-80" />
+                <div className="absolute inset-[1.5px] rounded-full bg-black/60 backdrop-blur-xl z-10" />
+              </div>
+              
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-full z-[15]"></div>
+              <span className="relative z-20 flex items-center justify-center gap-2 uppercase font-light">
                 Get Started
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1.5 transition-transform duration-500 opacity-70" />
               </span>
             </button>
           </div>
@@ -459,7 +436,7 @@ export const HomeView = React.memo(() => {
       {isLoading ? (
         <motion.div
           variants={itemVariants}
-          className="relative w-full min-h-[120px] bg-black/5 dark:bg-white/5 rounded-3xl p-6 flex flex-row items-center justify-between animate-pulse"
+          className="relative w-full min-h-[160px] bg-black/5 dark:bg-white/5 rounded-3xl p-5 pb-10 sm:p-8 sm:pb-14 flex flex-row items-center justify-between animate-pulse"
         >
           <div className="flex flex-col gap-3">
             <div className="w-24 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
@@ -496,7 +473,7 @@ export const HomeView = React.memo(() => {
                 }
               }}
               className={cn(
-                "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-[2rem] p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
+                "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
               )}
             >
               <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
@@ -891,11 +868,11 @@ export const HomeView = React.memo(() => {
           className="flex flex-col gap-3 mt-2 sm:mt-4 mb-4 sm:mb-8"
         >
           <div className="flex items-center gap-2 px-2">
-            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-            <h3 className="text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest">
+            <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
               Recent Sets
             </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent dark:from-emerald-500/10 ml-2" />
+            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
           </div>
 
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
@@ -1050,11 +1027,11 @@ export const HomeView = React.memo(() => {
           className="flex flex-col gap-3 mt-2 sm:mt-4"
         >
           <div className="flex items-center gap-2 px-2">
-            <User className="w-3.5 h-3.5 text-blue-500" />
-            <h3 className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest">
+            <User className="w-3.5 h-3.5 text-zinc-500" />
+            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
               Recent Runs
             </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-blue-500/20 to-transparent dark:from-blue-500/10 ml-2" />
+            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
           </div>
 
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
@@ -1288,7 +1265,7 @@ export const HomeView = React.memo(() => {
                   className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 active:text-blue-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
                     setVisibleRuns((prev) =>
-                      Math.min(prev + 20, 100, recentFeed.length),
+                      Math.min(prev + 10, 100, recentFeed.length),
                     )
                   }
                   onTouchStart={() => {}}
