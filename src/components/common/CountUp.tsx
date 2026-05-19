@@ -45,14 +45,14 @@ export const CountUp = React.memo(
         const currentCount = Math.floor(progress * end);
 
         if (nodeRef.current) {
-          nodeRef.current.textContent = currentCount.toString();
+          nodeRef.current.textContent = currentCount.toLocaleString();
         }
 
         if (progress < 1) {
           animationFrame = window.requestAnimationFrame(step);
         } else if (nodeRef.current) {
           // Guarantee final value
-          nodeRef.current.textContent = end.toString();
+          nodeRef.current.textContent = end.toLocaleString();
         }
       };
 

@@ -542,6 +542,8 @@ export const processLiveFeedData = (
       courseName: run.course,
       course: { name: run.course, ...(courseSetMap[normC] || {}) },
       result: run.result,
+      time: numericValue,
+      videoUrl: run.proof || (run.__raw && run.__raw[7]) || "",
       isCR: runRank === 1 && !isPlaceholderPlayer(pName),
       rank: runRank,
       fireCount: fireCount,

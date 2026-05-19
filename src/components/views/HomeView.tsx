@@ -9,9 +9,11 @@ import {
   ChevronDown,
   ArrowRight,
   Activity,
+  Play,
   Trophy,
   Users,
   Timer,
+  Waypoints,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
@@ -36,10 +38,27 @@ export const HomeView = React.memo(() => {
   const setPlayingVideoUrl = useAppStore((s) => s.setPlayingVideoUrl);
   const { navigateToEntity } = useAppNavigation();
   const [visibleRuns, setVisibleRuns] = useState(20);
+  const [visibleSets, setVisibleSets] = useState(10);
 
   const courseList_AT = useDataStore((s) => s.courseList_AT);
   const teamList_gyms_AT = useDataStore((s) => s.teamList_gyms_AT);
   const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
+  const atPerfs = useDataStore((s) => s.atPerfs);
+  const atMet = useDataStore((s) => s.atMet);
+
+  const recentSets = useMemo(() => {
+    if (!masterCourseList || !masterCourseList.length) return [];
+    
+    const validSets = masterCourseList
+      .filter((c: any) => c.dateSet && !isNaN(new Date(c.dateSet).getTime()))
+      .map((c: any) => ({
+        ...c,
+        timestamp: new Date(c.dateSet).getTime(),
+      }))
+      .sort((a: any, b: any) => b.timestamp - a.timestamp);
+      
+    return validSets.slice(0, 100);
+  }, [masterCourseList]);
 
   const { topPlayer, topCourse, dailyRecord } = useMemo(() => {
     // Generate deterministic index based on today's UTC Date.
@@ -241,8 +260,13 @@ export const HomeView = React.memo(() => {
     totalGyms,
     totalTeams,
     totalMedals,
+    playerCountries,
+    teamCountries,
+    totalFires,
+    totalCoins,
+    runsTrendData,
+    countriesTrendData,
     medalsTrendData,
-    playersTrendData,
     coursesTrendData,
   } = useMemo(() => {
     const kpiData = (kpiStats as Record<string, unknown>) || {};
@@ -263,22 +287,76 @@ export const HomeView = React.memo(() => {
 
     const pTrendData = kpiTrends?.players || [];
     const cTrendData = kpiTrends?.courses || [];
+    const rTrendData = kpiTrends?.runs || [];
+    const countryTrendData = kpiTrends?.countries || [];
 
     const medalsMultiplier = kpiData.courses ? tMedals / (kpiData.courses as number) : 6;
-    const mTrendData = cTrendData.map((d: Record<string, unknown>) => ({
-      value: Math.round((d.value as number) * medalsMultiplier),
+    const mTrendData = rTrendData.map((d: Record<string, unknown>) => ({
+      value: Math.round((d.value as number) * (medalsMultiplier / 10)),
     }));
+
+    const flagRegex = /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g;
+    
+    const pFlags = new Set<string>();
+    [...(playerList_M_AT || []), ...(playerList_F_AT || [])].forEach((p: any) => {
+      [p.gymFlag, p.townFlag, p.region].forEach(f => {
+        if (f) {
+          const matches = String(f).match(flagRegex);
+          if (matches) matches.forEach(m => pFlags.add(m));
+        }
+      });
+      if (p.teams && Array.isArray(p.teams)) {
+        p.teams.forEach((t: any) => {
+          if (t.flag) {
+            const matches = String(t.flag).match(flagRegex);
+            if (matches) matches.forEach(m => pFlags.add(m));
+          }
+        });
+      }
+    });
+
+    const tFlags = new Set<string>();
+    [...(teamList_teams_AT || []), ...(teamList_gyms_AT || [])].forEach((t: any) => {
+      if (t.flag) {
+        const matches = String(t.flag).match(flagRegex);
+        if (matches) matches.forEach(m => tFlags.add(m));
+      }
+    });
+
+    let tFires = 0;
+    if (atPerfs) {
+      Object.values(atPerfs).forEach((runs: any) => {
+        if (Array.isArray(runs)) {
+          runs.forEach((r: any) => {
+            tFires += (r.fireCount || 0);
+          });
+        }
+      });
+    }
+
+    let tCoins = 0;
+    if (atMet) {
+      Object.values(atMet).forEach((p: any) => {
+         tCoins += (p.contributionScore || 0);
+      });
+    }
 
     return {
       kpi: kpiData,
       totalGyms: tGyms,
       totalTeams: tTeams,
       totalMedals: tMedals,
+      playerCountries: Math.max(pFlags.size, 1),
+      teamCountries: Math.max(tFlags.size, 1),
+      totalFires: tFires,
+      totalCoins: tCoins,
+      runsTrendData: rTrendData,
+      countriesTrendData: countryTrendData,
       medalsTrendData: mTrendData,
       playersTrendData: pTrendData,
       coursesTrendData: cTrendData,
     };
-  }, [kpiStats, teamList_gyms_AT, teamList_teams_AT, masterCourseList, kpiTrends]);
+  }, [kpiStats, teamList_gyms_AT, teamList_teams_AT, masterCourseList, kpiTrends, playerList_M_AT, playerList_F_AT, atPerfs, atMet]);
 
   return (
     <motion.div
@@ -572,7 +650,7 @@ export const HomeView = React.memo(() => {
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={playersTrendData}>
+                <LineChart data={runsTrendData}>
                   <YAxis domain={["dataMin", "dataMax"]} hide />
                   <Line
                     type="monotone"
@@ -595,24 +673,29 @@ export const HomeView = React.memo(() => {
                 Players
               </h2>
               <p className="text-sm font-medium text-zinc-500">
-                View leaderboards & runs
+                View leaderboards
               </p>
             </div>
 
             <div className="mt-auto pt-8 w-full flex items-center justify-between z-10 text-xs sm:text-sm text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono font-medium">
+              <div className="flex flex-col items-start gap-1 sm:gap-2 font-mono font-medium">
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={kpi.players || 0} />
                   </strong>{" "}
                   PLAYERS
                 </span>
-                <span className="text-zinc-300 dark:text-zinc-700">•</span>
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={kpi.runs || 0} />
                   </strong>{" "}
                   RUNS
+                </span>
+                <span className="flex items-baseline gap-1">
+                  <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
+                    <CountUp end={playerCountries || 0} />
+                  </strong>{" "}
+                  COUNTRIES
                 </span>
               </div>
               <ArrowRight className="w-5 h-5 text-blue-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
@@ -650,29 +733,23 @@ export const HomeView = React.memo(() => {
                 Courses
               </h2>
               <p className="text-sm font-medium text-zinc-500">
-                Explore locations globally
+                Explore courses
               </p>
             </div>
 
             <div className="mt-auto pt-8 w-full flex items-center justify-between z-10 text-xs sm:text-sm text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono font-medium">
+              <div className="flex flex-col items-start gap-1 sm:gap-2 font-mono font-medium">
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={kpi.courses || 0} />
                   </strong>{" "}
                   COURSES
                 </span>
-                <span className="text-zinc-300 dark:text-zinc-700 hidden lg:inline">
-                  •
-                </span>
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={kpi.cities || 0} />
                   </strong>{" "}
                   CITIES
-                </span>
-                <span className="text-zinc-300 dark:text-zinc-700 hidden lg:inline">
-                  •
                 </span>
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
@@ -693,7 +770,7 @@ export const HomeView = React.memo(() => {
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={playersTrendData}>
+                <LineChart data={countriesTrendData}>
                   <YAxis domain={["dataMin", "dataMax"]} hide />
                   <Line
                     type="monotone"
@@ -713,27 +790,32 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                Gyms & Teams
+                Teams
               </h2>
               <p className="text-sm font-medium text-zinc-500">
-                Join squads and local gyms
+                Find gyms & teams
               </p>
             </div>
 
             <div className="mt-auto pt-8 w-full flex items-center justify-between z-10 text-xs sm:text-sm text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono font-medium">
+              <div className="flex flex-col items-start gap-1 sm:gap-2 font-mono font-medium">
+                <span className="flex items-baseline gap-1">
+                  <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
+                    <CountUp end={totalGyms || 0} />
+                  </strong>{" "}
+                  GYMS
+                </span>
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={totalTeams || 0} />
                   </strong>{" "}
                   TEAMS
                 </span>
-                <span className="text-zinc-300 dark:text-zinc-700">•</span>
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
-                    <CountUp end={totalGyms || 0} />
+                    <CountUp end={teamCountries || 0} />
                   </strong>{" "}
-                  GYMS
+                  COUNTRIES
                 </span>
               </div>
               <ArrowRight className="w-5 h-5 text-indigo-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
@@ -768,24 +850,195 @@ export const HomeView = React.memo(() => {
 
             <div className="flex flex-col items-start gap-1 z-10 w-full relative pt-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
-                Hall of Fame
+                HOF
               </h2>
               <p className="text-sm font-medium text-zinc-500">
-                All-time legends & medals
+                See ASR legends
               </p>
             </div>
 
             <div className="mt-auto pt-8 w-full flex items-center justify-between z-10 text-xs sm:text-sm text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono font-medium">
+              <div className="flex flex-col items-start gap-1 sm:gap-2 font-mono font-medium">
                 <span className="flex items-baseline gap-1">
                   <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
                     <CountUp end={totalMedals || 0} />
                   </strong>{" "}
                   MEDALS
                 </span>
+                <span className="flex items-baseline gap-1">
+                  <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
+                    <CountUp end={totalFires || 0} />
+                  </strong>{" "}
+                  FIRES
+                </span>
+                <span className="flex items-baseline gap-1">
+                  <strong className="text-zinc-900 dark:text-white tabular-nums text-sm sm:text-base">
+                    <CountUp end={totalCoins || 0} />
+                  </strong>{" "}
+                  COINS
+                </span>
               </div>
               <ArrowRight className="w-5 h-5 text-amber-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Recent Sets */}
+      {(isLoading || (recentSets && recentSets.length > 0)) && (
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col gap-3 mt-2 sm:mt-4 mb-4 sm:mb-8"
+        >
+          <div className="flex items-center gap-2 px-2">
+            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+            <h3 className="text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest">
+              Recent Sets
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent dark:from-emerald-500/10 ml-2" />
+          </div>
+
+          <div className="relative pl-4 sm:pl-6 sm:pr-2">
+            {/* Timeline Axis */}
+            <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-zinc-500/50 via-zinc-500/20 to-transparent" />
+
+            <div className="flex flex-col gap-4 relative z-10">
+              {isLoading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="relative flex items-start gap-4 sm:gap-6 mt-2"
+                    >
+                      <div className="relative mt-1.5 flex-shrink-0 z-20">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/5 dark:bg-white/5 border-2 border-black/10 dark:border-white/10 animate-pulse" />
+                      </div>
+                      <div className="flex-1 bg-black/5 dark:bg-white/5 rounded-2xl p-4 sm:p-5 h-[100px] animate-pulse" />
+                    </div>
+                  ))
+                : (() => {
+                    let currentMonth = "";
+                    return recentSets
+                      .slice(0, visibleSets)
+                      .map(
+                        (
+                          item: any,
+                          idx: number,
+                        ) => {
+                          const dateObj = new Date(item.timestamp);
+                          const dayStr = dateObj.getDate().toString();
+                          const monthStr = dateObj.toLocaleString("default", { month: "short" });
+                          const isNewMonth = monthStr && monthStr !== currentMonth;
+                          if (isNewMonth) {
+                            currentMonth = monthStr;
+                          }
+                          const courseFlag = fixCountryEntity(
+                            item.country || "",
+                            item.flag || item.region || ""
+                          ).flag;
+                          const setters = Array.isArray(item.leadSetters) ? item.leadSetters.join(', ') : item.leadSetters || item.setter || "Local Community";
+
+                          return (
+                            <React.Fragment key={`set-${item.name}-${idx}`}>
+                              {isNewMonth && (
+                                <div className="relative flex items-center justify-start gap-4 sm:gap-6 mt-1 mb-1">
+                                  <div className="relative z-20 flex-shrink-0 flex justify-center w-6 sm:w-8">
+                                    <div className="bg-white text-zinc-900 border-zinc-200 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-widest shadow-sm border z-30">
+                                      {monthStr}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="relative flex items-start gap-4 sm:gap-6 group">
+                                {/* Timeline Node */}
+                                <div className="relative mt-1.5 flex-shrink-0 z-20">
+                                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300">
+                                    <span className="text-[10px] sm:text-xs font-black text-emerald-500 dark:text-emerald-400">
+                                      {dayStr}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Content Card */}
+                                <div
+                                  className="group/card flex-1 bg-black/[0.02] dark:bg-white/[0.02] rounded-2xl p-4 sm:p-5 hover:bg-black/5 dark:hover:bg-white/5 active:scale-[0.98] active:bg-black/5 dark:active:bg-white/5 transition-all duration-300 cursor-pointer flex flex-row items-center justify-between min-w-0"
+                                  onClick={() =>
+                                    navigateToEntity("course", { name: item.name, ...item })
+                                  }
+                                  onTouchStart={() => {}}
+                                >
+                                  <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
+                                    <div className="flex items-center gap-2 max-w-full w-full">
+                                      <span
+                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-emerald-500"
+                                      >
+                                        {courseFlag && (
+                                          <span className="text-[12px] opacity-90 shrink-0">
+                                            {courseFlag}
+                                          </span>
+                                        )}
+                                        <span className="truncate">
+                                          {item.name}
+                                        </span>
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
+                                      <div className="flex items-center gap-1.5 max-w-full min-w-0">
+                                        <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                                        <span className="truncate uppercase tracking-wider text-[10px] sm:text-[11px]">
+                                          {[item.city, item.stateProv, item.country].filter((v) => v && v.toUpperCase() !== "UNKNOWN").join(", ")}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-1.5 max-w-full min-w-0">
+                                        <Waypoints className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                                        <span className="truncate max-w-[200px] sm:max-w-xs">
+                                          {setters}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex flex-col justify-center items-end shrink-0 pl-2">
+                                    <div className="flex items-center justify-center w-[36px] sm:w-[48px] shrink-0">
+                                      {(item.videoUrl || item.demoVideo) && (
+                                        <button
+                                          type="button"
+                                          className="p-2 sm:p-3 transition-all active:scale-90 text-zinc-500 group-hover/card:text-emerald-500 hover:!text-emerald-500 flex items-center justify-center cursor-pointer"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setPlayingVideoUrl(item.videoUrl || item.demoVideo);
+                                          }}
+                                        >
+                                          <Play className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]" strokeWidth={3} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </React.Fragment>
+                          );
+                        },
+                      );
+                  })()}
+            </div>
+
+            {!isLoading && recentSets && recentSets.length > visibleSets && (
+              <div className="flex justify-center mt-8">
+                <button
+                  className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all duration-300 rounded-2xl"
+                  onClick={() =>
+                    setVisibleSets((prev) =>
+                      Math.min(prev + 10, 100, recentSets.length),
+                    )
+                  }
+                  onTouchStart={() => {}}
+                >
+                  <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                  Load More
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -797,10 +1050,11 @@ export const HomeView = React.memo(() => {
           className="flex flex-col gap-3 mt-2 sm:mt-4"
         >
           <div className="flex items-center gap-2 px-2">
-            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+            <User className="w-3.5 h-3.5 text-blue-500" />
+            <h3 className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest">
               Recent Runs
             </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-black/5 to-transparent dark:from-white/5 ml-2" />
+            <div className="flex-1 h-px bg-gradient-to-r from-blue-500/20 to-transparent dark:from-blue-500/10 ml-2" />
           </div>
 
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
@@ -910,11 +1164,11 @@ export const HomeView = React.memo(() => {
                                 <div className="relative mt-1.5 flex-shrink-0 z-20">
                                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300">
                                     {dayStr ? (
-                                      <span className="text-[10px] sm:text-xs font-black text-zinc-500 dark:text-zinc-400">
+                                      <span className="text-[10px] sm:text-xs font-black text-blue-500 dark:text-blue-400">
                                         {dayStr}
                                       </span>
                                     ) : (
-                                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400" />
+                                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500/50 dark:text-blue-500/50" />
                                     )}
                                   </div>
                                 </div>
@@ -943,52 +1197,80 @@ export const HomeView = React.memo(() => {
                                         <span className="truncate">
                                           {playerName}
                                         </span>
-                                        {rankBadge && (
-                                          <span className="animate-bounce inline-block text-[14px] shrink-0">
-                                            {rankBadge.icon}
-                                          </span>
-                                        )}
                                       </span>
-                                      {fires > 0 && (
-                                        <span className="flex items-center text-xs bg-orange-500/10 text-orange-500 px-1.5 py-0.5 rounded-full shrink-0">
-                                          {Array.from({
-                                            length: Math.min(3, fires),
-                                          }).map((_, i) => (
-                                            <span
-                                              key={i}
-                                              className="animate-pulse"
-                                            >
-                                              🔥
-                                            </span>
-                                          ))}
-                                        </span>
-                                      )}
                                     </div>
 
-                                    <div 
-                                      className="course-target flex items-center text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:!text-blue-500 transition-colors cursor-pointer max-w-full min-w-0 w-max -ml-3 -mt-2 -mb-2 px-3 py-2 rounded-md"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigateToEntity("course", item.course || { name: item.courseName });
-                                      }}
-                                    >
-                                      <span className="truncate max-w-full">
-                                        {courseFlag && (
-                                          <span className="opacity-80 mr-1">
-                                            {courseFlag}
+                                    <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
+                                      <div 
+                                        className="course-target flex items-center hover:!text-blue-500 transition-colors cursor-pointer max-w-full min-w-0 -mx-1 px-1 rounded-md"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigateToEntity("course", item.course || { name: item.courseName });
+                                        }}
+                                      >
+                                        <div className="flex items-center gap-1.5 min-w-0 max-w-full">
+                                          <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                                          {courseFlag && (
+                                            <span className="opacity-80 shrink-0">
+                                              {courseFlag}
+                                            </span>
+                                          )}
+                                          <span className="truncate uppercase tracking-wider text-[10px] sm:text-[11px]">
+                                            {courseName}
+                                            {item.course?.city
+                                              ? `, ${item.course.city}`
+                                              : ""}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1.5 max-w-full min-w-0">
+                                        <Timer className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                                        <span className="tabular-nums truncate max-w-[200px] sm:max-w-xs">
+                                          {resultVal}
+                                        </span>
+                                        {(rankBadge || fires > 0) && (
+                                          <span className="flex items-center gap-1.5 ml-0.5">
+                                            {rankBadge && (
+                                              <span className="inline-block animate-bounce text-[14px] sm:text-[16px]">
+                                                {rankBadge.icon}
+                                              </span>
+                                            )}
+                                            {fires > 0 && (
+                                              <span className="flex items-center text-[10px] sm:text-[12px] opacity-90 shrink-0 tracking-[0.2em]">
+                                                {Array.from({
+                                                  length: Math.min(3, fires),
+                                                }).map((_, i) => (
+                                                  <span
+                                                    key={i}
+                                                    className="inline-block animate-pulse"
+                                                  >
+                                                    🔥
+                                                  </span>
+                                                ))}
+                                              </span>
+                                            )}
                                           </span>
                                         )}
-                                        {courseName}
-                                        {item.course?.city
-                                          ? `, ${item.course.city}`
-                                          : ""}
-                                      </span>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  <div className="flex flex-col justify-center items-end shrink-0">
-                                    <div className="text-lg sm:text-2xl font-black tabular-nums tracking-tighter text-zinc-900 dark:text-white transition-colors group-hover/card:text-blue-500 group-has-[.course-target:hover]/card:!text-zinc-900 dark:group-has-[.course-target:hover]/card:!text-white">
-                                      {resultVal}
+                                  <div className="flex flex-col justify-center items-end shrink-0 pl-2">
+                                    <div className="flex items-center justify-center w-[36px] sm:w-[48px] shrink-0">
+                                      {(item.videoUrl || item.demoVideo) && (
+                                        <button
+                                          type="button"
+                                          className="p-2 sm:p-3 transition-all active:scale-90 text-zinc-500 group-hover/card:text-blue-500 hover:!text-blue-500 flex items-center justify-center cursor-pointer"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setPlayingVideoUrl(item.videoUrl || item.demoVideo);
+                                          }}
+                                        >
+                                          <Play className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]" strokeWidth={3} />
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 </div>

@@ -205,8 +205,8 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const coursesTrend = [{ value: currentUniqueCourses.size }];
   const countriesTrend = [{ value: currentUniqueCountries.size }];
 
-  // Sample points to make it ~15 data points
-  const numDataPoints = 15;
+  // Sample points to make it ~40 data points
+  const numDataPoints = 40;
   const chunkSize = Math.max(1, Math.floor(datedRuns.length / (numDataPoints - 1)));
 
   for (let i = 0; i < datedRuns.length; i++) {

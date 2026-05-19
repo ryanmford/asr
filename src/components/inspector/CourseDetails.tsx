@@ -227,7 +227,7 @@ export const CourseDetails = React.memo(
             pKey,
             time: num,
             pts: num > 0 ? (record / num) * 100 : 0,
-            videoUrl: (rawBestSector?.[pKey] as Record<string, any>)?.[cName]?.videoUrl,
+            videoUrl: (rawBestSector?.[pKey] as Record<string, Record<string, { videoUrl?: string }>>)?.[cName]?.videoUrl,
           };
         })
         .sort((a, b) => b.pts - a.pts);

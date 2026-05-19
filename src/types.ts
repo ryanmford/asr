@@ -41,6 +41,7 @@ export interface CourseData {
   assistantSettersNormalized?: string[];
   assistantsetters?: string | string[];
   is2026?: boolean;
+  dateSet?: string;
 }
 
 export interface SetterProfile {
