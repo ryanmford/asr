@@ -30,6 +30,7 @@ import {
 import { FallbackAvatar } from "../common/FallbackAvatar";
 import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 import { ASRRankList } from "../list/ASRRankList";
+import { ASRStandardButton } from "../common/ASRStandardButton";
 import { ASRPremiumButton } from "../common/ASRPremiumButton";
 import { CourseChampions } from "./CourseChampions";
 import { ASRStatCard } from "../common/ASRStatCard";
@@ -309,7 +310,7 @@ export const CourseDetails = React.memo(
           subtitle={formatLocation(meta)}
           extra={
             <div className="flex w-full gap-2 mt-0">
-              <ASRPremiumButton
+              <ASRStandardButton
                 href={mapsUrl || undefined}
                 target="_blank"
                 rel="noreferrer"
@@ -324,8 +325,8 @@ export const CourseDetails = React.memo(
               >
                 <MapPin size={16} strokeWidth={2.5} />
                 <span>MAP</span>
-              </ASRPremiumButton>
-              <ASRPremiumButton
+              </ASRStandardButton>
+              <ASRStandardButton
                 href={rulesUrl || undefined}
                 target="_blank"
                 rel="noreferrer"
@@ -343,7 +344,7 @@ export const CourseDetails = React.memo(
               >
                 <Play size={16} strokeWidth={2.5} />
                 <span>RULES</span>
-              </ASRPremiumButton>
+              </ASRStandardButton>
             </div>
           }
         />

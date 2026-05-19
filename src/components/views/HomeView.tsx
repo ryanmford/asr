@@ -30,6 +30,8 @@ export const HomeView = React.memo(() => {
   const masterCourseList = useDataStore((s) => s.masterCourseList);
   const playerList_M_AT = useDataStore((s) => s.playerList_M_AT);
   const playerList_F_AT = useDataStore((s) => s.playerList_F_AT);
+  const playerList_M_OP = useDataStore((s) => s.playerList_M_OP);
+  const playerList_F_OP = useDataStore((s) => s.playerList_F_OP);
   const kpiStats = useDataStore((s) => s.kpiStats);
   const kpiTrends = useDataStore((s) => s.kpiTrends);
   const recentFeed = useDataStore((s) => s.recentFeed);
@@ -63,7 +65,6 @@ export const HomeView = React.memo(() => {
   }, [masterCourseList]);
 
   const { topPlayer, topCourse, dailyRecord } = useMemo(() => {
-    // Generate deterministic index based on today's UTC Date.
     const today = new Date();
     const seedStr = `${today.getUTCFullYear()}-${today.getUTCMonth()}-${today.getUTCDate()}`;
 
@@ -76,58 +77,93 @@ export const HomeView = React.memo(() => {
       return Math.floor((x - Math.floor(x)) * max);
     };
 
+    const combinedP = [
+      ...(playerList_M_AT || []),
+      ...(playerList_F_AT || []),
+      ...(playerList_M_OP || []),
+      ...(playerList_F_OP || []),
+    ].filter((p: any) => p && !p.isDivider && (p.isQualified || p.currentRank !== "UR"));
+    
+    // De-duplicate players by pKey just in case
+    const uniquePlayersMap = new Map();
+    combinedP.forEach((p: any) => {
+      if (p && p.pKey && !uniquePlayersMap.has(p.pKey)) {
+        uniquePlayersMap.set(p.pKey, p);
+      }
+    });
+    const uniquePlayers = Array.from(uniquePlayersMap.values());
+
     let pOfDay: Record<string, unknown> | null = null;
-    const topM = playerList_M_AT.slice(0, 30);
-    const topF = playerList_F_AT.slice(0, 20);
-    const combinedP = [...topM, ...topF].filter(Boolean);
-    if (combinedP.length > 0) {
-      const idx = sRandom(seedStr + "player", combinedP.length);
-      pOfDay = combinedP[idx];
-      pOfDay._gRank = pOfDay.gender === "F" 
-          ? playerList_F_AT.indexOf(pOfDay) + 1 
-          : playerList_M_AT.indexOf(pOfDay) + 1;
+    if (uniquePlayers.length > 0) {
+      const idx = sRandom(seedStr + "feature_player", uniquePlayers.length);
+      const chosenPlayer = uniquePlayers[idx] as any;
+      pOfDay = { ...chosenPlayer };
+      
+      // Attempt to find AT rank if available, else OR rank
+      if (pOfDay) {
+         if (pOfDay.gender === "F") {
+            const atIdx = playerList_F_AT?.findIndex((p:any) => p.name === pOfDay?.name) ?? -1;
+            pOfDay._gRank = atIdx >= 0 ? atIdx + 1 : ((playerList_F_OP?.findIndex((p:any) => p.name === pOfDay?.name) ?? 0) + 1);
+         } else {
+            const atIdx = playerList_M_AT?.findIndex((p:any) => p.name === pOfDay?.name) ?? -1;
+            pOfDay._gRank = atIdx >= 0 ? atIdx + 1 : ((playerList_M_OP?.findIndex((p:any) => p.name === pOfDay?.name) ?? 0) + 1);
+         }
+      }
     }
 
     let cOfDay: Record<string, unknown> | null = null;
-    const sortedCourses = [...courseList_AT].sort((a: any, b: any) => 
+    const sortedCourses = [...(courseList_AT || [])].sort((a: any, b: any) => 
        (b.totalAllTimeRuns || b.totalRuns || 0) - (a.totalAllTimeRuns || a.totalRuns || 0)
-    ).slice(0, 50);
-    if (sortedCourses.length > 0) {
-      const idx = sRandom(seedStr + "course", sortedCourses.length);
-      cOfDay = sortedCourses[idx];
+    );
+    
+    // "we should only pick from courses that have at least 1 male run and 1 female run"
+    const validCoursesForDay = sortedCourses.filter((c: any) => {
+        const atM = c.allTimeAthletesM || [];
+        const atF = c.allTimeAthletesF || [];
+        return atM.length > 0 && atF.length > 0;
+    });
+
+    if (validCoursesForDay.length > 0) {
+      const idx = sRandom(seedStr + "feature_course", validCoursesForDay.length);
+      cOfDay = validCoursesForDay[idx];
     }
 
     let rOfDay: Record<string, unknown> | null = null;
-    const coursesWithRecords = sortedCourses.filter((c: any) => {
-        const atM = c.allTimeAthletesM || [];
-        const atF = c.allTimeAthletesF || [];
-        const mHasVideo = atM.length > 1 && !!atM[0]?.[2];
-        const fHasVideo = atF.length > 1 && !!atF[0]?.[2];
-        return mHasVideo || fHasVideo;
+    // "only pick from runs that are personal records and by an all-time-ranked and/or open-ranked player"
+    // allTimeAthletesM and allTimeAthletesF contain all personal records on the course
+    const allValidRuns: any[] = [];
+    
+    sortedCourses.forEach((c: any) => {
+       const atM = c.allTimeAthletesM || [];
+       const atF = c.allTimeAthletesF || [];
+       
+       [...atM, ...atF].forEach((run) => {
+          if (run && run[2]) { // Must have video URL
+             const pKey = run[0];
+             // Must be AT or OP ranked
+             if (uniquePlayersMap.has(pKey)) {
+                allValidRuns.push({ run, course: c });
+             }
+          }
+       });
     });
 
-    if (coursesWithRecords.length > 0) {
-       const idx = sRandom(seedStr + "record", coursesWithRecords.length);
-       const targetCourse = coursesWithRecords[idx] as any;
-       const atM = targetCourse.allTimeAthletesM || [];
-       const atF = targetCourse.allTimeAthletesF || [];
-       const mHasVideo = atM.length > 1 && !!atM[0]?.[2];
-       const fHasVideo = atF.length > 1 && !!atF[0]?.[2];
-       let pickM = mHasVideo;
-       if (mHasVideo && fHasVideo) {
-         pickM = sRandom(seedStr + "record_gender", 2) === 0;
-       }
-       const bestRun = pickM ? atM[0] : atF[0];
-
-       const pObj = [...playerList_M_AT, ...playerList_F_AT].find((p: any) => p.name === bestRun[0]);
+    if (allValidRuns.length > 0) {
+       const idx = sRandom(seedStr + "feature_record", allValidRuns.length);
+       const selected = allValidRuns[idx];
+       const bestRun = selected.run;
+       const targetCourse = selected.course;
+       
+       const pObj = uniquePlayersMap.get(bestRun[0]);
        const pFlag = pObj ? (pObj.townFlag || pObj.gymFlag || pObj.country || pObj.region || "") : "";
        const pFlagFmt = pFlag ? `${formatFlagsWithSpace(pFlag).trim()} ` : "";
+       const athleteName = pObj ? pObj.name : bestRun[0];
 
        const cFlag = targetCourse.flag || targetCourse.region || targetCourse.country || "";
        const cFlagFmt = cFlag ? `${formatFlagsWithSpace(cFlag).trim()} ` : "";
 
        rOfDay = {
-         athleteName: `${pFlagFmt}${bestRun[0]}`,
+         athleteName: `${pFlagFmt}${athleteName}`,
          time: bestRun[1].toFixed(2),
          videoUrl: bestRun[2],
          courseName: `${cFlagFmt}${targetCourse.name}`,
@@ -136,7 +172,7 @@ export const HomeView = React.memo(() => {
     }
 
     return { topPlayer: pOfDay, topCourse: cOfDay, dailyRecord: rOfDay };
-  }, [playerList_M_AT, playerList_F_AT, courseList_AT]);
+  }, [playerList_M_AT, playerList_F_AT, playerList_M_OP, playerList_F_OP, courseList_AT]);
 
   const carouselIndex = useAppStore((s) => s.homeCarouselIndex);
   const setCarouselIndex = useAppStore((s) => s.setHomeCarouselIndex);
@@ -373,7 +409,7 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "py-2 sm:py-3 -mx-4 sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-1",
+          "py-2 sm:py-3 w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-1",
           theme === "dark"
             ? "border-white/5 bg-zinc-950/80"
             : "border-black/5 bg-white/80",
@@ -389,7 +425,7 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative min-h-[60vh] sm:min-h-[70vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col items-center justify-center overflow-hidden transition-all duration-500 group",
+          "relative min-h-[95vh] sm:min-h-[105vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col items-center justify-center overflow-hidden transition-all duration-500 group",
           theme === "dark" ? "bg-[#0A0A0A]" : "bg-black",
         )}
       >
@@ -1020,6 +1056,152 @@ export const HomeView = React.memo(() => {
                 </button>
               </div>
             )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Of The Day Section */}
+      {(topPlayer || topCourse || dailyRecord) && (
+        <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-4 sm:mt-8 mb-4 sm:mb-8">
+          <div className="flex items-center gap-2 px-2">
+            <Trophy className="w-3.5 h-3.5 text-zinc-500" />
+            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
+              Of The Day
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
+          </div>
+          
+          <div className="flex flex-col gap-4 px-2">
+            {[
+              dailyRecord && {
+                type: "video",
+                data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl },
+                displayName: dailyRecord.athleteName,
+                label: "Run of the Day",
+                icon: <Timer className="w-4 h-4 fill-current" />,
+                color: "text-pink-500",
+                bg: "bg-pink-500/10",
+                hoverBg: "group-hover:bg-pink-500",
+                hoverText: "group-hover:text-pink-500 dark:group-hover:text-pink-400",
+                metrics: [
+                  { label: "Course", value: dailyRecord.courseName },
+                  { label: "Time", value: <>{dailyRecord.time} <span className="inline-block animate-bounce ml-0.5">🥇</span></> },
+                ],
+              },
+              topPlayer && {
+                type: "player",
+                data: topPlayer,
+                displayName: topPlayer.townFlag || topPlayer.gymFlag ? `${formatFlagsWithSpace(topPlayer.townFlag || topPlayer.gymFlag).trim()} ${topPlayer.name}` : topPlayer.name,
+                label: "Player of the Day",
+                icon: <User className="w-4 h-4" />,
+                color: "text-blue-500",
+                bg: "bg-blue-500/10",
+                hoverBg: "group-hover:bg-blue-500",
+                hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
+                metrics: [
+                  { label: "Rank", value: topPlayer._gRank },
+                  { label: "LQ", value: Number(topPlayer.rating || 0).toFixed(2) },
+                  { label: "POINTS", value: Number(topPlayer.pts || (topPlayer.rating || 0) * (topPlayer.runs || 0)).toFixed(2) },
+                ],
+              },
+              topCourse && {
+                type: "course",
+                data: topCourse,
+                displayName: topCourse.flag ? `${formatFlagsWithSpace(topCourse.flag).trim()} ${topCourse.name}` : topCourse.name,
+                label: "Course of the Day",
+                icon: <MapPin className="w-4 h-4" />,
+                color: "text-emerald-500",
+                bg: "bg-emerald-500/10",
+                hoverBg: "group-hover:bg-emerald-500",
+                hoverText: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+                metrics: [
+                  { label: "Runs", value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0 },
+                  { label: "CR (M)", value: topCourse.mRecord ? Number(topCourse.mRecord).toFixed(2) : "--" },
+                  { label: "CR (W)", value: topCourse.fRecord ? Number(topCourse.fRecord).toFixed(2) : "--" },
+                ],
+              }
+            ].filter(Boolean).map((feat: any, idx: number) => (
+              <div
+                key={idx}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateToEntity(feat.type, feat.data)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateToEntity(feat.type, feat.data);
+                  }
+                }}
+                className={cn(
+                  "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 sm:p-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
+                )}
+              >
+                <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
+                  <div className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between">
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <div
+                        className={cn(
+                          "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5",
+                          feat.color,
+                        )}
+                      >
+                        {feat.icon} {feat.label}
+                      </div>
+                      <div
+                        className={cn(
+                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
+                          feat.displayName.length > 22
+                            ? "text-base sm:text-lg md:text-xl"
+                            : feat.displayName.length > 15
+                              ? "text-lg sm:text-xl md:text-2xl"
+                              : "text-xl sm:text-2xl md:text-3xl",
+                          feat.hoverText,
+                        )}
+                      >
+                        {feat.displayName}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
+                      {feat.metrics.map(
+                        (
+                          m: { label: string; value: React.ReactNode },
+                          i: number,
+                        ) => {
+                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
+                          const len = valStr.length || 5;
+                          return (
+                            <div key={i} className="flex flex-col min-w-0 flex-shrink">
+                              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
+                                {m.label}
+                              </span>
+                              <span className={cn(
+                                "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
+                                len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
+                                : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
+                                : "text-base sm:text-lg md:text-xl"
+                              )}>
+                                {m.value}
+                              </span>
+                            </div>
+                          )
+                        }
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
+                    feat.bg,
+                    feat.color,
+                    feat.hoverBg,
+                  )}
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       )}

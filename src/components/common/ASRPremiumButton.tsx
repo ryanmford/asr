@@ -53,13 +53,13 @@ export const ASRPremiumButton = ({
  if (disabled) return "text-zinc-500 dark:text-zinc-400";
  switch (color) {
  case "red":
- return "text-red-400";
+ return "text-red-600 dark:text-red-400";
  case "gold":
- return "text-amber-400";
+ return "text-amber-600 dark:text-amber-400";
  case "blue":
- return "text-blue-400";
+ return "text-blue-600 dark:text-blue-400";
  default:
- return "text-zinc-700 dark:text-zinc-300";
+ return "text-zinc-900 dark:text-zinc-300";
  }
  };
 
@@ -128,7 +128,7 @@ export const ASRPremiumButton = ({
  {...(Component === "button" && disabled ? { disabled: true } : {})}
  className={cn(
  "relative group py-4 px-8 font-black uppercase tracking-[0.2em] transition-all overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-        "theme-focus",
+ "theme-focus",
  getRadiusClass(),
  !disabled && "active:scale-95",
  disabled && "opacity-50 cursor-not-allowed",
@@ -137,8 +137,8 @@ export const ASRPremiumButton = ({
  ? color === "gold" ? "bg-amber-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]" : "bg-zinc-900/60 text-white glow-white"
  : `bg-zinc-900/40 ${getTextColor()}`
  : isSolid
- ? color === "gold" ? "bg-amber-500 text-white" : "bg-white text-zinc-900"
- : "bg-white text-zinc-900 shadow-xl shadow-black/5",
+ ? color === "gold" ? "bg-amber-500 text-amber-900" : "bg-white text-zinc-900"
+ : `bg-white shadow-xl shadow-black/5 ${getTextColor()}`,
  className,
  )}
  >
@@ -152,21 +152,21 @@ export const ASRPremiumButton = ({
  >
  {/* Ambient Glow */}
  <div 
-   className={cn(
-     "absolute inset-0 animate-border-shift blur-[6px] transition-opacity duration-500 z-0",
-     getRadiusClass(),
-     isSolid ? "opacity-30" : "opacity-0 group-hover:opacity-30"
-   )}
-   style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
+ className={cn(
+ "absolute inset-0 animate-border-shift blur-[6px] transition-opacity duration-500 z-0",
+ getRadiusClass(),
+ isSolid ? "opacity-30" : "opacity-0 group-hover:opacity-30"
+ )}
+ style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
  />
  {/* Sharp Edge Border */}
  <div 
-   className={cn(
-     "absolute inset-0 animate-border-shift transition-opacity duration-500 z-0",
-     getRadiusClass(),
-     isSolid ? "opacity-60" : "opacity-0 group-hover:opacity-60"
-   )}
-   style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
+ className={cn(
+ "absolute inset-0 animate-border-shift transition-opacity duration-500 z-0",
+ getRadiusClass(),
+ isSolid ? "opacity-60" : "opacity-0 group-hover:opacity-60"
+ )}
+ style={{ background: getLinearGradient(), backgroundSize: "200% 100%" }}
  />
  </div>
  )}
@@ -190,8 +190,8 @@ export const ASRPremiumButton = ({
  "absolute inset-[1.5px] z-20 backdrop-blur-md transition-colors",
  getRadiusClass(),
  theme === "dark"
- ? (color === "gold" ? "bg-[#332005]/90 group-hover:bg-[#402808]/90" : "bg-zinc-950/90 group-hover:bg-zinc-900/90")
- : (color === "gold" ? "bg-amber-50 group-hover:bg-amber-100" : "bg-white group-hover:bg-zinc-50"),
+ ? (color === "gold" ? "bg-[#332005]/90 group-hover:bg-[#402808]/90" : color === "red" ? "bg-red-950/40 group-hover:bg-red-900/40" : color === "blue" ? "bg-blue-950/40 group-hover:bg-blue-900/40" : "bg-zinc-950/90 group-hover:bg-zinc-900/90")
+ : (color === "gold" ? "bg-amber-50 group-hover:bg-amber-100" : color === "red" ? "bg-red-50 group-hover:bg-red-100" : color === "blue" ? "bg-blue-50 group-hover:bg-blue-100" : "bg-white group-hover:bg-zinc-50"),
  )}
  />
 

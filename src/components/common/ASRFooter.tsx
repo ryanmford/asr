@@ -62,21 +62,21 @@ export const ASRFooter = React.memo(() => {
       >
         <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-7xl gap-6">
           <div className="flex items-center gap-4 text-zinc-400">
-            <a href="https://www.instagram.com/apexspeedrun/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
+            <a href="https://www.instagram.com/apexspeedrun/" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               <Instagram className="w-5 h-5" />
             </a>
-            <a href="https://www.youtube.com/apexmovement" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
+            <a href="https://www.youtube.com/apexmovement" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               <Youtube className="w-5 h-5" />
             </a>
-            <a href="https://beacons.ai/apexspeedrun" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
+            <a href="https://beacons.ai/apexspeedrun" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               <Link className="w-5 h-5" />
             </a>
           </div>
 
           <div className="flex items-center justify-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-bold tracking-widest uppercase transition-colors shrink-0 whitespace-nowrap">
-            <button onClick={() => setActiveModal("about")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">About</button>
-            <button onClick={() => setActiveModal("privacy")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">Privacy Policy</button>
-            <button onClick={() => setActiveModal("terms")} className="hover:text-blue-500 transition-colors uppercase tracking-widest flex-shrink-0">Terms of Service</button>
+            <button onClick={() => setActiveModal("about")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">About</button>
+            <button onClick={() => setActiveModal("privacy")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Privacy Policy</button>
+            <button onClick={() => setActiveModal("terms")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Terms of Service</button>
           </div>
         </div>
 
@@ -87,12 +87,12 @@ export const ASRFooter = React.memo(() => {
 
           <div className="flex items-center gap-2 relative">
             {isLoading ? (
-              <div className="flex items-center gap-2 text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-full">
+              <div className="flex items-center gap-2 text-zinc-500 bg-zinc-500/10 px-3 py-1.5 rounded-full border border-zinc-500/20">
                 <RefreshCw className="w-3 h-3 animate-spin" />
                 <span>Syncing Live Data...</span>
               </div>
             ) : lastUpdated ? (
-              <div className="flex items-center gap-2 text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+              <div className="flex items-center gap-2 text-zinc-500 bg-zinc-500/10 px-3 py-1.5 rounded-full border border-zinc-500/20">
                 <CheckCircle2 className="w-3 h-3" />
                 <span>STATS UPDATED: {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>

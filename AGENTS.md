@@ -38,6 +38,7 @@ This file (`AGENTS.md`) is automatically read by the AI assistant at the start o
 * **Course DNA:** Every course profile must capture precise metrics to calculate intensity: Length (m), Elevation Change (+/-, up or down), and Checkpoint Count. Always verify "Structural Integrity" logic (e.g., Shunt Test, Cap Stones).
 
 ## Design & UI Guidelines
+* **Input Focus Zoom Prevention:** Never use font sizes smaller than 16px (e.g., `text-sm`, `text-[12px]`) on `<input>`, `<textarea>`, or `<select>` elements. iOS Safari automatically zooms out/in on any form element with a font size under 16px, which severely breaks PWA and mobile layouts. Always force inputs to be at least `text-[16px]` or `text-base`.
 * **Aesthetic:** Minimalist, high-fidelity design. Complexity happens by default. Simplicity happens by design.
 * **Visual Integration:** Visuals break up text and reinforce the core points. They do not exist just to decorate. 
 * **Video Proof:** Place a heavy, uncompromising emphasis on high-quality data and videos of actual world-class performers. 
@@ -45,6 +46,7 @@ This file (`AGENTS.md`) is automatically read by the AI assistant at the start o
 * **Typography & Theming:** Maintain brutalist but refined contrast. Dark backgrounds, stark white text, purposeful but subtle outlines, colors, and highlights.
 * **Motion & Feedback:** Animations (like `AnimatedListView` or `CountUp`) must be punchy, precise, and fast—exactly like the sport. Avoid slow, floaty fades or generic bouncing. 
 * **States & Loading:** Never flash blank screens or raw, unstyled data. Always default to `Skeletons` during data fetch cycles and specifically use `ASREmptyState` for null results so the UI never feels broken.
+* **UI Complexity Control:** Keep buttons, toggles, and atomic UI components simple. Do not let them creep into over-complexity. Avoid heavy nesting, excessive absolute layers (e.g., metallic sweeps, multiple z-indexed glows), or heavy blurring (`backdrop-blur`) inside repeated UI elements, which will cause freezing, lagging, and glitching on mobile rendering engines.
 
 ## Technical & Architecture Principles
 * **Mobile-First Reality:** The core navigation relies on bottom-heavy ergonomics (`ASRNavDock` and `ASRBottomSheet`). Always design layouts starting from thumb-reachability on mobile touch screens. Desktop serves as a widescreen expansion of this, not the baseline.

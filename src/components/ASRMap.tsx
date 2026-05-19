@@ -304,6 +304,14 @@ export const ASRMap = forwardRef(({
       ? 'bg-zinc-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.8)]' 
       : 'bg-white shadow-[inset_0_2px_3px_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1)]';
 
+    const dotClasses = currentIsDark 
+      ? 'bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]'
+      : 'bg-zinc-900 shadow-[0_0_12px_rgba(0,0,0,0.3)]';
+
+    const stemClasses = currentIsDark
+      ? 'from-white/80'
+      : 'from-zinc-900/60';
+
     const activeOuterClasses = isActive ? 'scale-[1.5] z-[1000] brightness-125' : 'hover:scale-[1.15] active:scale-95 drop-shadow-lg';
     
     return L.divIcon({
@@ -315,9 +323,9 @@ export const ASRMap = forwardRef(({
               <div class="absolute inset-0 rounded-full animate-border-shift neon-gradient-base blur-[4px] opacity-50 z-0"></div>
               <div class="absolute inset-0 rounded-full animate-border-shift neon-gradient-base opacity-90 z-0"></div>
               <div class="absolute inset-[1.5px] rounded-full z-10 backdrop-blur-md transition-colors ${innerSurface}"></div>
-              <div class="relative z-20 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.9)] ${isActive ? 'scale-125' : 'group-hover:scale-125'} transition-all"></div>
+              <div class="relative z-20 w-1.5 h-1.5 rounded-full ${dotClasses} ${isActive ? 'scale-125' : 'group-hover:scale-125'} transition-all"></div>
             </div>
-            <div class="w-[2px] h-[8px] bg-gradient-to-b from-white/80 to-transparent rounded-b-full"></div>
+            <div class="w-[2px] h-[8px] bg-gradient-to-b ${stemClasses} to-transparent rounded-b-full"></div>
           </div>
         </div>
       `,

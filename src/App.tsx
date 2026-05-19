@@ -248,7 +248,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
             <RouteErrorBoundary>
             <React.Suspense fallback={
               <div className="flex-1 flex flex-col items-center justify-center min-h-[50vh]">
-                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-zinc-900 dark:border-zinc-100 border-t-transparent dark:border-t-transparent rounded-full animate-spin opacity-50" />
               </div>
             }>
             <AnimatePresence mode="wait">
@@ -355,7 +355,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
         <RouteErrorBoundary>
             <React.Suspense fallback={
           <div className="flex-1 flex flex-col items-center justify-center min-h-[50vh]">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-zinc-900 dark:border-zinc-100 border-t-transparent dark:border-t-transparent rounded-full animate-spin opacity-50" />
           </div>
         }>
           <InspectorBody

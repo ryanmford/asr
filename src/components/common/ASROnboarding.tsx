@@ -15,7 +15,7 @@ import {
 import { ThemeContext } from "../../theme-context";
 import { CONFIG, trackEvent, cn } from "../../lib/asr-utils";
 
-import { ASRPremiumButton } from "./ASRPremiumButton";
+import { ASRStandardButton } from "./ASRStandardButton";
 
 interface ASROnboardingProps {
   isOpen: boolean;
@@ -254,7 +254,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
               <div className="w-full flex flex-col items-center gap-4">
                 <div className="flex gap-4 w-full">
                   {steps[step].action ? (
-                    <ASRPremiumButton
+                    <ASRStandardButton
                       href={CONFIG.SKOOL_LINK}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -273,9 +273,9 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
                         className="w-5 h-5 flex-shrink-0"
                         strokeWidth={2.5}
                       />
-                    </ASRPremiumButton>
+                    </ASRStandardButton>
                   ) : (
-                    <ASRPremiumButton
+                    <ASRStandardButton
                       onClick={nextStep}
                       theme={theme as "light" | "dark"}
                       className="flex-1"
@@ -286,7 +286,7 @@ export const ASROnboarding = ({ isOpen, onClose }: ASROnboardingProps) => {
                         className="w-5 h-5 flex-shrink-0"
                         strokeWidth={2.5}
                       />
-                    </ASRPremiumButton>
+                    </ASRStandardButton>
                   )}
                 </div>
                 <button

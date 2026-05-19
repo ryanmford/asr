@@ -82,7 +82,7 @@ export const ASRHeader = React.memo(
               <CloudOff size={10} /> OFFLINE
             </div>
           ) : isSyncing ? (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[9px] font-black tracking-widest uppercase">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-[9px] font-black tracking-widest uppercase opacity-70">
               <RefreshCw size={10} className="animate-spin" /> SYNCING
             </div>
           ) : null}

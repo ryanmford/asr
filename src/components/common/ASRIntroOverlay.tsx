@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { RotatingLogo } from "./RotatingLogo";
 
-import { ASRPremiumButton } from "./ASRPremiumButton";
+import { ASRStandardButton } from "./ASRStandardButton";
 
 interface ASRIntroOverlayProps {
   theme: "light" | "dark";
@@ -35,7 +35,7 @@ export const ASRIntroOverlay = React.memo(
           </div>
 
           <div className="flex flex-col gap-3 w-full">
-            <ASRPremiumButton
+            <ASRStandardButton
               onClick={onStart}
               theme={theme}
               className="w-full"
@@ -46,7 +46,7 @@ export const ASRIntroOverlay = React.memo(
                 size={18}
                 className="group-hover:translate-x-1 transition-transform"
               />
-            </ASRPremiumButton>
+            </ASRStandardButton>
             <p className="text-[9px] font-bold opacity-20 uppercase">
               TAP TO ENTER THE ARENA
             </p>
