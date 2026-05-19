@@ -119,10 +119,10 @@ export const ASRPremiumButton = ({
  disabled && "opacity-50 cursor-not-allowed",
  theme === "dark"
  ? isSolid
- ? "bg-zinc-900/60 text-white glow-white"
+ ? color === "gold" ? "bg-amber-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]" : "bg-zinc-900/60 text-white glow-white"
  : `bg-zinc-900/40 ${getTextColor()}`
  : isSolid
- ? "bg-white text-zinc-900"
+ ? color === "gold" ? "bg-amber-500 text-white" : "bg-white text-zinc-900"
  : "bg-white text-zinc-900 shadow-xl shadow-black/5",
  className,
  )}
@@ -175,8 +175,8 @@ export const ASRPremiumButton = ({
  "absolute inset-[1.5px] z-20 backdrop-blur-md transition-colors",
  getRadiusClass(),
  theme === "dark"
- ? "bg-zinc-950/90 group-hover:bg-zinc-900/90"
- : "bg-white group-hover:bg-zinc-50",
+ ? (color === "gold" ? "bg-[#332005]/90 group-hover:bg-[#402808]/90" : "bg-zinc-950/90 group-hover:bg-zinc-900/90")
+ : (color === "gold" ? "bg-amber-50 group-hover:bg-amber-100" : "bg-white group-hover:bg-zinc-50"),
  )}
  />
 

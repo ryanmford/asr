@@ -1,6 +1,7 @@
 {
   "short_name": "Apex",
   "name": "Apex Speed Run",
+  "description": "Global parkour speedrun leaderboards and course directory.",
   "icons": [
     {
       "src": "/apexspeedrun.png",
@@ -17,6 +18,8 @@
   ],
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "theme_color": "#09090b",
-  "background_color": "#09090b"
+  "background_color": "#09090b",
+  "categories": ["sports", "fitness"]
 }

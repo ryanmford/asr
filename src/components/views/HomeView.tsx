@@ -1081,11 +1081,6 @@ export const HomeView = React.memo(() => {
                               "",
                           ).trim();
 
-                          const courseFlag = fixCountryEntity(
-                            item.course?.country || "",
-                            item.course?.flag || item.course?.region || ""
-                          ).flag;
-
                           let rankBadge = null;
                           if (rank === 1)
                             rankBadge = {
@@ -1187,11 +1182,6 @@ export const HomeView = React.memo(() => {
                                       >
                                         <div className="flex items-center gap-1.5 min-w-0 max-w-full">
                                           <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                                          {courseFlag && (
-                                            <span className="opacity-80 shrink-0">
-                                              {courseFlag}
-                                            </span>
-                                          )}
                                           <span className="truncate uppercase tracking-wider text-[10px] sm:text-[11px]">
                                             {courseName}
                                             {item.course?.city

@@ -88,7 +88,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
              description = `Open Season Stats: ${rating} Rating | Open Rank: ${rank || 'UR'} | Gym: ${gym}`;
          }
       }
-    } else if (parts[0] === "map" && parts[1]) {
+    } else if (parts[0] === "courses" && parts[1]) {
       const slug = normalizeName(decodeURIComponent(parts[1]));
       const courseStr = Object.keys(cachedData.cMet || {}).find(c => normalizeName(c) === slug);
       if (courseStr) {

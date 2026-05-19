@@ -147,8 +147,8 @@ export const ASRPromotionBanner = React.memo(
  className={cn(
  "@container group relative w-full rounded-[3rem] p-8 @md:p-10 @2xl:p-12 overflow-hidden flex flex-col @2xl:flex-row items-center @2xl:items-stretch justify-between gap-12 transition-all hover:scale-[1.01] active:scale-[0.99]",
  theme === "dark"
- ? "bg-zinc-950"
- : "bg-white",
+ ? isSponsor ? "bg-[#251704] border border-amber-500/10" : "bg-zinc-950"
+ : isSponsor ? "bg-amber-50/50" : "bg-white",
  )}
  >
  <div className="relative z-10 flex flex-col gap-3 flex-1 text-left w-full min-w-0">
@@ -206,7 +206,7 @@ export const ASRPromotionBanner = React.memo(
  className={cn(
  "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl rotate-12 overflow-hidden flex items-center justify-center p-4 transition-colors",
  config.borderFocus,
- theme === "dark" ? "bg-zinc-900" : "bg-slate-50",
+ theme === "dark" ? (isSponsor ? "bg-[#332005]" : "bg-zinc-900") : (isSponsor ? "bg-amber-100/50" : "bg-slate-50"),
  )}
  >
  {config.icon}
@@ -215,7 +215,7 @@ export const ASRPromotionBanner = React.memo(
  className={cn(
  "w-20 h-20 @md:w-24 @md:h-24 @2xl:w-40 @2xl:h-40 rounded-3xl -rotate-12 overflow-hidden flex items-center justify-center p-4 -ml-10 @2xl:-ml-12 mt-6 @2xl:mt-8 opacity-50 transition-colors",
  config.borderGhost,
- theme === "dark" ? "bg-zinc-900" : "bg-slate-50",
+ theme === "dark" ? (isSponsor ? "bg-[#332005]" : "bg-zinc-900") : (isSponsor ? "bg-amber-100/50" : "bg-slate-50"),
  )}
  >
  <ChevronsRight className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-zinc-500" />
