@@ -326,14 +326,14 @@ export const HomeView = React.memo(() => {
         )}
       >
         {/* Full Background Video */}
-        <div className="absolute inset-0 z-0 bg-black pointer-events-none">
+        <div className="absolute inset-0 z-0 bg-black">
           <video 
             src="/ben-tivoli.mp4"
             autoPlay 
             playsInline 
             muted 
             loop 
-            className="w-full h-full object-cover opacity-80 pointer-events-none"
+            className="w-full h-full object-cover opacity-80"
           />
           {/* subtle vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
