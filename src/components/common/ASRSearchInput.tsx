@@ -42,9 +42,8 @@ export const ASRSearchInput = React.memo(
           className={cn(
             `relative flex items-center h-12 ${radiusClass} border transition-all duration-300 overflow-hidden`,
             theme === "dark"
-              ? "bg-zinc-900/40 border-white/[0.05] focus-within:border-transparent focus-within:bg-zinc-900/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]"
-              : "bg-white border-slate-200 focus-within:border-transparent focus-within:bg-white shadow-xl shadow-black/5",
-            (variant === "pill" || variant === "docked") && (theme === "dark" ? "backdrop-blur-md bg-zinc-900/70 border border-white/10" : "backdrop-blur-md bg-white/70 border border-black/5"),
+              ? "bg-zinc-900/80 border-white/10 focus-within:border-white/20 focus-within:bg-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-md"
+              : "bg-white border-slate-200 focus-within:border-slate-300 focus-within:bg-white shadow-sm shadow-black/5 backdrop-blur-md",
             (variant === "pill" || variant === "docked") && "shadow-none",
             variant === "docked" && "border-x-0 border-t-0 bg-transparent dark:bg-transparent backdrop-blur-none"
           )}
@@ -99,7 +98,7 @@ export const ASRSearchInput = React.memo(
             style={{ scrollMarginBottom: '120px' }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
-              "w-full h-full pl-10 bg-transparent outline-none text-[16px] placeholder:text-[11px] sm:placeholder:text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal z-30 relative appearance-none text-ellipsis",
+              "w-full h-full pl-10 bg-transparent outline-none text-[16px] placeholder:text-[15px] sm:placeholder:text-[16px] font-black uppercase tracking-widest placeholder:opacity-40 placeholder:normal-case placeholder:font-medium placeholder:tracking-normal z-30 relative appearance-none text-ellipsis",
               theme === "dark"
                 ? "text-white placeholder:text-white"
                 : "text-zinc-900 placeholder:text-zinc-900",

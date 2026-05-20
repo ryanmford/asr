@@ -408,7 +408,7 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative min-h-[90vh] sm:min-h-[105vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-start overflow-hidden transition-all duration-500 group border-b z-10",
+          "relative h-[115dvh] sm:h-[120dvh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-start overflow-hidden transition-all duration-500 group border-b z-10",
           theme === "dark" ? "bg-[#0A0A0A] border-white/5" : "bg-black border-white/10",
         )}
       >
@@ -429,7 +429,7 @@ export const HomeView = React.memo(() => {
         </div>
 
         {/* Get Started perfectly centered both horizontally and vertically within the hero section */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 pointer-events-none relative z-10">
+        <div className="absolute top-0 left-0 right-0 h-[100dvh] flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 pointer-events-none z-10">
           <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
               className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/40 backdrop-blur-md border border-white/20"

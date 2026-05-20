@@ -84,10 +84,10 @@ export const ASRHeader = React.memo(
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
             className={cn(
-              "group/theme min-w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-500 active:scale-95 outline-none overflow-hidden backdrop-blur-md relative",
+              "group/theme min-w-12 h-12 flex items-center justify-center rounded-full border transition-all duration-300 active:scale-95 outline-none overflow-hidden backdrop-blur-md relative",
               theme === "dark"
-                ? "bg-zinc-900/60 border-white/10 text-white/70 hover:text-white hover:bg-zinc-800/80 hover:border-white/20 shadow-[0_4px_24px_rgba(255,255,255,0.03)]"
-                : "bg-white/60 border-black/5 text-black/70 hover:text-black hover:bg-white/90 hover:border-black/15 shadow-[0_2px_12px_rgba(0,0,0,0.04)]",
+                ? "bg-zinc-900/80 border-white/10 text-white/70 hover:text-white hover:bg-zinc-800 hover:border-white/20 shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
+                : "bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 shadow-sm shadow-black/5",
             )}
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500"></div>

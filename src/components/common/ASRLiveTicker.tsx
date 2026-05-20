@@ -30,10 +30,16 @@ export const ASRLiveTicker = React.memo(
             "relative z-[40] w-full h-8 sm:h-10 border-b flex items-center justify-center select-none overflow-hidden backdrop-blur-md transition-colors duration-500",
             theme === "dark"
               ? "bg-zinc-950/80 border-white/5 text-zinc-100 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
-              : "bg-white/80 border-zinc-200/50 text-slate-800 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
+              : "bg-white/90 border-zinc-200/50 text-slate-800 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
           )}
         >
-          <div className="opacity-30 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
+          <div 
+            className="opacity-30 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse"
+            style={{
+              maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+              WebkitMaskImage: "linear-gradient(to right, transparent, black 2rem, black calc(100% - 2rem), transparent)"
+            }}
+          >
             SCANNING LIVE STATS...
           </div>
         </div>
@@ -58,13 +64,15 @@ export const ASRLiveTicker = React.memo(
           "relative z-[40] w-full overflow-hidden border-b h-10 sm:h-12 flex items-center select-none transition-colors duration-500 backdrop-blur-md",
           theme === "dark"
             ? "bg-zinc-950/80 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
-            : "bg-white/80 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
+            : "bg-white/90 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
         )}
       >
         <div
-          className="flex items-center shrink-0 whitespace-nowrap gap-12 sm:gap-20 px-8 animate-marquee"
+          className="flex items-center shrink-0 whitespace-nowrap gap-12 sm:gap-20 animate-marquee"
           style={{ 
             animationDuration: `${animationDurationSeconds}s`,
+            maskImage: "linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent)"
           }}
         >
           {duplicatedFeed.map((item: any, idx: number) => {
@@ -190,18 +198,6 @@ export const ASRLiveTicker = React.memo(
             );
           })}
         </div>
-        <div
-          className={cn(
-            "absolute top-0 right-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l pointer-events-none z-10",
-            theme === "dark" ? "from-black" : "from-white",
-          )}
-        />
-        <div
-          className={cn(
-            "absolute top-0 left-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r pointer-events-none z-10",
-            theme === "dark" ? "from-black" : "from-white",
-          )}
-        />
       </div>
     );
   },
