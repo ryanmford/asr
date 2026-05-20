@@ -352,6 +352,47 @@ export const formatFlagsWithSpace = (f: string) => {
   return f;
 };
 
+export const getCombinedFlags = (...objects: any[]) => {
+  const flags = new Set<string>();
+  const flagRegex = /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g;
+
+  for (const obj of objects) {
+    if (!obj) continue;
+    
+    // We handle the object directly if it's a string
+    if (typeof obj === 'string') {
+        const matches = String(obj).match(flagRegex);
+        if (matches) matches.forEach(m => flags.add(m));
+        continue;
+    }
+
+    const possibleFlagFields = [
+      obj.flag, 
+      obj.townFlag, 
+      obj.gymFlag, 
+      obj.region, 
+      obj.country, 
+      obj.countryName
+    ];
+
+    for (const val of possibleFlagFields) {
+      if (!val) continue;
+      
+      let resolvedFlag = val;
+      if (typeof val === 'string' && !flagRegex.test(val) && val.trim() !== "") {
+         resolvedFlag = fixCountryEntity(val, "").flag;
+      }
+      
+      const matches = String(resolvedFlag).match(flagRegex);
+      if (matches) {
+        matches.forEach(m => flags.add(m));
+      }
+    }
+  }
+
+  return Array.from(flags).join(" ");
+};
+
 export const getFireCountForRun = (time: number, gender: string) => {
   if (time === null || time === undefined) return 0;
   if (gender === "M") {

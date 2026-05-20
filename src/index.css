@@ -23,7 +23,7 @@
   .theme-hover { @apply hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300; }
   .theme-hover-strong { @apply hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-300; }
   
-  .theme-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#030303] transition-all duration-300; }
+  .theme-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#030303] transition-all duration-300; }
 }
 
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React from "react";
-import { cn, formatFlagsWithSpace } from "../../lib/asr-utils";
+import { cn, formatFlagsWithSpace, getCombinedFlags } from "../../lib/asr-utils";
 import { useDataStore } from "../../store/useDataStore";
 
 interface ASRLiveTickerProps {
@@ -78,12 +78,7 @@ export const ASRLiveTicker = React.memo(
           {duplicatedFeed.map((item: any, idx: number) => {
             const fires = item.fireCount || 0;
             const rank = item.rank || 0;
-            const athleteFlag = formatFlagsWithSpace(
-              item.athlete?.region ||
-                item.athlete?.flag ||
-                item.athlete?.country ||
-                "",
-            ).trim();
+            const athleteFlag = getCombinedFlags(item.athlete).trim();
             const courseFlag = formatFlagsWithSpace(
               item.course?.flag || "",
             ).trim();

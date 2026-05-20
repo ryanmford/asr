@@ -112,16 +112,16 @@ export const ASRListItem = React.memo(
  : "hover:bg-black/[0.05]";
  const cardHover =
  theme === "dark" 
- ? "hover:bg-white/5 hover:border-blue-500/50 transition-colors duration-150" 
- : "hover:bg-black/5 hover:border-blue-500/50 transition-colors duration-150";
+ ? "hover:bg-white/5 hover:border-zinc-500/30 transition-colors duration-150" 
+ : "hover:bg-black/5 hover:border-zinc-500/30 transition-colors duration-150";
 
  const getHighlightClass = () => {
    if (!isHighlighted) return "";
-   return theme === "dark" ? "!bg-white/10 !ring-2 !ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] !scale-[1.02] z-10 relative" : "!bg-black/5 !ring-2 !ring-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] !scale-[1.02] z-10 relative";
+   return theme === "dark" ? "!bg-white/10 !ring-2 !ring-zinc-100 shadow-[0_0_15px_rgba(255,255,255,0.2)] !scale-[1.02] z-10 relative" : "!bg-black/5 !ring-2 !ring-zinc-900 shadow-[0_0_15px_rgba(0,0,0,0.2)] !scale-[1.02] z-10 relative";
  };
  const getTableHighlightClass = () => {
    if (!isHighlighted) return "";
-   return theme === "dark" ? "!bg-white/[0.12] scale-[1.01] z-10 relative" : "!bg-blue-500/10 scale-[1.01] z-10 relative";
+   return theme === "dark" ? "!bg-white/[0.12] scale-[1.01] z-10 relative" : "!bg-zinc-900/5 scale-[1.01] z-10 relative";
  };
 
  const ItemWrapper: React.ElementType = 'div';
@@ -145,7 +145,7 @@ export const ASRListItem = React.memo(
  className={cn(
  "group flex items-center transition-all duration-300 ios-clip-fix py-5 sm:py-6 lg:py-8 px-0 outline-none w-full text-left",
  onClick
- ? `cursor-pointer active:scale-95 active:bg-blue-500/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-blue-500/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${tableHover}`
+ ? `cursor-pointer active:scale-95 active:bg-zinc-500/10 hover:scale-[1.01] focus-visible:outline-none focus-visible:bg-zinc-500/5 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-zinc-500 rounded-xl ${tableHover}`
  : "cursor-default",
  getTableHighlightClass(),
  shouldFade ? "opacity-40 grayscale" : "opacity-100",
@@ -176,7 +176,7 @@ export const ASRListItem = React.memo(
  <div
  className={cn(
  "flex items-center text-[11px] sm:text-[18px] lg:text-[24px] font-black uppercase leading-tight transition-colors max-w-full",
- onClick && !isUnclaimed ? "group-hover:text-blue-500" : "",
+ onClick && !isUnclaimed ? "" : "",
  isUnclaimed
  ? theme === "dark"
  ? "text-zinc-300"
@@ -232,14 +232,14 @@ export const ASRListItem = React.memo(
  ? cn(
  "text-sm sm:text-[24px] lg:text-[32px] tracking-tight",
  s.value
- ? cn(accentColor, "group-hover:text-blue-500")
+ ? cn(accentColor, "")
  : "opacity-20",
  )
  : cn(
  "text-[10px] sm:text-[15px] lg:text-[19px] font-bold transition-colors",
  theme === "dark"
- ? "text-white/60 group-hover:text-blue-500"
- : "text-zinc-500 group-hover:text-blue-500",
+ ? "text-white/60"
+ : "text-zinc-500",
  ),
  )}
  >
@@ -306,7 +306,7 @@ export const ASRListItem = React.memo(
  ? "py-3 pl-3 pr-1.5 rounded-[1.25rem] border h-auto min-h-[64px]"
  : "py-3 sm:py-5 lg:py-6 pl-3 sm:pl-6 lg:pl-8 pr-1.5 sm:pr-4 rounded-[1.25rem] sm:rounded-[1.5rem] lg:rounded-[2rem] border h-auto min-h-[64px] sm:min-h-[80px] lg:min-h-[100px] ",
  onClick && !isUnclaimed
- ? `cursor-pointer active:scale-95 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${"theme-focus"} ${cardHover}`
+ ? `cursor-pointer active:scale-95 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 ${"theme-focus"} ${cardHover}`
  : "cursor-default",
  isUnclaimed
  ? cn(
@@ -359,7 +359,7 @@ export const ASRListItem = React.memo(
  className={cn(
  "flex items-center font-black uppercase whitespace-normal leading-tight transition-colors line-clamp-2",
  isCompact ? "text-[10px]" : "text-[10px] sm:text-[18px] lg:text-[22px]",
- onClick && !isUnclaimed ? "group-hover:text-blue-500" : "",
+ onClick && !isUnclaimed ? "" : "",
  isUnclaimed
  ? theme === "dark"
  ? "text-zinc-300"
@@ -425,16 +425,16 @@ export const ASRListItem = React.memo(
  ? cn(
  isCompact ? "text-[13px]" : "text-[13px] sm:text-[24px] lg:text-[28px] tracking-tight",
  s.value
- ? cn(accentColor, "group-hover:text-blue-500")
+ ? cn(accentColor, "")
  : "opacity-20",
  )
  : theme === "dark"
  ? cn(
- "text-white/50 group-hover:text-blue-500",
+ "text-white/50",
  isCompact ? "text-[11px] font-bold" : "text-[11px] sm:text-[14px] lg:text-[18px] font-bold",
  )
  : cn(
- "text-zinc-500 group-hover:text-blue-500",
+ "text-zinc-500",
  isCompact ? "text-[11px] font-bold" : "text-[11px] sm:text-[14px] lg:text-[18px] font-bold",
  ),
  )}

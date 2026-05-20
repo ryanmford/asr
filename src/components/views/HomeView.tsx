@@ -20,7 +20,7 @@ import { useAppNavigation } from "../../hooks/useDerivedData";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
-import { cn, formatFlagsWithSpace, fixCountryEntity } from "../../lib/asr-utils";
+import { cn, formatFlagsWithSpace, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
 
 export const HomeView = React.memo(() => {
@@ -139,12 +139,21 @@ export const HomeView = React.memo(() => {
        const atM = c.allTimeAthletesM || [];
        const atF = c.allTimeAthletesF || [];
        
-       [...atM, ...atF].forEach((run) => {
+       atM.forEach((run: any) => {
           if (run && run[2]) { // Must have video URL
              const pKey = run[0];
              // Must be AT or OP ranked
              if (uniquePlayersMap.has(pKey)) {
-                allValidRuns.push({ run, course: c });
+                allValidRuns.push({ run, course: c, gender: 'M' });
+             }
+          }
+       });
+       atF.forEach((run: any) => {
+          if (run && run[2]) { // Must have video URL
+             const pKey = run[0];
+             // Must be AT or OP ranked
+             if (uniquePlayersMap.has(pKey)) {
+                allValidRuns.push({ run, course: c, gender: 'F' });
              }
           }
        });
@@ -157,16 +166,25 @@ export const HomeView = React.memo(() => {
        const targetCourse = selected.course;
        
        const pObj = uniquePlayersMap.get(bestRun[0]);
-       const pFlag = pObj ? (pObj.townFlag || pObj.gymFlag || pObj.country || pObj.region || "") : "";
-       const pFlagFmt = pFlag ? `${formatFlagsWithSpace(pFlag).trim()} ` : "";
+       const pFlagStr = pObj ? getCombinedFlags(pObj) : "";
+       const pFlagFmt = pFlagStr ? `${pFlagStr.trim()} ` : "";
        const athleteName = pObj ? pObj.name : bestRun[0];
 
-       const cFlag = targetCourse.flag || targetCourse.region || targetCourse.country || "";
-       const cFlagFmt = cFlag ? `${formatFlagsWithSpace(cFlag).trim()} ` : "";
+       const cFlagStr = getCombinedFlags(targetCourse);
+       const cFlagFmt = cFlagStr ? `${cFlagStr.trim()} ` : "";
+
+       // Calculate Points (LQ)
+       const cr = selected.gender === 'F' ? (targetCourse.fRecord || targetCourse.mRecord) : targetCourse.mRecord;
+       const runTime = bestRun[1];
+       let pts = 0;
+       if (cr && runTime > 0) {
+         pts = (cr / runTime) * 100;
+       }
 
        rOfDay = {
          athleteName: `${pFlagFmt}${athleteName}`,
          time: bestRun[1].toFixed(2),
+         pts: pts.toFixed(2),
          videoUrl: bestRun[2],
          courseName: `${cFlagFmt}${targetCourse.name}`,
          course: targetCourse,
@@ -341,6 +359,155 @@ export const HomeView = React.memo(() => {
           </div>
         </div>
       </motion.div>
+
+      {/* Of The Day Section */}
+      {(topPlayer || topCourse || dailyRecord) && (
+        <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-4 sm:mt-8 mb-4 sm:mb-8">
+          <div className="flex flex-col gap-4 px-2">
+            {[
+              dailyRecord && {
+                type: "video",
+                data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl },
+                displayName: dailyRecord.athleteName,
+                label: "Run of the Day",
+                icon: <Timer className="w-4 h-4" />,
+                color: "text-pink-500",
+                bg: "bg-pink-500/10",
+                hoverBg: "group-hover:bg-pink-500",
+                hoverText: "group-hover:text-pink-500 dark:group-hover:text-pink-400",
+                metrics: [
+                  { label: "Course", value: dailyRecord.courseName },
+                  { label: "Time", value: dailyRecord.time },
+                  { label: "POINTS", value: dailyRecord.pts },
+                ],
+              },
+              topPlayer && {
+                type: "player",
+                data: topPlayer,
+                displayName: getCombinedFlags(topPlayer) ? `${getCombinedFlags(topPlayer).trim()} ${topPlayer.name}` : topPlayer.name,
+                label: "Player of the Day",
+                icon: <User className="w-4 h-4" />,
+                color: "text-blue-500",
+                bg: "bg-blue-500/10",
+                hoverBg: "group-hover:bg-blue-500",
+                hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
+                metrics: [
+                  { label: "Rank", value: topPlayer._gRank },
+                  { label: "LQ", value: Number(topPlayer.rating || 0).toFixed(2) },
+                  { label: "POINTS", value: Number(topPlayer.pts || (topPlayer.rating || 0) * (topPlayer.runs || 0)).toFixed(2) },
+                ],
+              },
+              topCourse && {
+                type: "course",
+                data: topCourse,
+                displayName: getCombinedFlags(topCourse) ? `${getCombinedFlags(topCourse).trim()} ${topCourse.name}` : topCourse.name,
+                label: "Course of the Day",
+                icon: <MapPin className="w-4 h-4" />,
+                color: "text-emerald-500",
+                bg: "bg-emerald-500/10",
+                hoverBg: "group-hover:bg-emerald-500",
+                hoverText: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+                metrics: [
+                  { label: "Runs", value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0 },
+                  { label: "CR (M)", value: topCourse.mRecord ? Number(topCourse.mRecord).toFixed(2) : "--" },
+                  { label: "CR (W)", value: topCourse.fRecord ? Number(topCourse.fRecord).toFixed(2) : "--" },
+                ],
+              }
+            ].filter(Boolean).map((feat: any, idx: number) => (
+              <div
+                key={idx}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  if (feat.type === "video" && feat.data.videoUrl) {
+                    setPlayingVideoUrl(feat.data.videoUrl);
+                  } else {
+                    navigateToEntity(feat.type, feat.data);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (feat.type === "video" && feat.data.videoUrl) {
+                      setPlayingVideoUrl(feat.data.videoUrl);
+                    } else {
+                      navigateToEntity(feat.type, feat.data);
+                    }
+                  }
+                }}
+                className={cn(
+                  "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 sm:p-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
+                )}
+              >
+                <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
+                  <div className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between">
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <div
+                        className={cn(
+                          "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5",
+                          feat.color,
+                        )}
+                      >
+                        {feat.icon} {feat.label}
+                      </div>
+                      <div
+                        className={cn(
+                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
+                          feat.displayName.length > 22
+                            ? "text-base sm:text-lg md:text-xl"
+                            : feat.displayName.length > 15
+                              ? "text-lg sm:text-xl md:text-2xl"
+                              : "text-xl sm:text-2xl md:text-3xl",
+                          feat.hoverText,
+                        )}
+                      >
+                        {feat.displayName}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
+                      {feat.metrics.map(
+                        (
+                          m: { label: string; value: React.ReactNode },
+                          i: number,
+                        ) => {
+                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
+                          const len = valStr.length || 5;
+                          return (
+                            <div key={i} className="flex flex-col min-w-0 flex-shrink">
+                              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
+                                {m.label}
+                              </span>
+                              <span className={cn(
+                                "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
+                                len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
+                                : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
+                                : "text-base sm:text-lg md:text-xl"
+                              )}>
+                                {m.value}
+                              </span>
+                            </div>
+                          )
+                        }
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
+                    feat.bg,
+                    feat.color,
+                    feat.hoverBg,
+                  )}
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Unified Stats & Navigation Cards */}
       {isLoading ? (
@@ -766,152 +933,6 @@ export const HomeView = React.memo(() => {
         </motion.div>
       )}
 
-      {/* Of The Day Section */}
-      {(topPlayer || topCourse || dailyRecord) && (
-        <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-4 sm:mt-8 mb-4 sm:mb-8">
-          <div className="flex items-center gap-2 px-2">
-            <Trophy className="w-3.5 h-3.5 text-zinc-500" />
-            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
-              Of The Day
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
-          </div>
-          
-          <div className="flex flex-col gap-4 px-2">
-            {[
-              dailyRecord && {
-                type: "video",
-                data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl },
-                displayName: dailyRecord.athleteName,
-                label: "Run of the Day",
-                icon: <Timer className="w-4 h-4 fill-current" />,
-                color: "text-pink-500",
-                bg: "bg-pink-500/10",
-                hoverBg: "group-hover:bg-pink-500",
-                hoverText: "group-hover:text-pink-500 dark:group-hover:text-pink-400",
-                metrics: [
-                  { label: "Course", value: dailyRecord.courseName },
-                  { label: "Time", value: <>{dailyRecord.time} <span className="inline-block animate-bounce ml-0.5">🥇</span></> },
-                ],
-              },
-              topPlayer && {
-                type: "player",
-                data: topPlayer,
-                displayName: topPlayer.townFlag || topPlayer.gymFlag ? `${formatFlagsWithSpace(topPlayer.townFlag || topPlayer.gymFlag).trim()} ${topPlayer.name}` : topPlayer.name,
-                label: "Player of the Day",
-                icon: <User className="w-4 h-4" />,
-                color: "text-blue-500",
-                bg: "bg-blue-500/10",
-                hoverBg: "group-hover:bg-blue-500",
-                hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
-                metrics: [
-                  { label: "Rank", value: topPlayer._gRank },
-                  { label: "LQ", value: Number(topPlayer.rating || 0).toFixed(2) },
-                  { label: "POINTS", value: Number(topPlayer.pts || (topPlayer.rating || 0) * (topPlayer.runs || 0)).toFixed(2) },
-                ],
-              },
-              topCourse && {
-                type: "course",
-                data: topCourse,
-                displayName: topCourse.flag ? `${formatFlagsWithSpace(topCourse.flag).trim()} ${topCourse.name}` : topCourse.name,
-                label: "Course of the Day",
-                icon: <MapPin className="w-4 h-4" />,
-                color: "text-emerald-500",
-                bg: "bg-emerald-500/10",
-                hoverBg: "group-hover:bg-emerald-500",
-                hoverText: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-                metrics: [
-                  { label: "Runs", value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0 },
-                  { label: "CR (M)", value: topCourse.mRecord ? Number(topCourse.mRecord).toFixed(2) : "--" },
-                  { label: "CR (W)", value: topCourse.fRecord ? Number(topCourse.fRecord).toFixed(2) : "--" },
-                ],
-              }
-            ].filter(Boolean).map((feat: any, idx: number) => (
-              <div
-                key={idx}
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateToEntity(feat.type, feat.data)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigateToEntity(feat.type, feat.data);
-                  }
-                }}
-                className={cn(
-                  "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 sm:p-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
-                )}
-              >
-                <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
-                  <div className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between">
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div
-                        className={cn(
-                          "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5",
-                          feat.color,
-                        )}
-                      >
-                        {feat.icon} {feat.label}
-                      </div>
-                      <div
-                        className={cn(
-                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
-                          feat.displayName.length > 22
-                            ? "text-base sm:text-lg md:text-xl"
-                            : feat.displayName.length > 15
-                              ? "text-lg sm:text-xl md:text-2xl"
-                              : "text-xl sm:text-2xl md:text-3xl",
-                          feat.hoverText,
-                        )}
-                      >
-                        {feat.displayName}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
-                      {feat.metrics.map(
-                        (
-                          m: { label: string; value: React.ReactNode },
-                          i: number,
-                        ) => {
-                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
-                          const len = valStr.length || 5;
-                          return (
-                            <div key={i} className="flex flex-col min-w-0 flex-shrink">
-                              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
-                                {m.label}
-                              </span>
-                              <span className={cn(
-                                "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
-                                len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
-                                : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
-                                : "text-base sm:text-lg md:text-xl"
-                              )}>
-                                {m.value}
-                              </span>
-                            </div>
-                          )
-                        }
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className={cn(
-                    "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
-                    feat.bg,
-                    feat.color,
-                    feat.hoverBg,
-                  )}
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-
       {/* Recent Activity */}
       {(isLoading || (recentFeed && recentFeed.length > 0)) && (
         <motion.div
@@ -966,12 +987,7 @@ export const HomeView = React.memo(() => {
                               ? item.time.toFixed(2)
                               : "--");
 
-                          const athleteFlag = formatFlagsWithSpace(
-                            item.athlete?.region ||
-                              item.athlete?.flag ||
-                              item.athlete?.country ||
-                              "",
-                          ).trim();
+                          const athleteFlag = getCombinedFlags(item.athlete).trim();
 
                           let rankBadge = null;
                           if (rank === 1)

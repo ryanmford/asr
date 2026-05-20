@@ -9,6 +9,7 @@ import {
  cn,
  trackEvent,
  formatFlagsWithSpace,
+  getCombinedFlags,
  THEME,
 } from "../../lib/asr-utils";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
@@ -165,9 +166,7 @@ export const ASRWallOfFame = React.memo(
  else displayVal = a[sec.k] || 0;
 
  const isTop3 = i < 3;
- const flags = formatFlagsWithSpace(
- a.region || a.flag || a.country || "🏳️",
- );
+ const flags = getCombinedFlags(a);
  const hoverClass =
  theme === "dark"
  ? "hover:bg-blue-500/10"

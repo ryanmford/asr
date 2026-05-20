@@ -15,6 +15,7 @@ import {
   cn,
   formatLocation,
   formatFlagsWithSpace,
+  getCombinedFlags,
   getSetterLevel,
 } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
@@ -107,7 +108,7 @@ export const PlayerDetails = React.memo(
           title={
             <span className="flex items-center gap-2">
               <span className="drop-shadow-xl shrink-0 text-xl whitespace-nowrap">
-                {formatFlagsWithSpace(meta.flag || meta.region)}
+                {getCombinedFlags(meta)}
               </span>
               <span className="truncate">{meta.name}</span>
             </span>

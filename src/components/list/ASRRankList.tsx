@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Activity } from "lucide-react";
 import { motion } from "motion/react";
-import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity } from "../../lib/asr-utils";
+import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
 import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
@@ -201,15 +201,8 @@ export const ASRRankList = ({
  meta.location ||
  meta.city
  }
- flag={
- item.flag || 
- meta.flag || 
- meta.region || 
- (meta.countryName ? fixCountryEntity(meta.countryName, "").flag : null) ||
- (meta.country ? fixCountryEntity(meta.country, "").flag : null) ||
- (item.country ? fixCountryEntity(item.country, "").flag : null)
- }
- stats={stats}
+ flag={getCombinedFlags(item, meta)}
+                stats={stats}
  videoUrl={explicitVideoUrl || item.videoUrl || item.demoVideo}
  mapUrl={
  item.mapUrl ||
