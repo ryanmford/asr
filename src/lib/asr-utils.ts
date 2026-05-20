@@ -356,23 +356,39 @@ export const getCombinedFlags = (...objects: any[]) => {
   const flags = new Set<string>();
   const flagRegex = /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g;
 
+  // Process explicit strings or explicit flag/region fields first
   for (const obj of objects) {
     if (!obj) continue;
     
-    // We handle the object directly if it's a string
     if (typeof obj === 'string') {
         const matches = String(obj).match(flagRegex);
         if (matches) matches.forEach(m => flags.add(m));
         continue;
     }
 
+    const explicitFlagField = obj.flag || obj.region;
+    if (explicitFlagField) {
+      const matches = String(explicitFlagField).match(flagRegex);
+      if (matches && matches.length > 0) {
+        matches.forEach(m => flags.add(m));
+      }
+    }
+  }
+
+  // If we found any explicit flags, return them immediately.
+  if (flags.size > 0) {
+      return Array.from(flags).join(" ");
+  }
+
+  // Fallback: only if NO explicit flags were found across all objects
+  for (const obj of objects) {
+    if (!obj || typeof obj === 'string') continue;
+
     const possibleFlagFields = [
-      obj.flag, 
-      obj.townFlag, 
-      obj.gymFlag, 
-      obj.region, 
       obj.country, 
-      obj.countryName
+      obj.countryName,
+      obj.townFlag, 
+      obj.gymFlag
     ];
 
     for (const val of possibleFlagFields) {
