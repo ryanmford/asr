@@ -44,17 +44,17 @@ export const PlayersView = React.memo(({ theme }: { theme: "light" | "dark" }) =
       onItemClick={handleItemClick}
       middleLabel="PLAYER"
       columns={columns}
-      topControls={
+      headerControls={
         <ASRNeonToggle
           options={[
-            { label: "MEN", value: "M" },
-            { label: "WOMEN", value: "F" },
+            { label: "M", value: "M" },
+            { label: "W", value: "F" },
           ]}
           activeOption={gen}
           onChange={handleGenChange}
           layoutId="gen-pill"
           theme={theme}
-          className="w-full max-w-[200px]"
+          className="w-[100px] shrink-0"
         />
       }
     />

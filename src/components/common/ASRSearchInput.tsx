@@ -65,7 +65,7 @@ export const ASRSearchInput = React.memo(
           </div>
 
           <div className={cn(
-            "absolute left-5 opacity-40 group-focus-within:opacity-100 transition-all z-30 pointer-events-none",
+            "absolute left-4 opacity-40 group-focus-within:opacity-100 transition-all z-30 pointer-events-none",
             theme === "dark" ? "group-focus-within:text-white" : "group-focus-within:text-zinc-900"
           )}>
             <Search size={16} strokeWidth={3} />
@@ -99,11 +99,11 @@ export const ASRSearchInput = React.memo(
             style={{ scrollMarginBottom: '120px' }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
-              "w-full h-full pl-12 bg-transparent outline-none text-[16px] placeholder:text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal z-30 relative appearance-none",
+              "w-full h-full pl-10 bg-transparent outline-none text-[16px] placeholder:text-[11px] sm:placeholder:text-[12px] font-black uppercase tracking-widest placeholder:opacity-20 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal z-30 relative appearance-none text-ellipsis",
               theme === "dark"
                 ? "text-white placeholder:text-white"
                 : "text-zinc-900 placeholder:text-zinc-900",
-              rightElement ? "pr-24" : "pr-12"
+              rightElement ? "pr-24" : "pr-4"
             )}
           />
           <div className="absolute right-1 flex items-center gap-1 z-30">

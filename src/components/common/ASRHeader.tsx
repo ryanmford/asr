@@ -51,7 +51,7 @@ export const ASRHeader = React.memo(
         </div>
 
         {!hideTabs ? (
-          <div className="flex shrink-0 justify-center">
+          <div className="flex w-full min-w-0 justify-center">
             <ASRNeonToggle
               options={[
                 { label: "OPEN", value: "open" },
@@ -61,7 +61,7 @@ export const ASRHeader = React.memo(
               onChange={(t) => setEventType(t as any)}
               layoutId="header-pill"
               theme={theme}
-              className="w-full sm:w-[320px]"
+              className="w-full max-w-[260px] sm:max-w-[352px] sm:w-[352px]"
             />
           </div>
         ) : centerSlot ? (
@@ -92,7 +92,7 @@ export const ASRHeader = React.memo(
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10 transition-transform duration-500 group-hover/theme:rotate-12 group-active/theme:-rotate-12">
-              {theme === "dark" ? <Moon size={18} strokeWidth={2} /> : <Sun size={18} strokeWidth={2.5} />}
+              {theme === "dark" ? <Sun size={18} strokeWidth={2} /> : <Moon size={18} strokeWidth={2.5} />}
             </div>
           </button>
         </div>

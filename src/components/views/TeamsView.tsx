@@ -44,17 +44,17 @@ export const TeamsView = React.memo(({ theme }: { theme: "light" | "dark" }) => 
       onItemClick={handleItemClick}
       middleLabel={teamCategory === "gyms" ? "GYM" : "TEAM"}
       columns={columns}
-      topControls={
+      headerControls={
         <ASRNeonToggle
           options={[
-            { label: "GYMS", value: "gyms" },
-            { label: "TEAMS", value: "teams" },
+            { label: "G", value: "gyms" },
+            { label: "T", value: "teams" },
           ]}
           activeOption={teamCategory}
           onChange={handleTeamCategoryChange}
           layoutId="team-cat-pill"
           theme={theme}
-          className="w-full max-w-[200px]"
+          className="w-[100px] shrink-0"
         />
       }
     />
