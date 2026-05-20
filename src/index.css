@@ -97,6 +97,12 @@ body {
   isolation: isolate;
 }
 
+/* Hide iOS Safari's default large play button on videos in low power mode */
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+}
+
 /* Generic Utility for iOS Clipping 
    Used by various components in your React code 
 */

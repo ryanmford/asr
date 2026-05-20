@@ -326,14 +326,14 @@ export const HomeView = React.memo(() => {
         )}
       >
         {/* Full Background Video */}
-        <div className="absolute inset-0 z-0 bg-black">
+        <div className="absolute inset-0 z-0 bg-black pointer-events-none">
           <video 
             src="/ben-tivoli.mp4"
             autoPlay 
             playsInline 
             muted 
             loop 
-            className="w-full h-full object-cover opacity-80"
+            className="w-full h-full object-cover opacity-80 pointer-events-none"
           />
           {/* subtle vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
@@ -341,8 +341,8 @@ export const HomeView = React.memo(() => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/40 pointer-events-none"></div>
         </div>
 
-        {/* Get Started perfectly centered both horizontally and vertically within the hero section */}
-        <div className="absolute top-0 left-0 right-0 h-[100dvh] flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 pointer-events-none z-10">
+        {/* Get Started positioned securely out of the way of center-screen browser overlays */}
+        <div className="absolute top-0 left-0 right-0 h-[100dvh] flex flex-col items-center justify-end pb-[30dvh] w-full max-w-5xl mx-auto px-4 pointer-events-none z-10">
           <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
               className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/40 backdrop-blur-md border border-white/20"
