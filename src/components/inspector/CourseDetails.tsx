@@ -31,7 +31,6 @@ import { FallbackAvatar } from "../common/FallbackAvatar";
 import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 import { ASRRankList } from "../list/ASRRankList";
 import { ASRStandardButton } from "../common/ASRStandardButton";
-import { ASRPremiumButton } from "../common/ASRPremiumButton";
 import { CourseChampions } from "./CourseChampions";
 import { ASRStatCard } from "../common/ASRStatCard";
 import { ASRWeeklyActivityChart } from "./ASRWeeklyActivityChart";
@@ -155,11 +154,8 @@ export const CourseDetails = React.memo(
   ({ course, dataContext, onEntityClick, theme }: CourseDetailsProps) => {
     const {
       lbAT_Courses = { M: {}, F: {} },
-      lbOP_Courses = { M: {}, F: {} },
       cMet = {},
       atMet = {},
-      atRawBest = {},
-      opRawBest = {},
       pRaw = {},
       courseRunsHistory = {},
     } = dataContext || {};
@@ -483,7 +479,7 @@ export const CourseDetails = React.memo(
               <div className="px-4 py-6 overflow-visible min-h-[500px]">
                 {contentMode === "open" && !meta.is2026 ? (
                   <div className="text-center text-zinc-500 py-10 px-4 text-sm max-w-sm mx-auto">
-                    This course is not included in the 2026 ASR OPEN.
+                    * Course not included in the 2026 ASR Open.
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">

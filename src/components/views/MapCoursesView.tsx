@@ -2,7 +2,8 @@
  
 import React, { useMemo, startTransition, useRef } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
-import { ASRDataTable, ASRSearchInput } from "../ASRComponents";
+import { ASRDataTable } from "../ASRComponents";
+import { ASRSearchInput } from "../common/ASRSearchInput";
 import { ErrorBoundary } from "../common/ErrorBoundary";
 import { ASRBottomSheet } from "../common/ASRBottomSheet";
 import { CourseData } from "../../types";
@@ -124,22 +125,6 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     navigateToEntity("course", c);
   }, [navigateToEntity]);
 
-  React.useEffect(() => {
-    if (window.innerWidth < 768) {
-      if (snap >= 0.8) {
-        if (containerRef.current) {
-           const top = containerRef.current.getBoundingClientRect().top + window.scrollY;
-           // Scroll so that MapCoursesView is slightly past the sticky header
-           window.scrollTo({ top: top - 44, behavior: "smooth" }); 
-        } else {
-           window.scrollTo({ top: 250, behavior: "smooth" });
-        }
-      } else if (snap < 0.8 && window.scrollY > 0) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }
-  }, [snap]);
-
   const handlePinClick = React.useCallback((c: CourseData) => {
      setActiveCourseId(c.name || null);
      navigateToEntity("course", c);
@@ -152,6 +137,14 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
 
   const renderListContent = (currentSnap: number, scrollRef: React.RefObject<HTMLDivElement>, dRef: React.RefObject<any>) => (
     <div className="flex flex-col h-full bg-transparent">
+      <div className="px-4 pb-2 pt-2 shrink-0 pointer-events-auto">
+        <ASRSearchInput
+          value={search}
+          onChange={(e: any) => setSearch(e.target.value)}
+          theme={theme}
+          placeholder="search courses..."
+        />
+      </div>
       <div 
         ref={scrollRef}
         onScroll={(e) => {
@@ -181,24 +174,8 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
     </div>
   );
 
-  const renderSearchPill = (forMobile: boolean) => (
-    <div className="w-full transition-all duration-300 px-4">
-      <ASRSearchInput
-        value={search}
-        onChange={(e: any) => setSearch(e.target.value)}
-        onFocus={() => {
-          if (forMobile && snap < 0.85) {
-            setSnap(0.85);
-          }
-        }}
-        placeholder="search courses..."
-        theme={theme}
-      />
-    </div>
-  );
-
   return (
-    <div ref={containerRef} className="relative w-full h-[calc(100dvh-68px)] sm:h-[calc(100dvh-76px)] overflow-hidden bg-slate-100 dark:bg-zinc-900">
+    <div ref={containerRef} className="relative flex-1 w-full overflow-hidden bg-slate-100 dark:bg-zinc-900">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
         <React.Suspense
@@ -233,10 +210,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
             : "bg-white/70 border-black/10 backdrop-blur-xl"
         )}
       >
-        <div className="w-full pt-4 pb-2 sticky top-0 z-20">
-          {renderSearchPill(false)}
-        </div>
-        <div className="flex-1 overflow-hidden h-full">
+        <div className="flex-1 overflow-hidden h-full rounded-3xl">
           {renderListContent(1, scrollContainerRefDesktop, listRefDesktop)}
         </div>
       </div>
@@ -262,13 +236,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
           activeSnap={snap as number}
           onSnapChange={setSnap}
         >
-          <div className={cn(
-            "w-full pt-1 pb-3 flex justify-center sticky top-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
-             snap >= 0.8 ? (theme === "dark" ? "bg-zinc-950/90 border-white/5" : "bg-white/90 border-black/5") : "bg-transparent border-transparent"
-          )}>
-            {renderSearchPill(true)}
-          </div>
-          <div className="flex-1 overflow-hidden h-full">
+          <div className="flex-1 overflow-hidden h-full pt-2">
             {renderListContent(snap as number, scrollContainerRefMobile, listRefMobile)}
           </div>
         </ASRBottomSheet>

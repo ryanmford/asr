@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
-import { ASRGlobalSearch } from "../common/ASRGlobalSearch";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
@@ -405,28 +404,12 @@ export const HomeView = React.memo(() => {
       variants={containerVariants}
       className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 pt-0 sm:pt-1 pb-24 gap-2 sm:gap-4"
     >
-      {/* Global Search */}
-      <motion.div
-        variants={itemVariants}
-        className={cn(
-          "py-2 sm:py-3 w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] sticky z-[50] backdrop-blur-3xl border-b transition-all shadow-sm mb-1",
-          theme === "dark"
-            ? "border-white/5 bg-zinc-950/80"
-            : "border-black/5 bg-white/80",
-          "top-[calc(68px+env(safe-area-inset-top,0px))] sm:top-[calc(76px+env(safe-area-inset-top,0px))]",
-        )}
-      >
-        <div className="flex items-center gap-2 w-full max-w-2xl mx-auto px-4">
-          <ASRGlobalSearch theme={theme} />
-        </div>
-      </motion.div>
-
       {/* Hero Header CTA */}
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative min-h-[95vh] sm:min-h-[105vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col items-center justify-center overflow-hidden transition-all duration-500 group",
-          theme === "dark" ? "bg-[#0A0A0A]" : "bg-black",
+          "relative min-h-[90vh] sm:min-h-[105vh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-start overflow-hidden transition-all duration-500 group border-b z-10",
+          theme === "dark" ? "bg-[#0A0A0A] border-white/5" : "bg-black border-white/10",
         )}
       >
         {/* Full Background Video */}
@@ -439,33 +422,25 @@ export const HomeView = React.memo(() => {
             loop 
             className="w-full h-full object-cover opacity-80"
           />
-          {/* monochromatic minimal overlays for elegant tone */}
-          <div className="absolute inset-0 bg-black/40 pointer-events-none transition-colors duration-700"></div>
           {/* subtle vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none"></div>
+          {/* strong dark gradient overlay at top edge to guarantee contrast for search bar/header */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/40 pointer-events-none"></div>
         </div>
 
-        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full max-w-5xl mx-auto px-4 py-8 pointer-events-none">
+        {/* Get Started perfectly centered both horizontally and vertically within the hero section */}
+        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 pointer-events-none relative z-10">
           <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
-              className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/20 backdrop-blur-md"
+              className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/40 backdrop-blur-md border border-white/20"
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
             >
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500 z-10"></div>
-              
-              {/* Monochromatic Neon Hover Effect */}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500 z-0 rounded-full">
-                <div className="absolute inset-0 rounded-full neon-gradient-base animate-border-shift blur-[6px] opacity-40" />
-                <div className="absolute inset-0 rounded-full neon-gradient-base animate-border-shift opacity-80" />
-                <div className="absolute inset-[1.5px] rounded-full bg-black/60 backdrop-blur-xl z-10" />
-              </div>
-              
-              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-full z-[15]"></div>
-              <span className="relative z-20 flex items-center justify-center gap-2 uppercase font-light">
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/20 rounded-full z-[15]"></div>
+              <span className="relative z-20 flex items-center justify-center gap-2 uppercase font-black tracking-widest text-[#FFF]">
                 Get Started
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1.5 transition-transform duration-500 opacity-70" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1.5 transition-transform duration-500 opacity-90" />
               </span>
             </button>
           </div>

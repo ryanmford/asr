@@ -159,7 +159,8 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   return (
     <div
       className={cn(
-        "min-h-[100dvh] flex flex-col transition-colors duration-500",
+        "flex flex-col transition-colors duration-500",
+        view === "courses" ? "fixed inset-0 overflow-hidden" : "min-h-[100dvh]",
         theme === "dark" 
           ? "dark theme-bg-base text-zinc-100 selection:bg-blue-500/30" 
           : "theme-bg-base text-zinc-900 selection:bg-blue-500/20",
@@ -199,20 +200,16 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
         onClose={() => setShowOnboarding(false)}
       />
 
-      <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)]">
-        {!isLoading && view !== "courses" && (
+      <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)] relative z-[80]">
+        {!isLoading && view === "home" && (
           <div className="flex flex-col">
             <ASRLiveTicker
               theme={theme}
               onEntityClick={navigateToEntity}
             />
             <ASRCountdown
-              targetDate={
-                isAllTimeContext
-                  ? "2024-01-01T00:00:00Z"
-                  : CONFIG.DATES.COUNTDOWN_TARGET
-              }
-              eventType={eventType as "open" | "all-time"}
+              targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
+              eventType={"open"}
               onHelp={() => setShowOnboarding(true)}
               theme={theme as "light" | "dark"}
             />
@@ -222,13 +219,9 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
 
       <div 
         className={cn(
-          "fixed top-0 left-0 right-0 z-[100] h-[env(safe-area-inset-top)] backdrop-blur-xl border-b",
-          theme === "dark" ? "bg-zinc-950/80 border-white/5" : "bg-white/80 border-black/5"
+          "w-full flex flex-col pointer-events-auto transition-all duration-300",
+          "sticky z-[70]"
         )}
-      />
-
-      <div 
-        className="sticky z-[70] w-full flex flex-col pointer-events-auto transition-all duration-300"
         style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
           <ASRHeader
@@ -236,13 +229,27 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           setTheme={setTheme}
           eventType={eventType as "open" | "all-time"}
           setEventType={setEventType}
-          onHome={handleHome}
           hideTabs={view === "hof" || view === "setters" || view === "home"}
+          isTransparent={view === "home"}
+          showSearch={view === "home" || view === "hof"}
         />
       </div>
 
+      <div 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[100] h-[env(safe-area-inset-top)] backdrop-blur-xl border-b transition-colors duration-500",
+          view === "home" 
+            ? "bg-transparent border-transparent" 
+            : theme === "dark" ? "bg-zinc-950/80 border-white/5" : "bg-white/80 border-black/5"
+        )}
+      />
+
       <main
-        className="flex-1 w-full max-w-7xl mx-auto flex flex-col relative pt-0 sm:pt-4"
+        className={cn(
+          "flex-1 w-full mx-auto flex flex-col relative",
+          view === "courses" ? "max-w-none pt-0" : "max-w-7xl pt-0 sm:pt-4",
+          view === "home" ? "pt-0 -mt-[140px] sm:-mt-[160px]" : ""
+        )}
       >
         <div className="flex-1 flex flex-col">
             <RouteErrorBoundary>
@@ -277,7 +284,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                 } />
                 <Route path="/hof" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex flex-col">
-                    <PageHeader title="HALL OF FAME" theme={theme} />
                     <ASRWallOfFame
                       theme={theme}
                       onEntityClick={navigateToEntity}
@@ -314,7 +320,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           </React.Suspense>
           </RouteErrorBoundary>
         </div>
-        <ASRFooter />
+        {view !== "courses" && <ASRFooter />}
       </main>
 
       <ASRNavDock currentView={view} setView={handleViewChange} theme={theme} />

@@ -36,6 +36,7 @@ export const PlayersView = React.memo(({ theme }: { theme: "light" | "dark" }) =
   return (
     <AnimatedListView
       title="PLAYERS"
+      hideTitle={true}
       theme={theme}
       data={playerList}
       searchPlaceholder="search players..."
@@ -43,17 +44,17 @@ export const PlayersView = React.memo(({ theme }: { theme: "light" | "dark" }) =
       onItemClick={handleItemClick}
       middleLabel="PLAYER"
       columns={columns}
-      headerControls={
+      topControls={
         <ASRNeonToggle
           options={[
-            { label: "M", value: "M" },
-            { label: "W", value: "F" },
+            { label: "MEN", value: "M" },
+            { label: "WOMEN", value: "F" },
           ]}
           activeOption={gen}
           onChange={handleGenChange}
           layoutId="gen-pill"
           theme={theme}
-          className="w-24 sm:w-32 shrink-0"
+          className="w-full max-w-[200px]"
         />
       }
     />

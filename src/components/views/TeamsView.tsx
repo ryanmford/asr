@@ -36,6 +36,7 @@ export const TeamsView = React.memo(({ theme }: { theme: "light" | "dark" }) => 
   return (
     <AnimatedListView
       title="GYMS & TEAMS"
+      hideTitle={true}
       theme={theme}
       data={rankedTeams}
       searchPlaceholder="search gyms & teams..."
@@ -43,17 +44,17 @@ export const TeamsView = React.memo(({ theme }: { theme: "light" | "dark" }) => 
       onItemClick={handleItemClick}
       middleLabel={teamCategory === "gyms" ? "GYM" : "TEAM"}
       columns={columns}
-      headerControls={
+      topControls={
         <ASRNeonToggle
           options={[
-            { label: "G", value: "gyms" },
-            { label: "T", value: "teams" },
+            { label: "GYMS", value: "gyms" },
+            { label: "TEAMS", value: "teams" },
           ]}
           activeOption={teamCategory}
           onChange={handleTeamCategoryChange}
           layoutId="team-cat-pill"
           theme={theme}
-          className="w-24 sm:w-32 shrink-0"
+          className="w-full max-w-[200px]"
         />
       }
     />

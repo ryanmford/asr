@@ -4,6 +4,7 @@ import React from "react";
 import { Moon, Sun, CloudOff, RefreshCw } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { ASRNeonToggle } from "./ASRNeonToggle";
+import { ASRGlobalSearch } from "./ASRGlobalSearch";
 import { useDataStore } from "../../store/useDataStore";
 
 interface ASRHeaderProps {
@@ -11,9 +12,10 @@ interface ASRHeaderProps {
   setTheme: (theme: "light" | "dark") => void;
   eventType: "open" | "all-time";
   setEventType: (type: "open" | "all-time") => void;
-  onHome: () => void;
   hideTabs?: boolean;
   centerSlot?: React.ReactNode;
+  isTransparent?: boolean;
+  showSearch?: boolean;
 }
 
 export const ASRHeader = React.memo(
@@ -22,9 +24,10 @@ export const ASRHeader = React.memo(
     setTheme,
     eventType,
     setEventType,
-    onHome,
     hideTabs,
     centerSlot,
+    isTransparent,
+    showSearch,
   }: ASRHeaderProps) => {
     const isSyncing = useDataStore((s) => s.isSyncing);
     const hasError = useDataStore((s) => s.hasError);
@@ -32,32 +35,23 @@ export const ASRHeader = React.memo(
       <header
         className={cn(
           "z-[60] w-full px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between border-b backdrop-blur-xl pointer-events-auto transition-all duration-500 gap-2 select-none",
-          theme === "dark"
-            ? "bg-zinc-950/70 border-white/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
-            : "bg-white/70 border-black/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.02)]",
+          isTransparent
+            ? "bg-transparent border-transparent shadow-none"
+            : theme === "dark"
+              ? "bg-zinc-950/70 border-white/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
+              : "bg-white/70 border-black/[0.05] shadow-[0_4px_30px_rgba(0,0,0,0.02)]",
         )}
       >
-        <div className="flex flex-col shrink-0">
-          <button
-            onClick={onHome}
-            className={cn(
-              "flex items-center gap-2 group active:scale-95 transition-transform text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl",
-              "theme-focus"
-            )}
-          >
-            <span
-              className={cn(
-                "flex text-[18px] sm:text-[22px] font-black italic uppercase tracking-tighter leading-none whitespace-nowrap transition-colors items-center pr-1",
-                theme === "dark" ? "text-white" : "text-zinc-900",
-              )}
-            >
-              APEX SPEED RUN
-            </span>
-          </button>
+        <div className="flex min-w-0 pr-2 sm:pr-8 flex-1">
+          {showSearch && (
+            <div className="w-full">
+              <ASRGlobalSearch theme={theme} />
+            </div>
+          )}
         </div>
 
         {!hideTabs ? (
-          <div className="flex-1 flex justify-center max-w-[200px] sm:max-w-none">
+          <div className="flex shrink-0 justify-center">
             <ASRNeonToggle
               options={[
                 { label: "OPEN", value: "open" },
@@ -67,16 +61,16 @@ export const ASRHeader = React.memo(
               onChange={(t) => setEventType(t as any)}
               layoutId="header-pill"
               theme={theme}
-              className="w-full sm:w-44"
+              className="w-full sm:w-[320px]"
             />
           </div>
         ) : centerSlot ? (
-          <div className="flex-1 flex justify-center px-4 max-w-[400px]">
+          <div className="flex shrink-0 justify-center px-4 max-w-[400px]">
             {centerSlot}
           </div>
-        ) : <div className="flex-1" />}
+        ) : null}
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className={cn("flex items-center justify-end gap-2 shrink-0", (!hideTabs || centerSlot) ? "flex-1" : "flex-none")}>
           {hasError ? (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-black tracking-widest uppercase">
               <CloudOff size={10} /> OFFLINE
@@ -90,13 +84,16 @@ export const ASRHeader = React.memo(
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
             className={cn(
-              "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center sm:p-2 rounded-full border transition-all active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+              "group/theme min-w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-500 active:scale-95 outline-none overflow-hidden backdrop-blur-md relative",
               theme === "dark"
-                ? "bg-black border-zinc-800 text-white hover:bg-zinc-900 focus-visible:ring-offset-[#030303]"
-                : "bg-white border-slate-200 text-black shadow-sm hover:bg-slate-50 theme-focus",
+                ? "bg-zinc-900/60 border-white/10 text-white/70 hover:text-white hover:bg-zinc-800/80 hover:border-white/20 shadow-[0_4px_24px_rgba(255,255,255,0.03)]"
+                : "bg-white/60 border-black/5 text-black/70 hover:text-black hover:bg-white/90 hover:border-black/15 shadow-[0_2px_12px_rgba(0,0,0,0.04)]",
             )}
           >
-            {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 transition-transform duration-500 group-hover/theme:rotate-12 group-active/theme:-rotate-12">
+              {theme === "dark" ? <Moon size={18} strokeWidth={2} /> : <Sun size={18} strokeWidth={2.5} />}
+            </div>
           </button>
         </div>
       </header>

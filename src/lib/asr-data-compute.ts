@@ -489,10 +489,10 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const cListOP = masterCourseList.filter((c: CourseData) => c.is2026).sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
   const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
 
-  const courseRecords_M_AT: Record<string, any> = {};
-  const courseRecords_F_AT: Record<string, any> = {};
-  const courseRecords_M_OP: Record<string, any> = {};
-  const courseRecords_F_OP: Record<string, any> = {};
+  const courseRecords_M_AT: Record<string, unknown> = {};
+  const courseRecords_F_AT: Record<string, unknown> = {};
+  const courseRecords_M_OP: Record<string, unknown> = {};
+  const courseRecords_F_OP: Record<string, unknown> = {};
 
   const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined, cName: string) => {
     const source = (sourceSector?.[cName] || {}) as Record<string, unknown>;

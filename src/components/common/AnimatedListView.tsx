@@ -14,12 +14,14 @@ interface AnimatedListViewProps {
   data: any[];
   searchPlaceholder?: string;
   headerControls?: React.ReactNode;
+  topControls?: React.ReactNode;
   isLoading: boolean;
   onItemClick?: (item: any) => void;
   middleLabel?: string;
   columns?: any[];
   viewType?: "card" | "list";
   hideSubtitle?: boolean;
+  hideTitle?: boolean;
 }
 
 export const AnimatedListView = React.memo(({
@@ -28,12 +30,14 @@ export const AnimatedListView = React.memo(({
   data,
   searchPlaceholder,
   headerControls,
+  topControls,
   isLoading,
   onItemClick,
   middleLabel,
   columns,
   viewType = "card",
   hideSubtitle = false,
+  hideTitle = false,
   showVideoColumn = false,
   children,
 }: AnimatedListViewProps & { children?: React.ReactNode | ((props: { searchedData: any[] }) => React.ReactNode), showVideoColumn?: boolean }) => {
@@ -72,17 +76,24 @@ export const AnimatedListView = React.memo(({
 
   return (
     <div className="flex flex-col flex-1">
-      <PageHeader title={title} theme={theme}>
-        {searchPlaceholder && (
-          <ASRSearchInput
-            value={search}
-            onChange={(e: any) => setSearch(e.target.value)}
-            placeholder={searchPlaceholder}
-            theme={theme}
-            className="flex-1"
-          />
+      <PageHeader title={hideTitle ? undefined : title} theme={theme}>
+        {topControls && (
+          <div className="flex justify-center w-full">
+            {topControls}
+          </div>
         )}
-        {headerControls}
+        <div className="flex w-full gap-2 items-center">
+          {searchPlaceholder && (
+            <ASRSearchInput
+              value={search}
+              onChange={(e: any) => setSearch(e.target.value)}
+              placeholder={searchPlaceholder}
+              theme={theme}
+              className="flex-1"
+            />
+          )}
+          {headerControls}
+        </div>
       </PageHeader>
       
       {children ? (

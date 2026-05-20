@@ -28,10 +28,10 @@ interface ASRDataState {
   playerLB_OP: { M: PlayerProfile[]; F: PlayerProfile[] };
 
   // Pre-computed lists
-  courseRecords_M_AT: Record<string, any>;
-  courseRecords_F_AT: Record<string, any>;
-  courseRecords_M_OP: Record<string, any>;
-  courseRecords_F_OP: Record<string, any>;
+  courseRecords_M_AT: Record<string, unknown>;
+  courseRecords_F_AT: Record<string, unknown>;
+  courseRecords_M_OP: Record<string, unknown>;
+  courseRecords_F_OP: Record<string, unknown>;
   playerList_M_AT: PlayerProfile[];
   playerList_F_AT: PlayerProfile[];
   playerList_M_OP: PlayerProfile[];

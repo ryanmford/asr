@@ -160,9 +160,9 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
           value={search}
           onChange={(e: any) => setSearch(e.target.value)}
           onKeyDown={handleSearchKeyDown}
-          placeholder="search courses, players, etc..."
+          placeholder="search Apex Speed Run..."
           theme={theme}
-          className="w-full text-xs sm:text-sm"
+          className="w-full"
       />
       <AnimatePresence>
         {searchResults && (
@@ -170,7 +170,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[calc(100%+8px)] right-0 w-[calc(100vw-32px)] max-w-2xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[60vh] lg:max-h-[70vh] overflow-y-auto overscroll-none sm:right-auto sm:left-1/2 sm:-translate-x-1/2"
+            className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[250px] sm:max-w-2xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[60vh] lg:max-h-[70vh] overflow-y-auto overscroll-none"
           >
              {/* Locations */}
              {searchResults.locations && searchResults.locations.length > 0 && (

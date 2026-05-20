@@ -76,5 +76,10 @@ export interface ASRDataContext {
   courseRunsHistory?: Record<string, unknown[]>;
   setterMet?: Record<string, unknown>;
   lbAT_Courses?: { M?: Record<string, unknown>; F?: Record<string, unknown> };
+  lbOP_Courses?: { M?: Record<string, unknown>; F?: Record<string, unknown> };
   masterCourseList?: unknown[];
+  courseRecords_M_AT?: Record<string, unknown>;
+  courseRecords_F_AT?: Record<string, unknown>;
+  courseRecords_M_OP?: Record<string, unknown>;
+  courseRecords_F_OP?: Record<string, unknown>;
 }
