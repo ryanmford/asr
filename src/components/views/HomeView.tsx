@@ -52,15 +52,18 @@ export const HomeView = React.memo(() => {
   const recentSets = useMemo(() => {
     if (!masterCourseList || !masterCourseList.length) return [];
     
-    const validSets = masterCourseList
-      .filter((c: any) => c.dateSet && !isNaN(new Date(c.dateSet).getTime()))
-      .map((c: any) => ({
-        ...c,
-        timestamp: new Date(c.dateSet).getTime(),
-      }))
-      .sort((a: any, b: any) => b.timestamp - a.timestamp);
-      
-    return validSets.slice(0, 100);
+    return masterCourseList
+      .reduce((acc: any[], c: any) => {
+        if (c.dateSet) {
+          const timestamp = new Date(c.dateSet).getTime();
+          if (!isNaN(timestamp)) {
+            acc.push({ ...c, timestamp });
+          }
+        }
+        return acc;
+      }, [])
+      .sort((a: any, b: any) => b.timestamp - a.timestamp)
+      .slice(0, 100);
   }, [masterCourseList]);
 
   const { topPlayer, topCourse, dailyRecord } = useMemo(() => {
@@ -172,114 +175,6 @@ export const HomeView = React.memo(() => {
 
     return { topPlayer: pOfDay, topCourse: cOfDay, dailyRecord: rOfDay };
   }, [playerList_M_AT, playerList_F_AT, playerList_M_OP, playerList_F_OP, courseList_AT]);
-
-  const carouselIndex = useAppStore((s) => s.homeCarouselIndex);
-  const setCarouselIndex = useAppStore((s) => s.setHomeCarouselIndex);
-  const autoPlayTimer = useAppStore((s) => s.homeAutoPlayTimer);
-  const setAutoPlayTimer = useAppStore((s) => s.setHomeAutoPlayTimer);
-
-  const featureList = useMemo(() => {
-    const list = [];
-    
-    // 1. Run of the Day
-    if (dailyRecord) {
-      list.push({
-        type: "video",
-        data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl }, 
-        displayName: dailyRecord.athleteName,
-        label: "Run of the Day",
-        icon: <Timer className="w-4 h-4" />,
-        color: "text-purple-500",
-        shadowColor: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
-        borderHover: "hover:shadow-purple-500/40 ring-1 ring-purple-500/20",
-        bg: "bg-purple-500/10",
-        hoverBg: "group-hover:bg-purple-500",
-        hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
-        metrics: [
-          { label: "Course", value: dailyRecord.courseName },
-          { label: "Time", value: <>{dailyRecord.time} <span className="inline-block animate-bounce ml-0.5">🥇</span></> },
-        ],
-      });
-    }
-
-    // 2. Player of the Day
-    if (topPlayer) {
-      const playerFlag = topPlayer.townFlag || topPlayer.gymFlag;
-      list.push({
-        type: "player",
-        data: topPlayer,
-        displayName: playerFlag
-          ? `${formatFlagsWithSpace(playerFlag).trim()} ${topPlayer.name}`
-          : topPlayer.name,
-        label: "Player of the Day",
-        icon: <User className="w-4 h-4" />,
-        color: "text-blue-500",
-        shadowColor: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
-        borderHover: "hover:shadow-blue-500/40 ring-1 ring-blue-500/20",
-        bg: "bg-blue-500/10",
-        hoverBg: "group-hover:bg-blue-500",
-        hoverText: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
-        metrics: [
-          { label: "Rank", value: topPlayer._gRank },
-          { label: "LQ", value: topPlayer.rating?.toFixed(2) || "0.00" },
-          { label: "Wins", value: topPlayer.wins || 0 },
-        ],
-      });
-    }
-
-    // 3. Course of the Day
-    if (topCourse) {
-      const courseFlag = topCourse.flag;
-      list.push({
-        type: "course",
-        data: topCourse,
-        displayName: courseFlag
-          ? `${formatFlagsWithSpace(courseFlag).trim()} ${topCourse.name}`
-          : topCourse.name,
-        label: "Course of the Day",
-        icon: <MapPin className="w-4 h-4" />,
-        color: "text-emerald-500",
-        shadowColor: "shadow-[0_0_20px_rgba(16,185,129,0.3)]",
-        borderHover: "hover:shadow-emerald-500/40 ring-1 ring-emerald-500/20",
-        bg: "bg-emerald-500/10",
-        hoverBg: "group-hover:bg-emerald-500",
-        hoverText:
-          "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-        metrics: [
-          {
-            label: "Runs",
-            value: topCourse.totalAllTimeRuns || topCourse.totalRuns || 0,
-          },
-          {
-            label: "CR (M)",
-            value: topCourse.mRecord ? topCourse.mRecord.toFixed(2) : "--",
-          },
-          {
-            label: "CR (W)",
-            value: topCourse.fRecord ? topCourse.fRecord.toFixed(2) : "--",
-          },
-        ],
-      });
-    }
-
-    return list;
-  }, [topPlayer, topCourse, dailyRecord]);
-
-  React.useEffect(() => {
-    if (featureList.length <= 1) return;
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => prev + 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [autoPlayTimer, featureList.length]);
-
-  const currentFeature =
-    featureList.length > 0
-      ? featureList[
-          ((carouselIndex % featureList.length) + featureList.length) %
-            featureList.length
-        ]
-      : null;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -408,7 +303,7 @@ export const HomeView = React.memo(() => {
       <motion.div
         variants={itemVariants}
         className={cn(
-          "relative h-[115dvh] sm:h-[120dvh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-start overflow-hidden transition-all duration-500 group border-b z-10",
+          "relative h-[105dvh] sm:h-[105dvh] w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-start overflow-hidden transition-all duration-500 group border-b z-10",
           theme === "dark" ? "bg-[#0A0A0A] border-white/5" : "bg-black border-white/10",
         )}
       >
@@ -446,170 +341,6 @@ export const HomeView = React.memo(() => {
           </div>
         </div>
       </motion.div>
-
-      {/* Featured Section */}
-      {isLoading ? (
-        <motion.div
-          variants={itemVariants}
-          className="relative w-full min-h-[160px] bg-black/5 dark:bg-white/5 rounded-3xl p-5 pb-10 sm:p-8 sm:pb-14 flex flex-row items-center justify-between animate-pulse"
-        >
-          <div className="flex flex-col gap-3">
-            <div className="w-24 h-3 bg-black/10 dark:bg-white/10 rounded-full" />
-            <div className="w-48 h-6 bg-black/10 dark:bg-white/10 rounded-lg mb-2" />
-            <div className="flex gap-4">
-              <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-              <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-              <div className="w-12 h-6 bg-black/10 dark:bg-white/10 rounded-lg" />
-            </div>
-          </div>
-          <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded-full flex-shrink-0 ml-4" />
-        </motion.div>
-      ) : (
-        currentFeature && (
-          <motion.div variants={itemVariants} className="w-full">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => {
-                if (currentFeature.type === "video") {
-                  setPlayingVideoUrl((currentFeature.data as { videoUrl: string }).videoUrl);
-                } else {
-                  navigateToEntity(currentFeature.type, currentFeature.data);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  if (currentFeature.type === "video") {
-                    setPlayingVideoUrl((currentFeature.data as { videoUrl: string }).videoUrl);
-                  } else {
-                    navigateToEntity(currentFeature.type, currentFeature.data);
-                  }
-                }
-              }}
-              className={cn(
-                "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 pb-10 sm:p-8 sm:pb-14 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
-              )}
-            >
-              <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentFeature.label}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between"
-                  >
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div
-                        className={cn(
-                          "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5",
-                          currentFeature.color,
-                        )}
-                      >
-                        {currentFeature.icon} {currentFeature.label}
-                      </div>
-                      <div
-                        className={cn(
-                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
-                          (
-                            currentFeature.displayName ||
-                            currentFeature.data.name
-                          ).length > 22
-                            ? "text-base sm:text-lg md:text-xl"
-                            : (
-                                  currentFeature.displayName ||
-                                  currentFeature.data.name
-                                ).length > 15
-                              ? "text-lg sm:text-xl md:text-2xl"
-                              : "text-xl sm:text-2xl md:text-3xl",
-                          currentFeature.hoverText,
-                        )}
-                      >
-                        {currentFeature.displayName || currentFeature.data.name}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
-                      {currentFeature.metrics.map(
-                        (
-                          m: { label: string; value: React.ReactNode },
-                          i: number,
-                        ) => {
-                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
-                          const len = valStr.length || 5; // default to 5 for ReactNode (like time + emoji)
-                          return (
-                          <div key={i} className="flex flex-col min-w-0 flex-shrink">
-                            <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
-                              {m.label}
-                            </span>
-                            <span className={cn(
-                              "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
-                              len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
-                              : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
-                              : "text-base sm:text-lg md:text-xl"
-                            )}>
-                              {m.value}
-                            </span>
-                          </div>
-                        )}
-                      )}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              <div
-                className={cn(
-                  "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
-                  currentFeature.bg,
-                  currentFeature.color,
-                  currentFeature.hoverBg,
-                )}
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-
-              {/* Pagination Dots */}
-              {featureList.length > 1 && (
-                <div className="absolute bottom-3 sm:bottom-3 left-0 right-0 flex justify-center gap-1.5 z-40">
-                  {featureList.map((_, idx) => {
-                    const isActive =
-                      idx ===
-                      ((carouselIndex % featureList.length) +
-                        featureList.length) %
-                        featureList.length;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCarouselIndex(idx);
-                          setAutoPlayTimer(t => t + 1);
-                        }}
-                        className="w-10 h-10 flex items-center justify-center group/dot focus:outline-none"
-                        aria-label={`Go to slide ${idx + 1}`}
-                      >
-                        <div
-                          className={cn(
-                            "h-1.5 rounded-full transition-all duration-300",
-                            isActive
-                              ? cn("w-4", currentFeature.color) // Match dot color to feature text color
-                              : "w-1.5 bg-black/20 dark:bg-white/20 group-hover/dot:bg-black/40 dark:group-hover/dot:bg-white/40",
-                          )}
-                          style={
-                            isActive ? { backgroundColor: "currentColor" } : {}
-                          }
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )
-      )}
 
       {/* Unified Stats & Navigation Cards */}
       {isLoading ? (

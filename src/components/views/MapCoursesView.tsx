@@ -33,7 +33,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const scrollContainerRefMobile = React.useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const [visibleBounds, setVisibleBounds] = React.useState<any>(null);
-  const [snap, setSnap] = React.useState<number>(0.3);
+  const [snap, setSnap] = React.useState<number>(0.2);
   const containerRef = useRef<HTMLDivElement>(null);
   const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
   const columns = React.useMemo(() => [{ label: "RUNS", key: "totalAllTimeRuns" }], []);
@@ -62,7 +62,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
       // Reset view to default when nav dock button is clicked while active
       setSearch("");
       setActiveCourseId(null);
-      setSnap(0.3);
+      setSnap(0.2);
       if (mapRef.current?.resetView) {
         mapRef.current.resetView();
       }

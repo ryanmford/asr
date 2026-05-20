@@ -300,3 +300,8 @@ body {
     0 15px 40px rgba(0, 0, 0, 0.2),
     0 0 0 2px rgba(37, 99, 235, 0.4);
 }
+
+.mask-image-bottom {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
