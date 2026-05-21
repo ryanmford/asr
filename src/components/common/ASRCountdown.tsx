@@ -99,20 +99,23 @@ export const ASRCountdown = React.memo(
               : "bg-white/40 border-black/5 shadow-xl shadow-black/5 text-black",
           )}
         >
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={onHelp}
-            className="absolute inset-0 w-full h-full flex items-center justify-center cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 z-20"
-          >
-            <span
-              className={cn(
-                "text-[10px] sm:text-[11px] font-black uppercase tracking-[0.4em] relative pr-6 pl-2 sm:px-0",
-                "theme-text-base",
-              )}
+          <div className="w-full max-w-5xl mx-auto px-4 h-full relative flex items-center justify-center">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onHelp}
+              className="absolute inset-x-4 inset-y-0 flex items-center justify-center cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 z-20"
             >
-              SEASON ENDED
-            </span>
+              <span
+                className={cn(
+                  "text-[10px] sm:text-[11px] font-black uppercase tracking-[0.4em] relative pr-6 pl-2 sm:px-0",
+                  "theme-text-base",
+                )}
+              >
+                SEASON ENDED
+              </span>
+            </div>
+            {renderCloseButton()}
           </div>
 
           {/* The Shimmering Neon Outline - Long Trail */}
@@ -129,8 +132,6 @@ export const ASRCountdown = React.memo(
               theme === "dark" ? "bg-zinc-950/90" : "bg-white/95",
             )}
           />
-
-          {renderCloseButton()}
         </div>
       );
 
@@ -143,61 +144,64 @@ export const ASRCountdown = React.memo(
             : "bg-white/40 border-black/5 shadow-xl shadow-black/5",
         )}
       >
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={onHelp}
-          className="absolute inset-0 w-full h-full flex items-center justify-center cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500 z-20"
-        >
+        <div className="w-full max-w-5xl mx-auto px-4 h-full relative flex items-center justify-center z-20">
           <div
-            className={cn(
-              "flex items-center gap-3 sm:gap-8 font-black tracking-tight transition-colors pr-10 pl-2 sm:px-0",
-              "theme-text-base",
-            )}
+            role="button"
+            tabIndex={0}
+            onClick={onHelp}
+            className="absolute inset-x-4 inset-y-0 flex items-center justify-center cursor-pointer transition-all active:scale-95 outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            <div className="flex items-center gap-2 hidden min-[360px]:flex">
-              <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60">
-                OPEN CLIPS DUE IN:
-              </span>
-            </div>
-            <div className="flex items-center font-black tabular-nums tracking-tighter">
-              <div className="flex items-center">
-                <span className="text-[16px] sm:text-[20px]">
-                  {String(currentTime.days).padStart(2, "0")}
-                </span>
-                <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
-                  D
+            <div
+              className={cn(
+                "flex items-center gap-3 sm:gap-8 font-black tracking-tight transition-colors pr-10 pl-2 sm:px-0",
+                "theme-text-base",
+              )}
+            >
+              <div className="flex items-center gap-2 hidden min-[360px]:flex">
+                <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60">
+                  OPEN CLIPS DUE IN:
                 </span>
               </div>
-              <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
-              <div className="flex items-center">
-                <span className="text-[16px] sm:text-[20px]">
-                  {String(currentTime.hours).padStart(2, "0")}
-                </span>
-                <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
-                  H
-                </span>
-              </div>
-              <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
-              <div className="flex items-center">
-                <span className="text-[16px] sm:text-[20px]">
-                  {String(currentTime.minutes).padStart(2, "0")}
-                </span>
-                <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
-                  M
-                </span>
-              </div>
-              <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
-              <div className="flex items-center">
-                <span className="text-[16px] sm:text-[20px]">
-                  {String(currentTime.seconds).padStart(2, "0")}
-                </span>
-                <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
-                  S
-                </span>
+              <div className="flex items-center font-black tabular-nums tracking-tighter">
+                <div className="flex items-center">
+                  <span className="text-[16px] sm:text-[20px]">
+                    {String(currentTime.days).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
+                    D
+                  </span>
+                </div>
+                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
+                <div className="flex items-center">
+                  <span className="text-[16px] sm:text-[20px]">
+                    {String(currentTime.hours).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
+                    H
+                  </span>
+                </div>
+                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
+                <div className="flex items-center">
+                  <span className="text-[16px] sm:text-[20px]">
+                    {String(currentTime.minutes).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
+                    M
+                  </span>
+                </div>
+                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
+                <div className="flex items-center">
+                  <span className="text-[16px] sm:text-[20px]">
+                    {String(currentTime.seconds).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
+                    S
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+          {renderCloseButton()}
         </div>
 
         <div className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500">
@@ -215,8 +219,6 @@ export const ASRCountdown = React.memo(
               : "bg-white/95 group-hover:bg-white",
           )}
         />
-
-        {renderCloseButton()}
       </div>
     );
   },
