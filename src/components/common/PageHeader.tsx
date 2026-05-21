@@ -28,7 +28,7 @@ export const PageHeader = ({ title, theme, children }: any) => {
                 : "border-black/5 bg-[#FAFAFA]/95 supports-[backdrop-filter]:bg-white/70"
             )}
           >
-            <div className="w-full max-w-7xl mx-auto flex flex-col gap-2">
+            <div className="w-full max-w-5xl mx-auto flex flex-col gap-2">
               {children}
             </div>
           </div>

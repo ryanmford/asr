@@ -38,7 +38,7 @@ const MedalHeader = React.memo(
  return (
  <th
  className={cn(
- "py-3 sm:py-5 px-1 sm:px-4 uppercase text-[9px] sm:text-[11px] font-black tracking-widest transition-all select-none group h-full",
+ "py-3 sm:py-5 px-3 sm:px-5 uppercase text-[9px] sm:text-[11px] font-black tracking-widest transition-all select-none group h-full",
  sortable ? "cursor-pointer hover:bg-black/5" : "cursor-default",
  isActive
  ? "text-blue-500 opacity-100"
@@ -132,14 +132,14 @@ export const ASRWallOfFame = React.memo(
  ];
 
  return (
- <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700">
- <div className="px-4 sm:px-6 mt-0 mb-[-1.5rem] w-full max-w-7xl mx-auto">
+ <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700 w-full max-w-6xl mx-auto">
+ <div className="px-4 sm:px-6 mt-0 mb-[-1.5rem] w-full">
   <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
    * RUN 10+ COURSES TO JOIN THE HOF
   </p>
  </div>
  {/* Leaderboard Grids */}
- <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
  {sections.map((sec) => (
  <div key={sec.k} className="flex flex-col gap-5">
  <ASRSectionHeading title={sec.l} theme={theme} />
@@ -156,7 +156,7 @@ export const ASRWallOfFame = React.memo(
  if (sec.k === "rating")
  displayVal = (a.rating || 0).toFixed(2);
  else if (sec.k === "winPercentage")
- displayVal = `${(a.winPercentage || 0).toFixed(2)}%`;
+ displayVal = (a.winPercentage || 0).toFixed(2);
  else if (sec.k === "contributionScore")
  displayVal = (a.contributionScore || 0).toFixed(2);
  else if (sec.k === "totalFireCount")
@@ -255,7 +255,7 @@ export const ASRWallOfFame = React.memo(
  <tr>
  <th
  className={cn(
- "py-3 sm:py-6 pl-2 sm:pl-8 w-10 sm:w-20 uppercase text-[9px] sm:text-[11px] font-black tracking-widest",
+ "py-3 sm:py-5 pl-6 sm:pl-10 w-20 sm:w-28 text-left uppercase text-[9px] sm:text-[11px] font-black tracking-widest",
  theme === "dark"
  ? "text-white opacity-30"
  : "text-black opacity-40",
@@ -268,7 +268,7 @@ export const ASRWallOfFame = React.memo(
  k="name"
  a="left"
  sortable={false}
- className="w-[110px] "
+ className="w-auto px-3 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -277,7 +277,7 @@ export const ASRWallOfFame = React.memo(
  l="🥇"
  k="gold"
  a="right"
- className="w-9 "
+ className="w-16 sm:w-28 px-3 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -286,7 +286,7 @@ export const ASRWallOfFame = React.memo(
  l="🥈"
  k="silver"
  a="right"
- className="w-9 "
+ className="w-16 sm:w-28 px-3 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -295,7 +295,7 @@ export const ASRWallOfFame = React.memo(
  l="🥉"
  k="bronze"
  a="right"
- className="w-9 "
+ className="w-16 sm:w-28 px-3 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -304,10 +304,11 @@ export const ASRWallOfFame = React.memo(
  l="TOTAL"
  k="total"
  a="right"
- className="w-12 "
+ className="w-24 sm:w-36 !pr-6 sm:!pr-10 !pl-3 sm:!pl-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
+ style={{ pointerEvents: "auto" }}
  />
  </tr>
  </thead>
@@ -329,51 +330,53 @@ export const ASRWallOfFame = React.memo(
  : "hover:bg-blue-500/5",
  )}
  >
- <td className="py-4 sm:py-6 pl-2 sm:pl-8 text-center ">
- <ASRRankBadge rank={c.displayRank} />
- </td>
- <td className="py-4 sm:py-6 px-1 sm:px-4 text-left max-w-[110px] sm:max-w-[200px] ">
- <div className="flex items-center gap-1.5 sm:gap-3 text-left min-w-0 h-full">
- <span className="emoji-slot text-[14px] sm:text-2xl shrink-0">
- {formatFlagsWithSpace(c.flag)}
- </span>
- <span
- className={cn(
- "text-[10px] sm:text-[16px] font-black uppercase truncate leading-tight group-hover:text-blue-500 transition-colors",
- theme === "dark"
- ? "text-zinc-100"
- : "text-zinc-800",
- )}
- >
- {c.name}
- </span>
- </div>
- </td>
- <td className="py-4 sm:py-6 px-1 sm:px-4 text-right">
- <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-amber-500">
- {String(c.gold)}
- </span>
- </td>
- <td className="py-4 sm:py-6 px-1 sm:px-4 text-right">
- <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-zinc-400">
- {String(c.silver)}
- </span>
- </td>
- <td className="py-4 sm:py-6 px-1 sm:px-4 text-right">
- <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-[#CE8946]">
- {String(c.bronze)}
- </span>
- </td>
- <td className="py-4 sm:py-6 pr-2 sm:pr-8 text-right">
- <span
- className={cn(
- "text-[12px] sm:text-[24px] font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",
- theme === "dark" ? "text-white" : "text-zinc-900",
- )}
- >
- {String(c.total)}
- </span>
- </td>
+  <td className="py-4 sm:py-6 pl-6 sm:pl-10 text-left">
+  <div className="flex items-center justify-start">
+  <ASRRankBadge rank={c.displayRank} />
+  </div>
+  </td>
+  <td className="py-4 sm:py-6 px-3 sm:px-5 text-left max-w-[120px] sm:max-w-xs">
+  <div className="flex items-center gap-1.5 sm:gap-3 text-left min-w-0 h-full">
+  <span className="emoji-slot text-[14px] sm:text-2xl shrink-0">
+  {formatFlagsWithSpace(c.flag)}
+  </span>
+  <span
+  className={cn(
+  "text-[10px] sm:text-[16px] font-black uppercase truncate leading-tight group-hover:text-blue-500 transition-colors",
+  theme === "dark"
+  ? "text-zinc-100"
+  : "text-zinc-800",
+  )}
+  >
+  {c.name}
+  </span>
+  </div>
+  </td>
+  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-amber-500">
+  {String(c.gold)}
+  </span>
+  </td>
+  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-zinc-400">
+  {String(c.silver)}
+  </span>
+  </td>
+  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-[#CE8946]">
+  {String(c.bronze)}
+  </span>
+  </td>
+  <td className="py-4 sm:py-6 pr-6 sm:pr-10 pl-3 sm:pl-5 text-right">
+  <span
+  className={cn(
+  "text-[12px] sm:text-[24px] font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",
+  theme === "dark" ? "text-white" : "text-zinc-900",
+  )}
+  >
+  {String(c.total)}
+  </span>
+  </td>
  </tr>
  ))}
  </tbody>
