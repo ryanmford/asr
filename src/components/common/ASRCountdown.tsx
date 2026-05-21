@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React, { useState, useEffect } from "react";
-import { CountUp } from "./CountUp";
 import { cn } from "../../lib/asr-utils";
 import { X } from "lucide-react";
 
@@ -12,15 +11,13 @@ interface ASRCountdownProps {
   theme: "light" | "dark";
 }
 
-import { useKpiStats } from "../../hooks/useAppCalculations";
-
 export const ASRCountdown = React.memo(
   ({ targetDate, eventType, onHelp, theme }: ASRCountdownProps) => {
     const [currentTime, setCurrentTime] = useState<any>(null);
     const [isVisible, setIsVisible] = useState(() => {
       try {
         return sessionStorage.getItem("asr_hide_countdown_v3") !== "true";
-      } catch (e) {
+      } catch {
         return true;
       }
     });

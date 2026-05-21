@@ -1,9 +1,0 @@
- flag={
- item.flag || 
- meta.flag || 
- meta.region || 
- (meta.countryName ? fixCountryEntity(meta.countryName, "").flag : null) ||
- (meta.country ? fixCountryEntity(meta.country, "").flag : null) ||
- (item.country ? fixCountryEntity(item.country, "").flag : null)
- }
- stats={stats}

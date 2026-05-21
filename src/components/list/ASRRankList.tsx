@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Activity } from "lucide-react";
 import { motion } from "motion/react";
-import { cn, isPlaceholderPlayer, cleanNumeric, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
+import { cn, isPlaceholderPlayer, cleanNumeric, getCombinedFlags } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
 import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";

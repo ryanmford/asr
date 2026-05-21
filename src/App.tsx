@@ -29,6 +29,7 @@ const TeamsView = React.lazy(() => import("./components/views/TeamsView").then(m
 const HomeView = React.lazy(() => import("./components/views/HomeView").then(m => ({ default: m.HomeView })));
 const MapCoursesView = React.lazy(() => import("./components/views/MapCoursesView").then(m => ({ default: m.MapCoursesView })));
 const ASRWallOfFame = React.lazy(() => import("./components/views/ASRWallOfFame").then(m => ({ default: m.ASRWallOfFame })));
+const ASRVideoAnnotator = React.lazy(() => import("./components/views/ASRVideoAnnotator").then(m => ({ default: m.ASRVideoAnnotator })));
 const InspectorBody = React.lazy(() => import("./components/inspector/InspectorBody").then(m => ({ default: m.InspectorBody })));
 
 import { motion, AnimatePresence } from "motion/react";
@@ -36,7 +37,6 @@ import { RouteScrollRestoration } from "./components/common/RouteScrollRestorati
 import { useAppStore } from "./store/useAppStore";
 import { useDataStore } from "./store/useDataStore";
 
-import { PageHeader } from "./components/common/PageHeader";
 import {
   CONFIG,
   cn,
@@ -95,7 +95,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   const showOnboarding = useAppStore((s) => s.showOnboarding);
   const setShowOnboarding = useAppStore((s) => s.setShowOnboarding);
 
-  const { eventType, isAllTimeContext, setEventType } = useURLState();
+  const { eventType, setEventType } = useURLState();
   const { navigateToEntity, closeModals, goBackOne, canGoForward, goForwardOne } = useAppNavigation();
 
   const [showIntro, setShowIntro] = useState(false);
@@ -142,10 +142,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   const inspectorData = inspectorDataObj.current;
 
   const view = backgroundLocation.pathname.split("/")[1] || "players";
-
-  const handleHome = useCallback(() => {
-    navigate("/home");
-  }, [navigate]);
 
   const handleViewChange = useCallback((v: string) => {
     navigate(`/${v}`);
@@ -247,7 +243,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       <main
         className={cn(
           "flex-1 w-full mx-auto flex flex-col relative",
-          view === "courses" ? "max-w-none pt-0" : "max-w-7xl pt-0 sm:pt-4",
+          (view === "courses" || view === "admin") ? "max-w-none pt-0" : "max-w-7xl pt-0 sm:pt-4",
           view === "home" ? "pt-0 -mt-[140px] sm:-mt-[160px]" : ""
         )}
       >
@@ -290,6 +286,11 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                       medalSort={medalSort as "copper" | "silver" | "gold"}
                       onMedalSort={handleReqSort}
                     />
+                  </motion.div>
+                } />
+                <Route path="/admin/annotator" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col bg-black min-h-0 z-50 relative">
+                    <ASRVideoAnnotator theme={theme} />
                   </motion.div>
                 } />
                 <Route path="*" element={

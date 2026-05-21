@@ -15,12 +15,12 @@ import {
   Timer,
   Waypoints,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
-import { cn, formatFlagsWithSpace, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
+import { cn, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
 
 export const HomeView = React.memo(() => {

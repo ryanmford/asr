@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ExternalLink, Loader2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,21 +32,24 @@ export const ASRVideoModal = () => {
     }
   }, [playingVideoUrl]);
 
-  useEffect(() => {
-    if (playingVideoUrl && !(location.state as Record<string, unknown>)?.videoModal) {
-      navigate(location.pathname + location.search, {
-        state: { ...location.state, videoModal: true },
-        replace: false
-      });
-    }
-  }, [playingVideoUrl, location.pathname, location.search, location.state, navigate]);
+  const lastState = useRef((location.state as Record<string, unknown>)?.videoModal);
 
   useEffect(() => {
     const isVideoModalInHistory = (location.state as Record<string, unknown>)?.videoModal;
-    if (!isVideoModalInHistory && isOpen) {
-      setPlayingVideoUrl(null);
+    
+    if (isOpen && !isVideoModalInHistory) {
+      if (lastState.current) {
+        setPlayingVideoUrl(null);
+      } else {
+        navigate(location.pathname + location.search, {
+          state: { ...location.state, videoModal: true },
+          replace: false
+        });
+      }
     }
-  }, [location.state, isOpen, setPlayingVideoUrl]);
+    
+    lastState.current = isVideoModalInHistory;
+  }, [isOpen, location.state, location.pathname, location.search, navigate, setPlayingVideoUrl]);
 
   const handleClose = useCallback(() => {
     const isVideoModalInHistory = (location.state as Record<string, unknown>)?.videoModal;

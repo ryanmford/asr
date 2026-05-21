@@ -14,7 +14,6 @@ import {
 import {
   cn,
   formatLocation,
-  formatFlagsWithSpace,
   getCombinedFlags,
   getSetterLevel,
 } from "../../lib/asr-utils";
