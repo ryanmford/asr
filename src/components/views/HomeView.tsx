@@ -794,16 +794,16 @@ export const HomeView = React.memo(() => {
           className="flex flex-col gap-3 mt-2 sm:mt-4 mb-4 sm:mb-8"
         >
           <div className="flex items-center gap-2 px-2">
-            <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
+            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+            <h3 className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
               Recent Sets
             </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
+            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent ml-2" />
           </div>
 
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
-            <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-zinc-500/50 via-zinc-500/20 to-transparent" />
+            <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent" />
 
             <div className="flex flex-col gap-4 relative z-10">
               {isLoading
@@ -855,7 +855,7 @@ export const HomeView = React.memo(() => {
                                 {/* Timeline Node */}
                                 <div className="relative mt-1.5 flex-shrink-0 z-20">
                                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300">
-                                    <span className="text-[10px] sm:text-xs font-black text-emerald-500 dark:text-emerald-400">
+                                    <span className="text-[10px] sm:text-xs font-black text-zinc-900 dark:text-white">
                                       {dayStr}
                                     </span>
                                   </div>
@@ -893,7 +893,7 @@ export const HomeView = React.memo(() => {
                                       </div>
                                       <div className="flex items-center gap-1.5 max-w-full min-w-0">
                                         <Waypoints className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                                        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 truncate max-w-full text-[10px] sm:text-[11px] uppercase tracking-wider">
+                                        <div className="flex flex-wrap items-center gap-y-0.5 truncate max-w-full text-[10px] sm:text-[11px] uppercase tracking-wider">
                                           {((Array.isArray(item.leadSetters)
                                             ? item.leadSetters
                                             : (item.leadSetters || item.setter || "Local Community").split(",")
@@ -908,7 +908,7 @@ export const HomeView = React.memo(() => {
                                             }
                                             return (
                                               <React.Fragment key={idxSetter}>
-                                                {idxSetter > 0 && <span className="text-zinc-500 dark:text-zinc-400">, </span>}
+                                                {idxSetter > 0 && <span className="text-zinc-500 dark:text-zinc-400 mr-1">,</span>}
                                                 <span
                                                   className="setter-target hover:text-emerald-500 transition-colors cursor-pointer truncate uppercase tracking-wider text-[10px] sm:text-[11px]"
                                                   onClick={(e) => {
@@ -1083,7 +1083,7 @@ export const HomeView = React.memo(() => {
                                 <div className="relative mt-1.5 flex-shrink-0 z-20">
                                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(244,63,94,0.05)] dark:shadow-[0_0_10px_rgba(244,63,94,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(244,63,94,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(244,63,94,0.1)] transition-all duration-300">
                                     {dayStr ? (
-                                      <span className="text-[10px] sm:text-xs font-black text-pink-500 dark:text-pink-400">
+                                      <span className="text-[10px] sm:text-xs font-black text-zinc-900 dark:text-white">
                                         {dayStr}
                                       </span>
                                     ) : (
