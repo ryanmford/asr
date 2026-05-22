@@ -4,6 +4,7 @@ import { CONFIG } from "../lib/asr-utils";
 import { trackEvent } from "../lib/asr-utils";
 import { useDataStore } from "../store/useDataStore";
 import { fetchGoogleSheetCSV } from "../lib/asr-data";
+import type { ASRDataContext } from "../types";
 
 export let dataWorker: Worker | null = null;
 if (typeof Worker !== "undefined") {
@@ -22,46 +23,73 @@ export const useFetchASRData = () => {
     async (isInitialFetch: boolean = true) => {
       setFetchStatus({ isSyncing: true, hasError: false });
       
-      if (isInitialFetch && !initialDataConsumed.current) {
-        if (typeof window !== 'undefined' && 'window' in globalThis && (window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__) {
-           
-           setData((window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__!);
-           initialDataConsumed.current = true;
-           setFetchStatus({ isSyncing: false, hasError: false });
-           return;
-        }
-      }
-
       const RAW_CSV_KEY = `${CONFIG.SNAPSHOT_KEY}_raw_csvs`;
 
       if (isInitialFetch) {
-        try {
-          const cached = await localforage.getItem(CONFIG.SNAPSHOT_KEY);
-          if (cached) {
-            setData({ ...(cached as ASRDataContext), isLoading: false });
-          } else {
-            // Check for raw cached CSVs
+        let restored = false;
+
+        // Stage 1: SSR Data
+        if (!initialDataConsumed.current) {
+          if (typeof window !== "undefined" && "window" in globalThis && (window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__) {
+            const ssrData = (window as unknown as { __INITIAL_DATA__?: ASRDataContext }).__INITIAL_DATA__!;
+            setData({ ...ssrData, isLoading: false });
+            initialDataConsumed.current = true;
+            restored = true;
+          }
+        }
+
+        // Stage 2: localforage snapshot storage
+        if (!restored) {
+          try {
+            const cachedSnap = await localforage.getItem(CONFIG.SNAPSHOT_KEY);
+            if (cachedSnap) {
+              setData({ ...(cachedSnap as ASRDataContext), isLoading: false });
+              restored = true;
+            }
+          } catch (e) {
+            console.warn("Failed to retrieve snapshot from localforage:", e);
+          }
+        }
+
+        // Stage 3: Parsing cached raw sheets
+        if (!restored) {
+          try {
             const rawCached = await localforage.getItem(RAW_CSV_KEY) as Record<string, string>;
             if (rawCached && rawCached.rM && rawCached.rF && rawCached.rLive && dataWorker) {
-               dataWorker.postMessage({
-                 type: "PROCESS_AND_COMPUTE",
-                 payload: { ...rawCached, hasTotalError: false, hasPartialError: false },
-               });
-            } else {
-              const localCached = localStorage.getItem(CONFIG.SNAPSHOT_KEY);
-              if (localCached) {
-                const parsedLocal = JSON.parse(localCached);
-                setData({ ...parsedLocal, isLoading: false });
-                try {
-                  await localforage.setItem(CONFIG.SNAPSHOT_KEY, parsedLocal);
-                } catch (e) {
-                  console.warn("Could not write cache to localforage.", e);
-                }
-              }
+              restored = await new Promise<boolean>((resolve) => {
+                const handleCacheWorkerMessage = (e: MessageEvent) => {
+                  if (e.data.type === "COMPUTE_ALL_READY") {
+                    const resultingData = e.data.payload;
+                    setData({
+                      ...resultingData,
+                      isLoading: false,
+                    });
+                    dataWorker?.removeEventListener("message", handleCacheWorkerMessage);
+                    resolve(true);
+                  }
+                };
+                dataWorker?.addEventListener("message", handleCacheWorkerMessage);
+                dataWorker?.postMessage({
+                  type: "PROCESS_AND_COMPUTE",
+                  payload: { ...rawCached, hasTotalError: false, hasPartialError: false },
+                });
+                // Safe resolution failover
+                setTimeout(() => {
+                  dataWorker?.removeEventListener("message", handleCacheWorkerMessage);
+                  resolve(false);
+                }, 5000);
+              });
             }
+          } catch (e) {
+            console.warn("Failed to hydrate cached raw sheets from localforage:", e);
           }
-        } catch {
-          console.warn("Cache recovery fail-safe.");
+        }
+
+        // Determine final load status and prevent parallel state overlaps
+        if (!restored) {
+          setFetchStatus({ isLoading: true });
+        } else {
+          setFetchStatus({ isLoading: false, isSyncing: true });
         }
       }
 
@@ -117,7 +145,7 @@ export const useFetchASRData = () => {
 
         // Spin up the worker to do heavy lifting mapping
         if (dataWorker) {
-          dataWorker.onmessage = async (e) => {
+          const handleLiveMapping = async (e: MessageEvent) => {
             if (e.data.type === "COMPUTE_ALL_READY") {
               const resultingData = e.data.payload;
               setData({
@@ -125,6 +153,7 @@ export const useFetchASRData = () => {
                 isLoading: false,
               });
               setFetchStatus({ isSyncing: false });
+              dataWorker?.removeEventListener("message", handleLiveMapping);
               
               try {
                 await localforage.setItem(CONFIG.SNAPSHOT_KEY, resultingData);
@@ -133,6 +162,8 @@ export const useFetchASRData = () => {
               }
             }
           };
+
+          dataWorker.addEventListener("message", handleLiveMapping);
 
           dataWorker.postMessage({
             type: "PROCESS_AND_COMPUTE",

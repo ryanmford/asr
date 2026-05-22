@@ -12,6 +12,11 @@ interface Annotation {
   lineWidth: number;
 }
 
+interface CapturableVideoElement extends HTMLVideoElement {
+  captureStream?(fps?: number): MediaStream;
+  mozCaptureStream?(fps?: number): MediaStream;
+}
+
 export function ASRVideoAnnotator({ theme }: { theme: "light" | "dark" }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -291,9 +296,10 @@ export function ASRVideoAnnotator({ theme }: { theme: "light" | "dark" }) {
     const stream = canvas.captureStream(30); // 30fps is stable and smooth without dropping too many canvas frames
     
     // Add audio track if video has one
-    const audioTrack = (videoRef.current as any).mozCaptureStream ? (videoRef.current as any).mozCaptureStream().getAudioTracks()[0] : null;
-    if (!audioTrack && (videoRef.current as any).captureStream) {
-        const vidStream = (videoRef.current as any).captureStream();
+    const capturableVid = videoRef.current as CapturableVideoElement;
+    const audioTrack = capturableVid.mozCaptureStream ? capturableVid.mozCaptureStream().getAudioTracks()[0] : null;
+    if (!audioTrack && capturableVid.captureStream) {
+        const vidStream = capturableVid.captureStream();
         if (vidStream && vidStream.getAudioTracks().length > 0) {
             stream.addTrack(vidStream.getAudioTracks()[0]);
         }

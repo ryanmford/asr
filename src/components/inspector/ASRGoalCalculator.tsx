@@ -37,7 +37,7 @@ export const ASRGoalCalculator = ({ theme, courseRecord, records, targetPts, set
                        setTargetPts(val);
                    }}
                    className={cn(
-                       "w-full text-2xl font-black bg-transparent border-b-2 outline-none pb-1 tabular-nums",
+                       "w-full text-[16px] sm:text-2xl font-black bg-transparent border-b-2 outline-none pb-1 tabular-nums",
                        theme === "dark" ? "border-white/20 focus:border-red-500" : "border-black/20 focus:border-red-500"
                    )}
                />

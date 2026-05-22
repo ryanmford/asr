@@ -64,23 +64,6 @@ export const useDataStore = create<ASRDataState>((set) => {
   if (typeof window !== "undefined" && "window" in globalThis && (window as unknown as { __INITIAL_DATA__?: Record<string, unknown> }).__INITIAL_DATA__) {
     initialData = (window as unknown as { __INITIAL_DATA__?: Record<string, unknown> }).__INITIAL_DATA__;
     initialIsLoading = false;
-  } else if (typeof window !== "undefined") {
-    // Fire off async fetch to avoid main thread blockage during boot
-    setTimeout(() => {
-      try {
-        const cached = localStorage.getItem("asr_data_vault_v1_integrated_v60_teams");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          set(state => {
-            // Unnecessary to override if we fetched live data by the time this runs
-            if (!state.isLoading) return state;
-            return { ...state, ...parsed, isLoading: false };
-          });
-        }
-      } catch {
-        // Ignore
-      }
-    }, 0);
   }
 
   return {

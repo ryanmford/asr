@@ -20,7 +20,7 @@ import { useAppNavigation } from "../../hooks/useDerivedData";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
-import { cn, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
+import { cn, fixCountryEntity, getCombinedFlags, isPlaceholderPlayer } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
 
 export const HomeView = React.memo(() => {
@@ -48,6 +48,7 @@ export const HomeView = React.memo(() => {
   const teamList_teams_AT = useDataStore((s) => s.teamList_teams_AT);
   const atPerfs = useDataStore((s) => s.atPerfs);
   const atMet = useDataStore((s) => s.atMet);
+  const dnMap = useDataStore((s) => s.dnMap);
 
   const recentSets = useMemo(() => {
     if (!masterCourseList || !masterCourseList.length) return [];
@@ -118,11 +119,23 @@ export const HomeView = React.memo(() => {
        (b.totalAllTimeRuns || b.totalRuns || 0) - (a.totalAllTimeRuns || a.totalRuns || 0)
     );
     
-    // "we should only pick from courses that have at least 1 male run and 1 female run"
+    // "we should only pick from courses that have at least 1 male run and 1 female run, and both must be real human players (not interim/placeholder)"
     const validCoursesForDay = sortedCourses.filter((c: any) => {
         const atM = c.allTimeAthletesM || [];
         const atF = c.allTimeAthletesF || [];
-        return atM.length > 0 && atF.length > 0;
+        const hasRealM = atM.some((run: any) => {
+          if (!run || !run[0]) return false;
+          const pKey = run[0];
+          const name = (dnMap && dnMap[pKey]) || pKey;
+          return !isPlaceholderPlayer(name);
+        });
+        const hasRealF = atF.some((run: any) => {
+          if (!run || !run[0]) return false;
+          const pKey = run[0];
+          const name = (dnMap && dnMap[pKey]) || pKey;
+          return !isPlaceholderPlayer(name);
+        });
+        return hasRealM && hasRealF;
     });
 
     if (validCoursesForDay.length > 0) {
@@ -192,7 +205,7 @@ export const HomeView = React.memo(() => {
     }
 
     return { topPlayer: pOfDay, topCourse: cOfDay, dailyRecord: rOfDay };
-  }, [playerList_M_AT, playerList_F_AT, playerList_M_OP, playerList_F_OP, courseList_AT]);
+  }, [playerList_M_AT, playerList_F_AT, playerList_M_OP, playerList_F_OP, courseList_AT, dnMap]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -825,7 +838,7 @@ export const HomeView = React.memo(() => {
                             item.country || "",
                             item.flag || item.region || ""
                           ).flag;
-                          const setters = Array.isArray(item.leadSetters) ? item.leadSetters.join(', ') : item.leadSetters || item.setter || "Local Community";
+
 
                           return (
                             <React.Fragment key={`set-${item.name}-${idx}`}>
@@ -859,7 +872,7 @@ export const HomeView = React.memo(() => {
                                   <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
                                     <div className="flex items-center gap-2 max-w-full w-full">
                                       <span
-                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-emerald-500"
+                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-emerald-500 group-has-[.setter-target:hover]/card:!text-zinc-900 dark:group-has-[.setter-target:hover]/card:!text-white"
                                       >
                                         {courseFlag && (
                                           <span className="text-[12px] opacity-90 shrink-0">
@@ -880,9 +893,35 @@ export const HomeView = React.memo(() => {
                                       </div>
                                       <div className="flex items-center gap-1.5 max-w-full min-w-0">
                                         <Waypoints className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                                        <span className="truncate max-w-[200px] sm:max-w-xs">
-                                          {setters}
-                                        </span>
+                                        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 truncate max-w-full text-[10px] sm:text-[11px] uppercase tracking-wider">
+                                          {((Array.isArray(item.leadSetters)
+                                            ? item.leadSetters
+                                            : (item.leadSetters || item.setter || "Local Community").split(",")
+                                          ) as string[]).map((s: string, idxSetter: number) => {
+                                            const trimmed = s.trim();
+                                            if (trimmed.toUpperCase() === "LOCAL COMMUNITY") {
+                                              return (
+                                                <span key={idxSetter} className="truncate uppercase tracking-wider text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400">
+                                                  LOCAL COMMUNITY
+                                                </span>
+                                              );
+                                            }
+                                            return (
+                                              <React.Fragment key={idxSetter}>
+                                                {idxSetter > 0 && <span className="text-zinc-500 dark:text-zinc-400">, </span>}
+                                                <span
+                                                  className="setter-target hover:text-emerald-500 transition-colors cursor-pointer truncate uppercase tracking-wider text-[10px] sm:text-[11px]"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigateToEntity("setter", { name: trimmed });
+                                                  }}
+                                                >
+                                                  {trimmed.toUpperCase()}
+                                                </span>
+                                              </React.Fragment>
+                                            );
+                                          })}
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -940,16 +979,16 @@ export const HomeView = React.memo(() => {
           className="flex flex-col gap-3 mt-2 sm:mt-4"
         >
           <div className="flex items-center gap-2 px-2">
-            <User className="w-3.5 h-3.5 text-zinc-500" />
-            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">
+            <Timer className="w-3.5 h-3.5 text-pink-500" />
+            <h3 className="text-[10px] font-black text-pink-600 dark:text-pink-400 uppercase tracking-widest">
               Recent Runs
             </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-zinc-500/20 to-transparent ml-2" />
+            <div className="flex-1 h-px bg-gradient-to-r from-pink-500/20 to-transparent ml-2" />
           </div>
 
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
-            <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-zinc-500/50 via-zinc-500/20 to-transparent" />
+            <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent" />
 
             <div className="flex flex-col gap-4 relative z-10">
               {isLoading
@@ -1042,13 +1081,13 @@ export const HomeView = React.memo(() => {
                               <div className="relative flex items-start gap-4 sm:gap-6 group">
                                 {/* Timeline Node */}
                                 <div className="relative mt-1.5 flex-shrink-0 z-20">
-                                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300">
+                                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shadow-[0_0_10px_rgba(244,63,94,0.05)] dark:shadow-[0_0_10px_rgba(244,63,94,0.05)] group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(244,63,94,0.1)] dark:group-hover:shadow-[0_0_15px_rgba(244,63,94,0.1)] transition-all duration-300">
                                     {dayStr ? (
-                                      <span className="text-[10px] sm:text-xs font-black text-blue-500 dark:text-blue-400">
+                                      <span className="text-[10px] sm:text-xs font-black text-pink-500 dark:text-pink-400">
                                         {dayStr}
                                       </span>
                                     ) : (
-                                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500/50 dark:text-blue-500/50" />
+                                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-pink-500/50 dark:text-pink-500/50" />
                                     )}
                                   </div>
                                 </div>
@@ -1067,7 +1106,7 @@ export const HomeView = React.memo(() => {
                                   <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
                                     <div className="flex items-center gap-2 max-w-full w-full">
                                       <span
-                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-blue-500 group-has-[.course-target:hover]/card:!text-zinc-900 dark:group-has-[.course-target:hover]/card:!text-white"
+                                        className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-pink-500 group-has-[.course-target:hover]/card:!text-zinc-900 dark:group-has-[.course-target:hover]/card:!text-white"
                                       >
                                         {athleteFlag && (
                                           <span className="text-[12px] opacity-90 shrink-0">
@@ -1082,7 +1121,7 @@ export const HomeView = React.memo(() => {
 
                                     <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
                                       <div 
-                                        className="course-target flex items-center hover:!text-blue-500 transition-colors cursor-pointer max-w-full min-w-0 -mx-1 px-1 rounded-md"
+                                        className="course-target flex items-center hover:!text-pink-500 transition-colors cursor-pointer max-w-full min-w-0 -mx-1 px-1 rounded-md"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           navigateToEntity("course", item.course || { name: item.courseName });
@@ -1101,7 +1140,7 @@ export const HomeView = React.memo(() => {
                                       
                                       <div className="flex items-center gap-1.5 max-w-full min-w-0">
                                         <Timer className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                                        <span className="tabular-nums truncate max-w-[200px] sm:max-w-xs">
+                                        <span className="tabular-nums truncate max-w-[200px] sm:max-w-xs uppercase tracking-wider text-[10px] sm:text-[11px]">
                                           {resultVal}
                                         </span>
                                         {(rankBadge || fires > 0) && (
@@ -1136,7 +1175,7 @@ export const HomeView = React.memo(() => {
                                       {(item.videoUrl || item.demoVideo) && (
                                         <button
                                           type="button"
-                                          className="p-2 sm:p-3 transition-all active:scale-90 text-zinc-500 group-hover/card:text-blue-500 hover:!text-blue-500 flex items-center justify-center cursor-pointer"
+                                          className="p-2 sm:p-3 transition-all active:scale-90 text-zinc-500 group-hover/card:text-pink-500 hover:!text-pink-500 flex items-center justify-center cursor-pointer"
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
@@ -1160,7 +1199,7 @@ export const HomeView = React.memo(() => {
             {!isLoading && recentFeed && recentFeed.length > homeVisibleRuns && (
               <div className="flex justify-center mt-8">
                 <button
-                  className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 active:text-blue-500 transition-all duration-300 rounded-2xl"
+                  className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-pink-500 active:text-pink-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
                     setHomeVisibleRuns((prev) =>
                       Math.min(prev + 10, 100, recentFeed.length),

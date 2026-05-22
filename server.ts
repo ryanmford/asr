@@ -6,6 +6,47 @@ import fs from 'fs/promises';
 import { getPageMeta } from './src/meta-injector.ts';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
+import crypto from 'crypto';
+
+class OgImageCache {
+  private cache = new Map<string, Buffer>();
+  private readonly maxKeys = 500;
+
+  get(title: string, desc: string): Buffer | null {
+    const key = this.hash(title, desc);
+    if (this.cache.has(key)) {
+      const buffer = this.cache.get(key)!;
+      // Refresh key order (LRU behavior)
+      this.cache.delete(key);
+      this.cache.set(key, buffer);
+      return buffer;
+    }
+    return null;
+  }
+
+  set(title: string, desc: string, buffer: Buffer): void {
+    const key = this.hash(title, desc);
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxKeys) {
+      // LRU eviction: the Map.keys().next().value returns the oldest inserted element
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.cache.delete(oldestKey);
+      }
+    }
+    this.cache.set(key, buffer);
+  }
+
+  private hash(title: string, desc: string): string {
+    return crypto
+      .createHash('sha256')
+      .update(`${title}||${desc}`)
+      .digest('hex');
+  }
+}
+
+const ogCache = new OgImageCache();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,6 +107,13 @@ async function startServer() {
     try {
       const title = (req.query.title as string) || 'Apex Speed Run';
       const desc = (req.query.desc as string) || 'Global Parkour Leaderboards and Course Directory';
+
+      const cachedBuffer = ogCache.get(title, desc);
+      if (cachedBuffer) {
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+        return res.send(cachedBuffer);
+      }
 
       const fontData = await fs.readFile(
         path.join(process.cwd(), 'node_modules', '@fontsource', 'inter', 'files', 'inter-latin-700-normal.woff')
@@ -248,6 +296,8 @@ async function startServer() {
         fitTo: { mode: 'width', value: 1200 },
       });
       const pngBuffer = resvg.render().asPng();
+
+      ogCache.set(title, desc, pngBuffer);
 
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day

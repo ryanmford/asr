@@ -352,7 +352,17 @@ export const formatFlagsWithSpace = (f: string) => {
   return f;
 };
 
-export const getCombinedFlags = (...objects: any[]) => {
+export interface FlaggedObject {
+  flag?: string | null;
+  region?: string | null;
+  country?: string | null;
+  countryName?: string | null;
+  townFlag?: string | null;
+  gymFlag?: string | null;
+  [key: string]: unknown;
+}
+
+export const getCombinedFlags = (...objects: (string | FlaggedObject | null | undefined)[]): string => {
   const flags = new Set<string>();
   const flagRegex = /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g;
 
@@ -360,48 +370,48 @@ export const getCombinedFlags = (...objects: any[]) => {
   for (const obj of objects) {
     if (!obj) continue;
     
-    if (typeof obj === 'string') {
-        const matches = String(obj).match(flagRegex);
-        if (matches) matches.forEach(m => flags.add(m));
-        continue;
+    if (typeof obj === "string") {
+      const matches = obj.match(flagRegex);
+      if (matches) matches.forEach((m) => flags.add(m));
+      continue;
     }
 
     const explicitFlagField = obj.flag || obj.region;
     if (explicitFlagField) {
       const matches = String(explicitFlagField).match(flagRegex);
       if (matches && matches.length > 0) {
-        matches.forEach(m => flags.add(m));
+        matches.forEach((m) => flags.add(m));
       }
     }
   }
 
   // If we found any explicit flags, return them immediately.
   if (flags.size > 0) {
-      return Array.from(flags).join(" ");
+    return Array.from(flags).join(" ");
   }
 
   // Fallback: only if NO explicit flags were found across all objects
   for (const obj of objects) {
-    if (!obj || typeof obj === 'string') continue;
+    if (!obj || typeof obj === "string") continue;
 
     const possibleFlagFields = [
-      obj.country, 
+      obj.country,
       obj.countryName,
-      obj.townFlag, 
-      obj.gymFlag
+      obj.townFlag,
+      obj.gymFlag,
     ];
 
     for (const val of possibleFlagFields) {
       if (!val) continue;
-      
-      let resolvedFlag = val;
-      if (typeof val === 'string' && !flagRegex.test(val) && val.trim() !== "") {
-         resolvedFlag = fixCountryEntity(val, "").flag;
+
+      let resolvedFlag = String(val);
+      if (!flagRegex.test(resolvedFlag) && resolvedFlag.trim() !== "") {
+        resolvedFlag = fixCountryEntity(resolvedFlag, "").flag;
       }
-      
-      const matches = String(resolvedFlag).match(flagRegex);
+
+      const matches = resolvedFlag.match(flagRegex);
       if (matches) {
-        matches.forEach(m => flags.add(m));
+        matches.forEach((m) => flags.add(m));
       }
     }
   }
