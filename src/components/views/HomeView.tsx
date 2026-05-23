@@ -552,19 +552,23 @@ export const HomeView = React.memo(() => {
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={runsTrendData}>
-                  <YAxis domain={["dataMin", "dataMax"]} hide />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {runsTrendData && runsTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" debounce={150}>
+                  <LineChart data={runsTrendData}>
+                    <YAxis domain={["dataMin", "dataMax"]} hide />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full border-t border-dashed border-blue-500/20" />
+              )}
             </div>
 
             <div className="absolute top-0 right-0 p-6 pointer-events-none z-30 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 origin-top-right">
@@ -612,19 +616,23 @@ export const HomeView = React.memo(() => {
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={coursesTrendData}>
-                  <YAxis domain={["dataMin", "dataMax"]} hide />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {coursesTrendData && coursesTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" debounce={150}>
+                  <LineChart data={coursesTrendData}>
+                    <YAxis domain={["dataMin", "dataMax"]} hide />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full border-t border-dashed border-emerald-500/20" />
+              )}
             </div>
 
             <div className="absolute top-0 right-0 p-6 pointer-events-none z-30 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 origin-top-right">
@@ -672,19 +680,23 @@ export const HomeView = React.memo(() => {
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={countriesTrendData}>
-                  <YAxis domain={["dataMin", "dataMax"]} hide />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#6366f1"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {countriesTrendData && countriesTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" debounce={150}>
+                  <LineChart data={countriesTrendData}>
+                    <YAxis domain={["dataMin", "dataMax"]} hide />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#6366f1"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full border-t border-dashed border-indigo-500/20" />
+              )}
             </div>
 
             <div className="absolute top-0 right-0 p-6 pointer-events-none z-30 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 origin-top-right">
@@ -732,19 +744,23 @@ export const HomeView = React.memo(() => {
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={medalsTrendData}>
-                  <YAxis domain={["dataMin", "dataMax"]} hide />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {medalsTrendData && medalsTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" debounce={150}>
+                  <LineChart data={medalsTrendData}>
+                    <YAxis domain={["dataMin", "dataMax"]} hide />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full border-t border-dashed border-amber-500/20" />
+              )}
             </div>
 
             <div className="absolute top-0 right-0 p-6 pointer-events-none z-30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12 origin-top-right">

@@ -281,6 +281,17 @@ export const ASRMap = forwardRef(({
     };
   }, [mapReady]);
 
+  // Solve Leaflet Gray Tiles bug when map mounts or views transition
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return;
+    const timer = setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [mapReady]);
+
   // Theme synchronization for Tiles
   useEffect(() => {
     if (!tileLayersRef.current) return;

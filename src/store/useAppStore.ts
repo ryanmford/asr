@@ -52,17 +52,29 @@ const getInitialMapMode = () => {
 export const useAppStore = create<AppState>((set) => ({
   gen: getInitialGen(),
   setGen: (gen) => {
-    localStorage.setItem("gen", JSON.stringify(gen));
+    try {
+      localStorage.setItem("gen", JSON.stringify(gen));
+    } catch (e) {
+      console.warn("localStorage setItem failed:", e);
+    }
     set({ gen });
   },
   teamCategory: getInitialTeamCategory(),
   setTeamCategory: (teamCategory) => {
-    localStorage.setItem("teamCategory", JSON.stringify(teamCategory));
+    try {
+      localStorage.setItem("teamCategory", JSON.stringify(teamCategory));
+    } catch (e) {
+      console.warn("localStorage setItem failed:", e);
+    }
     set({ teamCategory });
   },
   mapMode: getInitialMapMode(),
   setMapMode: (mapMode) => {
-    localStorage.setItem("mapMode", JSON.stringify(mapMode));
+    try {
+      localStorage.setItem("mapMode", JSON.stringify(mapMode));
+    } catch (e) {
+      console.warn("localStorage setItem failed:", e);
+    }
     set({ mapMode });
   },
   playingVideoUrl: null,

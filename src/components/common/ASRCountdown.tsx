@@ -32,7 +32,7 @@ export const ASRCountdown = React.memo(
           e.stopPropagation();
           setIsVisible(false);
           try {
-            sessionStorage.setItem("asr_hide_countdown_v2", "true");
+            sessionStorage.setItem("asr_hide_countdown_v3", "true");
           } catch (err) {
             console.warn("Could not save to sessionStorage", err);
           }
@@ -42,7 +42,7 @@ export const ASRCountdown = React.memo(
           e.stopPropagation();
           setIsVisible(false);
           try {
-            sessionStorage.setItem("asr_hide_countdown_v2", "true");
+            sessionStorage.setItem("asr_hide_countdown_v3", "true");
           } catch (err) {
             console.warn("Could not save to sessionStorage", err);
           }
@@ -157,8 +157,8 @@ export const ASRCountdown = React.memo(
                 "theme-text-base",
               )}
             >
-              <div className="flex items-center gap-2 hidden min-[360px]:flex">
-                <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60">
+              <div className="flex items-center gap-2 hidden min-[360px]:flex shrink-0">
+                <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60 whitespace-nowrap">
                   OPEN CLIPS DUE IN:
                 </span>
               </div>

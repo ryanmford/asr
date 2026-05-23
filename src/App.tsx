@@ -57,20 +57,19 @@ import {
   useInspectorData,
 } from "./hooks/useDerivedData";
 import { useFetchASRData } from "./hooks/useASRData";
-import { useDataStore } from "./store/useDataStore";
 
 export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof localStorage !== "undefined") {
-      const p = localStorage.getItem(CONFIG.PREFS_KEY);
-      if (p) {
-        try {
+    try {
+      if (typeof localStorage !== "undefined") {
+        const p = localStorage.getItem(CONFIG.PREFS_KEY);
+        if (p) {
           const prefs = JSON.parse(p);
           if (prefs.theme === "light" || prefs.theme === "dark") return prefs.theme;
-        } catch (e) {
-          console.error("Failed to parse prefs", e);
         }
       }
+    } catch (e) {
+      console.warn("localStorage not available in current environment", e);
     }
     if (typeof window !== "undefined" && window.matchMedia) {
       if (window.matchMedia("(prefers-color-scheme: light)").matches) return "light";
@@ -101,10 +100,14 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
-    const p = localStorage.getItem(CONFIG.PREFS_KEY);
-    const parsed = p ? JSON.parse(p) : {};
-    parsed.theme = theme;
-    localStorage.setItem(CONFIG.PREFS_KEY, JSON.stringify(parsed));
+    try {
+      const p = localStorage.getItem(CONFIG.PREFS_KEY);
+      const parsed = p ? JSON.parse(p) : {};
+      parsed.theme = theme;
+      localStorage.setItem(CONFIG.PREFS_KEY, JSON.stringify(parsed));
+    } catch (e) {
+      console.warn("Could not write theme to localStorage:", e);
+    }
     
     if (theme === "dark") {
       document.documentElement.classList.add("dark");

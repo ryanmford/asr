@@ -17,6 +17,65 @@ interface CapturableVideoElement extends HTMLVideoElement {
   mozCaptureStream?(fps?: number): MediaStream;
 }
 
+interface DecimalInputProps {
+  value: number;
+  min?: number;
+  max?: number;
+  onChange: (val: number) => void;
+  className?: string;
+}
+
+const ASRDecimalInput = ({ value, min = 0, max, onChange, className }: DecimalInputProps) => {
+  const [localVal, setLocalVal] = useState(value.toFixed(2));
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setLocalVal(value.toFixed(2));
+    }
+  }, [value, isFocused]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    setLocalVal(rawVal);
+    const parsed = parseFloat(rawVal);
+    if (!isNaN(parsed)) {
+      onChange(parsed);
+    }
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    const parsed = parseFloat(localVal);
+    if (!isNaN(parsed)) {
+      let clamped = parsed;
+      if (min !== undefined && clamped < min) clamped = min;
+      if (max !== undefined && clamped > max) clamped = max;
+      
+      setLocalVal(clamped.toFixed(2));
+      onChange(clamped);
+    } else {
+      setLocalVal(value.toFixed(2));
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      value={localVal}
+      onChange={handleInputChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      className={className}
+    />
+  );
+};
+
 export function ASRVideoAnnotator({ theme }: { theme: "light" | "dark" }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -44,6 +103,32 @@ export function ASRVideoAnnotator({ theme }: { theme: "light" | "dark" }) {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  // Prevent memory leak on videoSrc upload/cleanup
+  useEffect(() => {
+    return () => {
+      if (videoSrc) {
+        try {
+          URL.revokeObjectURL(videoSrc);
+        } catch (e) {
+          console.warn("Failed to revoke video object URL:", e);
+        }
+      }
+    };
+  }, [videoSrc]);
+
+  // Prevent memory leak on recordingUrl cleanup
+  useEffect(() => {
+    return () => {
+      if (recordingUrl) {
+        try {
+          URL.revokeObjectURL(recordingUrl);
+        } catch (e) {
+          console.warn("Failed to revoke recording URL:", e);
+        }
+      }
+    };
+  }, [recordingUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -558,35 +643,33 @@ console.log("HD Export capability unlocked in version 2.0. Join ASR Discord.");
                                               }
                                           }}>JUMP</button>
                                     </span>
-                                    <input 
-                                      type="number" 
-                                      value={ann.time.toFixed(2)} 
+                                    <ASRDecimalInput 
+                                      value={ann.time} 
                                       step={0.1}
                                       min={0}
-                                      onChange={(e) => {
+                                      onChange={(val) => {
                                           const newAnns = [...annotations];
                                           const idx = newAnns.findIndex(a => a.id === ann.id);
-                                          newAnns[idx].time = parseFloat(e.target.value) || 0;
+                                          newAnns[idx].time = val;
                                           setAnnotations(newAnns.sort((a,b) => a.time - b.time));
                                       }}
-                                      className="bg-current/5 border border-current/20 outline-none focus:border-current p-1.5 w-full" 
+                                      className="bg-current/5 border border-current/20 outline-none focus:border-current p-1.5 w-full text-base" 
                                     />
                                 </label>
                                 <label className="flex flex-col gap-1">
                                     <span className="uppercase opacity-50">FREEZE TIME (s)</span>
-                                    <input 
-                                      type="number" 
-                                      value={ann.freezeDuration.toFixed(2)} 
+                                    <ASRDecimalInput 
+                                      value={ann.freezeDuration} 
                                       step={0.1}
                                       min={0}
                                       max={10}
-                                      onChange={(e) => {
+                                      onChange={(val) => {
                                           const newAnns = [...annotations];
                                           const idx = newAnns.findIndex(a => a.id === ann.id);
-                                          newAnns[idx].freezeDuration = parseFloat(e.target.value) || 0;
+                                          newAnns[idx].freezeDuration = val;
                                           setAnnotations(newAnns);
                                       }}
-                                      className="bg-current/5 border border-current/20 outline-none focus:border-current p-1.5 w-full" 
+                                      className="bg-current/5 border border-current/20 outline-none focus:border-current p-1.5 w-full text-base" 
                                     />
                                 </label>
                             </div>
