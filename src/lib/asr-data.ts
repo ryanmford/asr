@@ -637,7 +637,7 @@ export const calculateWofStats = (
   atPerfs: Record<string, { fireCount?: number }[]>,
   lbAT: { M: Record<string, unknown>; F: Record<string, unknown> },
   atMet: Record<string, PlayerProfile>,
-  medalSort: string,
+  medalSort: { key: string; direction: "ascending" | "descending" } | null,
   settersWithImpact: SetterProfile[],
 ) => {
   try {

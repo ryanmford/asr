@@ -286,7 +286,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                     <ASRWallOfFame
                       theme={theme}
                       onEntityClick={navigateToEntity}
-                      medalSort={medalSort as "copper" | "silver" | "gold"}
+                      medalSort={medalSort}
                       onMedalSort={handleReqSort}
                     />
                   </motion.div>

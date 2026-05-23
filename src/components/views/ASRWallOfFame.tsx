@@ -207,7 +207,7 @@ export const ASRWallOfFame = React.memo(
  <div className="flex items-center justify-end gap-2 shrink-0 text-right z-10 relative">
  <span
  className={cn(
- "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-zinc-500",
+ "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-blue-500",
  theme === "dark" ? "text-white" : "text-zinc-900",
  isTop3 ? "scale-110" : "opacity-100",
  i === 0 && ""
