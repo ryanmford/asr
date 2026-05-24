@@ -51,6 +51,20 @@ export const HomeView = React.memo(() => {
   const dnMap = useDataStore((s) => s.dnMap);
 
   // Home Hero Background video rotation & self-healing fallback
+  const ALL_HERO_VIDEOS = useMemo(() => [
+    "/ben-tivoli.mp4",
+    "/joey-harbourfront1.mp4",
+    "/olof-c4c.mp4",
+    "/taylor-navfac.mp4",
+  ], []);
+
+  const [failedVideos, setFailedVideos] = React.useState<string[]>([]);
+
+  const availableVideos = useMemo(() => {
+    const working = ALL_HERO_VIDEOS.filter((v) => !failedVideos.includes(v));
+    return working.length > 0 ? working : ["/ben-tivoli.mp4"];
+  }, [ALL_HERO_VIDEOS, failedVideos]);
+
   const [activeVideoIndex] = React.useState(() => {
     const key = "asr_hero_video_index";
     try {
@@ -72,22 +86,66 @@ export const HomeView = React.memo(() => {
     }
     return rand;
   });
-  const [videoError, setVideoError] = React.useState(false);
 
   const currentVideoSrc = useMemo(() => {
-    const videos = [
-      "/ben-tivoli.mp4",
-      "/joey-harbourfront1.mp4",
-      "/olof-c4c.mp4",
-      "/taylor-navfac.mp4",
-    ];
-    if (videoError) return "/ben-tivoli.mp4";
-    return videos[activeVideoIndex] || "/ben-tivoli.mp4";
-  }, [activeVideoIndex, videoError]);
+    const preferred = ALL_HERO_VIDEOS[activeVideoIndex] || "/ben-tivoli.mp4";
+    if (failedVideos.includes(preferred)) {
+      return availableVideos[0];
+    }
+    return preferred;
+  }, [activeVideoIndex, ALL_HERO_VIDEOS, failedVideos, availableVideos]);
+
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  // Fast preflight validation to filter out 0-byte or corrupted files without downloading them
+  React.useEffect(() => {
+    let active = true;
+    const preflightCheck = async () => {
+      const failedList: string[] = [];
+      await Promise.all(
+        ALL_HERO_VIDEOS.map(async (video) => {
+          try {
+            const res = await fetch(video, { method: "HEAD" });
+            const size = res.headers.get("content-length");
+            if (!res.ok || size === "0" || size === null) {
+              failedList.push(video);
+            }
+          } catch {
+            failedList.push(video);
+          }
+        })
+      );
+      if (active && failedList.length > 0) {
+        setFailedVideos((prev) => {
+          const merged = new Set([...prev, ...failedList]);
+          return Array.from(merged);
+        });
+      }
+    };
+    preflightCheck();
+    return () => {
+      active = false;
+    };
+  }, [ALL_HERO_VIDEOS]);
+
+  // Ensure high-reliability mobile autoplay and clean transitions
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play()?.catch(() => {
+        // Safe catch for autoplay blocks (such as mobile low power mode)
+      });
+    }
+  }, [currentVideoSrc]);
 
   const handleVideoError = React.useCallback(() => {
-    setVideoError(true);
-  }, []);
+    setFailedVideos((prev) => {
+      if (!prev.includes(currentVideoSrc)) {
+        return [...prev, currentVideoSrc];
+      }
+      return prev;
+    });
+  }, [currentVideoSrc]);
 
   const recentSets = useMemo(() => {
     if (!masterCourseList || !masterCourseList.length) return [];
@@ -380,6 +438,7 @@ export const HomeView = React.memo(() => {
         {/* Full Background Video */}
         <div className="absolute inset-0 z-0 bg-black">
           <video 
+            ref={videoRef}
             src={currentVideoSrc}
             autoPlay 
             playsInline 
