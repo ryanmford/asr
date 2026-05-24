@@ -50,6 +50,45 @@ export const HomeView = React.memo(() => {
   const atMet = useDataStore((s) => s.atMet);
   const dnMap = useDataStore((s) => s.dnMap);
 
+  // Home Hero Background video rotation & self-healing fallback
+  const [activeVideoIndex] = React.useState(() => {
+    const key = "asr_hero_video_index";
+    try {
+      const saved = sessionStorage.getItem(key);
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 0 && parsed < 4) {
+          return parsed;
+        }
+      }
+    } catch {
+      // safe fallback
+    }
+    const rand = Math.floor(Math.random() * 4);
+    try {
+      sessionStorage.setItem(key, String(rand));
+    } catch {
+      // safe fallback
+    }
+    return rand;
+  });
+  const [videoError, setVideoError] = React.useState(false);
+
+  const currentVideoSrc = useMemo(() => {
+    const videos = [
+      "/ben-tivoli.mp4",
+      "/joey-harbourfront1.mp4",
+      "/olof-c4c.mp4",
+      "/taylor-navfac.mp4",
+    ];
+    if (videoError) return "/ben-tivoli.mp4";
+    return videos[activeVideoIndex] || "/ben-tivoli.mp4";
+  }, [activeVideoIndex, videoError]);
+
+  const handleVideoError = React.useCallback(() => {
+    setVideoError(true);
+  }, []);
+
   const recentSets = useMemo(() => {
     if (!masterCourseList || !masterCourseList.length) return [];
     
@@ -341,11 +380,12 @@ export const HomeView = React.memo(() => {
         {/* Full Background Video */}
         <div className="absolute inset-0 z-0 bg-black">
           <video 
-            src="/ben-tivoli.mp4"
+            src={currentVideoSrc}
             autoPlay 
             playsInline 
             muted 
             loop 
+            onError={handleVideoError}
             className="w-full h-full object-cover opacity-80"
           />
           {/* subtle vignette */}
