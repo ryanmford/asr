@@ -338,11 +338,11 @@ export const ASRDataTable = React.memo(
  theme === "dark"
  ? "opacity-30 text-white border-white/5"
  : "opacity-50 text-zinc-900 border-black/5",
- viewType === "card" ? "pl-4 sm:pl-5 lg:pl-6 pr-4 sm:pr-5 lg:pr-6 mx-4" : "mx-4",
+ viewType === "card" ? (isCompact ? "pl-3 pr-1.5 mx-4" : "pl-3 sm:pl-6 lg:pl-8 pr-1.5 sm:pr-4 mx-4") : "mx-4",
  )}
  >
  {viewType === "card" ? (
-          <div className="flex items-center min-w-0 pr-1 flex-1 gap-2 sm:gap-4 lg:gap-6">
+          <div className={cn("flex items-center min-w-0 pr-1 flex-1", isCompact ? "gap-2" : "gap-2 sm:gap-4 lg:gap-6")}>
             <div className="w-10 sm:w-16 lg:w-20 shrink-0 flex items-center justify-center text-center">RANK</div>
             <div className="flex flex-col min-w-0 flex-1 text-left">{middleLabel}</div>
           </div>
@@ -355,7 +355,7 @@ export const ASRDataTable = React.memo(
  <div
  className={cn(
  "flex items-center",
- viewType === "card" ? "gap-2 sm:gap-4" : "gap-0",
+ viewType === "card" ? (isCompact ? "gap-2" : "gap-2 sm:gap-4") : "gap-0",
  )}
  >
  {statColumns.map((c, i: number) => (
@@ -363,13 +363,13 @@ export const ASRDataTable = React.memo(
  key={i}
  className={cn(
    "flex justify-end text-right shrink-0",
-   c.width ? c.width : viewType === "card" ? "min-w-[50px] sm:min-w-[80px] lg:min-w-[120px]" : "w-20 sm:w-24 lg:w-32 px-1 sm:px-4 lg:px-6"
+   c.width ? c.width : viewType === "card" ? (isCompact ? "min-w-[50px]" : "min-w-[50px] sm:min-w-[80px] lg:min-w-[120px]") : "w-20 sm:w-24 lg:w-32 px-1 sm:px-4 lg:px-6"
  )}
  >
  {c.label}
  </div>
  ))}
- {showVideoColumn && <div className={cn("shrink-0", viewType === "card" ? "w-10 sm:w-12 ml-2 sm:ml-3" : "w-10 sm:w-16 lg:w-20 pr-4 sm:pr-6 lg:pr-8 ml-2")} />}
+ {showVideoColumn && <div className={cn("shrink-0", viewType === "card" ? (isCompact ? "w-10 ml-2 sm:ml-3" : "w-10 sm:w-12 ml-2 sm:ml-3") : "w-10 sm:w-16 lg:w-20 pr-4 sm:pr-6 lg:pr-8 ml-2")} />}
  </div>
  </div>
  )}
