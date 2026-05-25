@@ -11,6 +11,28 @@ import {
 } from "./asr-utils";
 import { normalizeForSearch } from "./utils";
 
+export const isFootwearTeam = (name: string, shoeField?: string): boolean => {
+  if (!name) return false;
+  const nLow = name.toLowerCase().trim();
+  const shoeKeywords = [
+    "vans", "salomon", "feiyue", "adidas", "puma", "nike", 
+    "strike mvmnt", "strike movement", "new balance", "inov-8", 
+    "merrell", "asics", "reebok", "saucony", "hoka", "on running", 
+    "trail running", "ultrarange", "speedcross", "haze", "trainer",
+    "shoes", "footwear", "equipment"
+  ];
+  if (shoeKeywords.some(kw => nLow === kw || nLow.includes(kw))) {
+    return true;
+  }
+  if (shoeField) {
+    const sLow = shoeField.toLowerCase().trim();
+    if (sLow && sLow !== "-" && (nLow.includes(sLow) || sLow.includes(nLow))) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const RANKING_MAPPING = {
   name: ["athlete", "name", "player"],
   country: ["country"],
@@ -27,6 +49,8 @@ export const RANKING_MAPPING = {
   cert: ["cert", "level", "certification"],
   location: ["location", "city", "region", "hometown"],
   homeGym: ["gym", "home gym"],
+  shoe: ["shoe", "shoes", "footwear"],
+  shoeSize: ["size", "shoe size"],
 };
 
 export const SET_LIST_MAPPING = {
@@ -97,11 +121,12 @@ export const processRankingData = (csv: string, gender: string) => {
       const pTeamLocation = (vals.__raw ? vals.__raw[21] || "" : "").trim();
 
       const pTeams: TeamProfile[] = [];
+      const shoeField = (vals.shoe || "").trim();
       if (vals.__raw) {
         // Check for team slots: (X,Y,Z), (AA,AB,AC), (AD,AE,AF)
         for (let j = 23; j <= 31; j += 3) {
           const tName = (vals.__raw[j] || "").trim();
-          if (tName && tName.toUpperCase() !== "UNAFFILIATED") {
+          if (tName && tName.toUpperCase() !== "UNAFFILIATED" && !isFootwearTeam(tName, shoeField)) {
             pTeams.push({
               name: tName,
               location: (vals.__raw[j + 1] || "").trim(),
@@ -143,6 +168,8 @@ export const processRankingData = (csv: string, gender: string) => {
         allTimeFireCount: Math.floor(cleanNumeric(vals.fire) || 0),
         avgTime: cleanNumeric(vals.avg) || 0,
         certLevel: (vals.cert || "").trim().toUpperCase() || "NONE",
+        shoe: (vals.shoe || "").trim(),
+        shoeSize: (vals.shoeSize || "").trim(),
         searchKey,
       };
     })
@@ -227,7 +254,7 @@ export const processSettersData = (csv: string) => {
       if (vals.__raw) {
         for (let j = 23; j <= 31; j += 3) {
           const tName = (vals.__raw[j] || "").trim();
-          if (tName && tName.toUpperCase() !== "UNAFFILIATED") {
+          if (tName && tName.toUpperCase() !== "UNAFFILIATED" && !isFootwearTeam(tName)) {
             pTeams.push({
               name: tName,
               location: (vals.__raw[j + 1] || "").trim(),

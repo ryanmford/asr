@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Globe, Instagram, Youtube } from "lucide-react";
 import { cn, formatLocation, formatFlagsWithSpace } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
-import { BioStat } from "./BioComponents";
+import { BioStat, BioRow } from "./BioComponents";
 import { FallbackAvatar } from "../common/FallbackAvatar";
 import {
   ProfileHeader,
@@ -136,22 +137,34 @@ export const TeamDetails = React.memo(
             <InspectorTabContainer>
               <div className="flex flex-col gap-4">
                 <SectionTitle>GYM PROFILE</SectionTitle>
-                <div className="grid grid-cols-2 gap-3">
-                  <BioStat
-                    theme={theme}
-                    label="WEBSITE"
-                    value={tMeta?.website || team?.website || "-"}
-                  />
-                  <BioStat
-                    theme={theme}
-                    label="INSTAGRAM"
-                    value={tMeta?.instagram || team?.instagram || "-"}
-                  />
-                  <BioStat
-                    theme={theme}
-                    label="YOUTUBE"
-                    value={tMeta?.youtube || team?.youtube || "-"}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {(tMeta?.website || team?.website) && (
+                    <BioRow
+                      theme={theme}
+                      icon={<Globe size={18} />}
+                      label="WEBSITE"
+                      value={String(tMeta?.website || team?.website).replace(/^https?:\/\//, '')}
+                      href={String(tMeta?.website || team?.website).startsWith('http') ? String(tMeta?.website || team?.website) : `https://${tMeta?.website || team?.website}`}
+                    />
+                  )}
+                  {(tMeta?.instagram || team?.instagram) && (
+                    <BioRow
+                      theme={theme}
+                      icon={<Instagram size={18} />}
+                      label="INSTAGRAM"
+                      value={`@${(tMeta?.instagram || team?.instagram)}`}
+                      href={`https://instagram.com/${(tMeta?.instagram || team?.instagram)}`}
+                    />
+                  )}
+                  {(tMeta?.youtube || team?.youtube) && (
+                    <BioRow
+                      theme={theme}
+                      icon={<Youtube size={18} />}
+                      label="YOUTUBE"
+                      value={String(tMeta?.youtube || team?.youtube)}
+                      href={`https://youtube.com/${String(tMeta?.youtube || team?.youtube)}`}
+                    />
+                  )}
                 </div>
               </div>
 

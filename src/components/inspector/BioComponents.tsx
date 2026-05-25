@@ -45,13 +45,23 @@ interface BioRowProps {
  icon: React.ReactNode;
  label: string;
  value: string;
- isLink?: boolean;
- igHandle?: string;
+ href?: string;
+ onClick?: () => void;
  theme?: "light" | "dark";
 }
 
 export const BioRow = React.memo(
- ({ icon, label, value, isLink, igHandle, theme }: BioRowProps) => {
+ ({ icon, label, value, href, onClick, theme }: BioRowProps) => {
+ const valLength = value.length;
+ const fontSizeCls =
+ valLength > 18
+ ? "text-[8px] md:text-[10px]"
+ : valLength > 15
+ ? "text-[9px] md:text-xs"
+ : valLength > 11
+ ? "text-[10px] md:text-xs"
+ : "text-xs md:text-sm";
+
  const content = (
  <div
  className={cn(
@@ -69,12 +79,13 @@ export const BioRow = React.memo(
  {icon}
  </div>
  <div className="flex flex-col min-w-0">
- <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-0.5">
+ <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-0.5 group-hover:text-blue-500 transition-colors">
  {label}
  </span>
  <span
  className={cn(
- "text-xs font-black uppercase tracking-tight",
+ fontSizeCls,
+ "font-black uppercase tracking-tight break-all group-hover:text-blue-500 transition-colors",
  "theme-text-base",
  )}
  >
@@ -84,17 +95,31 @@ export const BioRow = React.memo(
  </div>
  </div>
  );
- if (isLink && igHandle)
+
+ if (href) {
  return (
  <a
- href={`https://instagram.com/${igHandle}`}
+ href={href}
  target="_blank"
  rel="noopener noreferrer"
- className="block h-full transition-transform active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-[1.5rem]"
+ className="block h-full transition-transform active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-[1.5rem]"
  >
  {content}
  </a>
  );
+ }
+
+ if (onClick) {
+ return (
+ <button
+ onClick={onClick}
+ className="block w-full text-left h-full transition-transform active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-[1.5rem]"
+ >
+ {content}
+ </button>
+ );
+ }
+
  return content;
  },
 );

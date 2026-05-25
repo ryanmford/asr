@@ -3,13 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ASRWeeklyActivityChart } from "./ASRWeeklyActivityChart";
 import {
-  Video,
   Calendar,
   Instagram,
   ShieldAlert,
   Building2,
   Users,
   X,
+  MapPin,
 } from "lucide-react";
 import {
   cn,
@@ -18,12 +18,11 @@ import {
   getSetterLevel,
 } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
-import { BioStat, BioRow } from "./BioComponents";
+import { BioRow } from "./BioComponents";
 import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { FallbackAvatar } from "../common/FallbackAvatar";
 import {
   ProfileHeader,
-  SupportLink,
   SectionTitle,
   InspectorTabContainer,
 } from "./InspectorComponents";
@@ -94,6 +93,64 @@ export const PlayerDetails = React.memo(
       vaultItems,
     } = usePlayerDetailsData(player, contentMode, dataContext);
 
+    const assignedShoe = useMemo(() => {
+      const rawShoe = vitals.shoe;
+      const hasShoe = rawShoe && rawShoe !== "-";
+      
+      if (hasShoe) {
+        return {
+          model: rawShoe,
+          hasDetails: true
+        };
+      }
+
+      return {
+        model: "SHOES UNKNOWN",
+        hasDetails: false
+      };
+    }, [vitals.shoe]);
+
+    const affiliateLink = useMemo(() => {
+      const modelLower = (assignedShoe.model || "").toLowerCase();
+      if (modelLower.includes("strike movement") || modelLower.includes("strike mvmnt")) {
+        return "https://strike-mvmnt.com/";
+      }
+      return `https://www.amazon.com/s?k=${encodeURIComponent(assignedShoe.model)}&tag=apexspeedrun-20`;
+    }, [assignedShoe.model]);
+
+    const memberSince = useMemo(() => {
+      const dates: Date[] = [];
+      allRuns.forEach((r: Record<string, unknown>) => {
+        if (r.date) {
+          const d = new Date(r.date as string);
+          if (!isNaN(d.getTime())) {
+            dates.push(d);
+          }
+        }
+      });
+      rankListSets.forEach((s: Record<string, unknown>) => {
+        const dateVal = (s.dateSet || s.date) as string | undefined;
+        if (dateVal) {
+          const d = new Date(dateVal);
+          if (!isNaN(d.getTime())) {
+            dates.push(d);
+          }
+        }
+      });
+
+      if (dates.length === 0) {
+        return "MARCH 2024"; // fallback for default members
+      }
+
+      dates.sort((a, b) => a.getTime() - b.getTime());
+      const earliestDate = dates[0];
+      const months = [
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+      ];
+      return `${months[earliestDate.getMonth()]} ${earliestDate.getFullYear()}`;
+    }, [allRuns, rankListSets]);
+
     return (
       <div
         className={cn(
@@ -112,7 +169,14 @@ export const PlayerDetails = React.memo(
               <span className="truncate">{meta.name}</span>
             </span>
           }
-          subtitle={formatLocation(meta)}
+          subtitle={
+            <span className="flex items-center gap-1">
+              <MapPin size={12} className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"} />
+              <span className="truncate uppercase tracking-widest text-[11px] font-bold">
+                {formatLocation(meta)}
+              </span>
+            </span>
+          }
         />
 
         <div
@@ -128,6 +192,7 @@ export const PlayerDetails = React.memo(
               options={[
                 { label: "RUNS", value: "runs" },
                 { label: "SETS", value: "sets" },
+                { label: "BIO", value: "bio" },
               ]}
               activeOption={uiTab}
               onChange={(t) => {
@@ -431,45 +496,49 @@ export const PlayerDetails = React.memo(
 
           {contentTab === "bio" && (
             <InspectorTabContainer>
-              <div className="flex flex-col gap-4">
-                <SectionTitle>SEND TIP</SectionTitle>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <SupportLink
-                    provider="Venmo"
-                    handle={`@${(meta?.name || "").toLowerCase().replace(" ", "_")}`}
-                    color="bg-[#008CFF]/10 text-[#008CFF] border-[#008CFF]/20 hover:bg-[#008CFF]/20"
-                  />
-                  <SupportLink
-                    provider="ENS"
-                    handle={`${(meta?.name || "").split(" ")[0].toLowerCase()}.eth`}
-                    color="bg-[#8C52FF]/10 text-[#8C52FF] border-[#8C52FF]/20 hover:bg-[#8C52FF]/20"
-                  />
+              {/* Profile Channels / Networks */}
+              {meta.igHandle ? (
+                <div className="flex flex-col gap-4">
+                  <SectionTitle>SOCIALS</SectionTitle>
+                  <div className="grid grid-cols-1 gap-4">
+                    <BioRow
+                      theme={theme}
+                      icon={<Instagram size={18} />}
+                      label="INSTAGRAM"
+                      value={`@${meta.igHandle}`}
+                      href={`https://instagram.com/${meta.igHandle}`}
+                    />
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
+              {/* Gym and team affiliations (AFFILIATIONS) */}
               <div className="flex flex-col gap-4">
-                <SectionTitle>GYMS & TEAMS</SectionTitle>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <SectionTitle>AFFILIATIONS</SectionTitle>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {meta.homeGym && meta.homeGym !== "UNAFFILIATED" && (
                     <BioRow
                       theme={theme}
                       icon={<Building2 size={18} />}
-                      label="HOME GYM"
-                      value={meta.homeGym}
+                      label="GYM"
+                      value={String(meta.homeGym)}
+                      onClick={() => onEntityClick("team", { name: String(meta.homeGym) })}
                     />
                   )}
                   {meta.teams && meta.teams.length > 0
-                    ? meta.teams.map((t: Record<string, unknown> | string, i: number) => (
-                        <BioRow
-                          key={i}
-                          theme={theme}
-                          icon={<Users size={18} />}
-                          label={
-                            meta.teams.length > 1 ? `TEAM ${i + 1}` : "TEAM"
-                          }
-                          value={typeof t === "string" ? t : t?.name}
-                        />
-                      ))
+                    ? meta.teams.map((t: Record<string, unknown> | string, i: number) => {
+                        const teamName = typeof t === "string" ? t : t?.name;
+                        return (
+                          <BioRow
+                            key={i}
+                            theme={theme}
+                            icon={<Users size={18} />}
+                            label={meta.teams && meta.teams.length > 1 ? `TEAM ${i + 1}` : "TEAM"}
+                            value={String(teamName)}
+                            onClick={() => onEntityClick("team", { name: String(teamName) })}
+                          />
+                        );
+                      })
                     : (!meta.homeGym || meta.homeGym === "UNAFFILIATED") && (
                         <BioRow
                           theme={theme}
@@ -481,58 +550,53 @@ export const PlayerDetails = React.memo(
                 </div>
               </div>
 
+              {/* Official Footwear Spec Section */}
               <div className="flex flex-col gap-4">
-                <SectionTitle>SPECIFICATIONS</SectionTitle>
-                <div className="grid grid-cols-2 gap-3">
-                  <BioStat theme={theme} label="HEIGHT" value={vitals.height} />
-                  <BioStat theme={theme} label="WEIGHT" value={vitals.weight} />
-                  <BioStat
-                    theme={theme}
-                    label="WINGSPAN"
-                    value={vitals.wingspan}
-                  />
-                  <BioStat
-                    theme={theme}
-                    label="APE INDEX"
-                    value={vitals.apeIndex}
-                  />
-                  <BioStat
-                    theme={theme}
-                    label="EQUIPMENT"
-                    value={vitals.shoe}
-                  />
-                  <BioStat
-                    theme={theme}
-                    label="SHOE SIZE"
-                    value={vitals.shoeSize}
-                  />
-                </div>
+                <SectionTitle>FOOTWEAR</SectionTitle>
+                {assignedShoe.hasDetails ? (
+                  <a
+                    href={affiliateLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "p-[1.5rem] rounded-[1.5rem] border relative overflow-hidden transition-all flex flex-col justify-center shadow-sm group hover:scale-[1.01] duration-300 pointer-events-auto",
+                      theme === "dark"
+                        ? "bg-zinc-950/40 border-white/5 hover:border-white/10 hover:bg-zinc-950/60"
+                        : "bg-zinc-50/60 border-black/5 hover:border-black/10 hover:bg-zinc-50/80"
+                    )}
+                  >
+                    <span className={cn(
+                      "text-base font-black uppercase tracking-tight truncate group-hover:text-blue-500 transition-colors",
+                      theme === "dark" ? "text-white" : "text-zinc-900"
+                    )}>
+                      {assignedShoe.model}
+                    </span>
+                  </a>
+                ) : (
+                  <div
+                    className={cn(
+                      "p-[1.5rem] rounded-[1.5rem] border relative overflow-hidden flex flex-col justify-center shadow-sm",
+                      theme === "dark"
+                        ? "bg-zinc-950/10 border-white/5"
+                        : "bg-zinc-50/20 border-black/5"
+                    )}
+                  >
+                    <span className="text-sm font-black uppercase tracking-tight text-zinc-400 dark:text-zinc-600">
+                      {assignedShoe.model}
+                    </span>
+                  </div>
+                )}
               </div>
 
+              {/* Membership Registration */}
               <div className="flex flex-col gap-4">
-                <SectionTitle>DIGITAL FOOTPRINT</SectionTitle>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <BioRow
-                    theme={theme}
-                    icon={<Instagram size={18} />}
-                    label="INSTAGRAM"
-                    value={meta.igHandle || meta.ig || "NOT LINKED"}
-                    isLink={!!(meta.igHandle || meta.ig)}
-                    igHandle={meta.igHandle || meta.ig}
-                  />
-                  <BioRow
-                    theme={theme}
-                    icon={<Video size={18} />}
-                    label="YOUTUBE"
-                    value={meta.name?.split(" ")[0] + " Parkour"}
-                  />
-                  <BioRow
-                    theme={theme}
-                    icon={<Calendar size={18} />}
-                    label="MEMBER SINCE"
-                    value="MARCH 2024"
-                  />
-                </div>
+                <SectionTitle>REGISTRY</SectionTitle>
+                <BioRow
+                  theme={theme}
+                  icon={<Calendar size={18} />}
+                  label="JOINED IN"
+                  value={memberSince}
+                />
               </div>
             </InspectorTabContainer>
           )}

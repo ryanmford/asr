@@ -248,24 +248,52 @@ export const InspectorTabContainer = React.memo(
   ),
 );
 
-export const SupportLink = React.memo(({ provider, handle, color }: { provider: string; handle: string; color: string }) => (
-  <div
-    className={cn(
-      "flex flex-col p-5 rounded-[2rem] border transition-all group cursor-pointer active:scale-95 h-full",
-      color,
-    )}
-  >
-    <div className="flex items-center justify-between mb-3">
-      <span className="text-[8px] font-black uppercase tracking-[0.25em] opacity-80">
-        {provider}
-      </span>
-      <ArrowUpRight
-        size={14}
-        className="opacity-30 group-hover:opacity-100 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-      />
-    </div>
-    <span className="text-[13px] font-black tabular-nums tracking-tighter truncate">
-      {handle}
-    </span>
-  </div>
-));
+export const SupportLink = React.memo(
+  ({
+    provider,
+    handle,
+    color,
+    href,
+  }: {
+    provider: string;
+    handle: string;
+    color: string;
+    href?: string;
+  }) => {
+    const cardContent = (
+      <div
+        className={cn(
+          "flex flex-col p-5 rounded-[2rem] border transition-all group cursor-pointer active:scale-95 h-full",
+          color,
+        )}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[8px] font-black uppercase tracking-[0.25em] opacity-80">
+            {provider}
+          </span>
+          <ArrowUpRight
+            size={14}
+            className="opacity-30 group-hover:opacity-100 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </div>
+        <span className="text-[13px] font-black tabular-nums tracking-tighter truncate">
+          {handle}
+        </span>
+      </div>
+    );
+
+    if (href) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-[2rem]"
+        >
+          {cardContent}
+        </a>
+      );
+    }
+    return cardContent;
+  },
+);

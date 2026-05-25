@@ -412,8 +412,8 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
             </div>
 
             <div className="flex justify-between text-[11px] font-black uppercase text-zinc-400 mt-2">
-                <span>{minTime.toFixed(1)}s</span>
-                <span>{maxTime.toFixed(1)}s</span>
+                <span>{minTime.toFixed(2)}s</span>
+                <span>{maxTime.toFixed(2)}s</span>
             </div>
         </div>
 

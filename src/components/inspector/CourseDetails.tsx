@@ -303,7 +303,14 @@ export const CourseDetails = React.memo(
               <span className="truncate">{cName}</span>
             </span>
           }
-          subtitle={formatLocation(meta)}
+          subtitle={
+            <span className="flex items-center gap-1">
+              <MapPin size={12} className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"} />
+              <span className="truncate uppercase tracking-widest text-[11px] font-bold">
+                {formatLocation(meta)}
+              </span>
+            </span>
+          }
           extra={
             <div className="flex w-full gap-2 mt-0">
               <ASRStandardButton
