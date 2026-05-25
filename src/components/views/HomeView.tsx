@@ -534,9 +534,9 @@ export const HomeView = React.memo(() => {
 
         {/* Get Started positioned securely out of the way of center-screen browser overlays */}
         <div
-          className="absolute left-0 right-0 w-full max-w-5xl mx-auto px-4 pointer-events-none z-10 flex flex-col items-center"
+          className="absolute left-0 right-0 w-full max-w-5xl mx-auto px-4 pointer-events-none z-10 flex flex-col items-center bottom-[170px] md:bottom-[220px]"
           style={{
-            bottom: "calc(112px + env(safe-area-inset-bottom, 0px))",
+            marginBottom: "env(safe-area-inset-bottom, 0px)",
             gap: "24px",
           }}
         >
@@ -553,9 +553,6 @@ export const HomeView = React.memo(() => {
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1.5 transition-transform duration-500 opacity-90" />
               </span>
             </button>
-          </div>
-          <div className="pointer-events-none z-40">
-            <ChevronDown className="w-8 h-8 text-white/50 animate-bounce" />
           </div>
         </div>
       </motion.div>
