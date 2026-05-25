@@ -43,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
               RECORD NOT FOUND
             </h3>
             <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-50 px-2 theme-text-muted">
-              {this.props.fallbackMessage || "Failed to load this view. The data might be unavailable or malformed."}
+              {this.props.fallbackMessage || "Oops, the data lost its way! Please refresh."}
             </p>
             <button
               onClick={() => {

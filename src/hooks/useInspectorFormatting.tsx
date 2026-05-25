@@ -167,7 +167,7 @@ export const usePlayerDetailsData = (
         (meta.vitals?.wingspan && meta.vitals?.height
           ? (
               parseFloat(meta.vitals.wingspan) - parseFloat(meta.vitals.height)
-            ).toFixed(1)
+            ).toFixed(2)
           : "-"),
       shoe: meta.shoe || "-",
       shoeSize: meta.shoeSize || "-",

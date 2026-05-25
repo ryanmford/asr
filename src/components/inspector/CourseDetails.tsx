@@ -264,7 +264,7 @@ export const CourseDetails = React.memo(
       {
         label: "Elevation",
         value: meta.elevation
-          ? `${(parseFloat(meta.elevation) || 0).toFixed(1)}m`
+          ? `${(parseFloat(meta.elevation) || 0).toFixed(2)}m`
           : "-",
         icon: <Mountain className="w-3.5 h-3.5" />,
       },

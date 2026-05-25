@@ -7,6 +7,7 @@ import { MapPin, User, Users, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/asr-utils";
 import { normalizeForSearch } from "../../lib/utils";
+import { ASREmptyState } from "./ASREmptyState";
 
 import { useDebounce } from "../../hooks/useDataHooks";
 
@@ -260,7 +261,13 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
                </div>
              )}
              {searchResults.players.length === 0 && searchResults.courses.length === 0 && searchResults.teams.length === 0 && searchResults.gyms.length === 0 && (!searchResults.locations || searchResults.locations.length === 0) && (
-               <div className="p-8 text-center text-zinc-500 text-sm font-medium">No results found</div>
+               <div className="p-4">
+                 <ASREmptyState
+                   theme={theme}
+                   title="NO RESULTS FOUND"
+                   message="TRY ANOTHER SEARCH TERM."
+                 />
+               </div>
              )}
           </motion.div>
         )}

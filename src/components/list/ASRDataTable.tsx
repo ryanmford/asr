@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { Search, CloudOff } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
 import { ASRListItem } from "../ASRListItems";
+import { ASREmptyState } from "../common/ASREmptyState";
 import { useVirtualizer, useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useDataStore } from "../../store/useDataStore";
 import { useAppStore } from "../../store/useAppStore";
@@ -281,53 +281,28 @@ export const ASRDataTable = React.memo(
   );
  }
 
- if (!data || data.length === 0) {
- if (hasError) {
- return (
- <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center animate-in fade-in duration-700 min-h-[50vh]">
- <div
- className={cn(
- "p-8 sm:p-12 w-full max-w-sm rounded-[2rem] border border-dashed flex flex-col items-center justify-center text-center gap-4 transition-colors",
- theme === "dark"
- ? "border-red-900/30 bg-red-950/20"
- : "border-red-200 bg-red-50/50",
- )}
- >
- <div className="w-14 h-14 rounded-full flex items-center justify-center mb-1 bg-red-500/10">
- <CloudOff size={24} className="text-red-500" />
- </div>
- <h3 className={cn("text-lg sm:text-xl font-black uppercase tracking-widest", theme === "dark" ? "text-red-400" : "text-red-600")}>
- NETWORK ERROR
- </h3>
- <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50 px-2 line-clamp-2", theme === "dark" ? "text-red-400" : "text-red-600")}>
- WE COULDN'T CONNECT TO THE ASSETS SERVER.
- </p>
- </div>
- </div>
- );
- }
-
- return (
- <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center animate-in fade-in duration-700 min-h-[50vh]">
- <div
- className={cn(
- "p-8 sm:p-12 w-full max-w-sm rounded-[2rem] border border-dashed flex flex-col items-center justify-center text-center gap-4 transition-colors",
- "theme-panel",
- )}
- >
- <div className={cn("w-14 h-14 rounded-full flex items-center justify-center mb-1", "bg-black/5 dark:bg-white/5")}>
- <Search size={24} className={"theme-text-faint"} />
- </div>
- <h3 className={cn("text-lg sm:text-xl font-black uppercase tracking-widest", "theme-text-base")}>
- NO RECORDS FOUND
- </h3>
- <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50 px-2 line-clamp-2", "theme-text-muted")}>
- TRY ADJUSTING YOUR FILTERS OR SEARCH TERM.
- </p>
- </div>
- </div>
- );
- }
+  if (!data || data.length === 0) {
+    if (hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center animate-in fade-in duration-700 min-h-[50vh]">
+          <ASREmptyState
+            theme={theme as "light" | "dark"}
+            title="NETWORK ERROR"
+            message="WE COULDN'T CONNECT TO THE ASSETS SERVER."
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center animate-in fade-in duration-700 min-h-[50vh]">
+        <ASREmptyState
+          theme={theme as "light" | "dark"}
+          title="NO RECORDS FOUND"
+          message="TRY ADJUSTING YOUR FILTERS OR SEARCH TERM."
+        />
+      </div>
+    );
+  }
 
  return (
  <div className="flex flex-col w-full pb-32">

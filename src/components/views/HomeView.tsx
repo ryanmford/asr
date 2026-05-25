@@ -15,7 +15,7 @@ import {
   Timer,
   Waypoints,
 } from "lucide-react";
-import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
@@ -468,7 +468,7 @@ export const HomeView = React.memo(() => {
         </div>
 
         {/* Get Started positioned securely out of the way of center-screen browser overlays */}
-        <div className="absolute top-0 left-0 right-0 h-[100dvh] flex flex-col items-center justify-end pb-[30dvh] w-full max-w-5xl mx-auto px-4 pointer-events-none z-10">
+        <div className="absolute top-0 left-0 right-0 h-[100dvh] flex flex-col items-center justify-end pb-[12vh] sm:pb-[15vh] w-full max-w-5xl mx-auto px-4 pointer-events-none z-10 gap-8 sm:gap-12">
           <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
               className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/40 backdrop-blur-md border border-white/20"
@@ -483,7 +483,7 @@ export const HomeView = React.memo(() => {
               </span>
             </button>
           </div>
-          <div className="absolute bottom-32 sm:bottom-40 left-[calc(50%-1rem)] pointer-events-none z-40">
+          <div className="pointer-events-none z-40">
             <ChevronDown className="w-8 h-8 text-white/50 animate-bounce" />
           </div>
         </div>
@@ -584,9 +584,11 @@ export const HomeView = React.memo(() => {
                     {feat.icon} {feat.label}
                   </div>
                   <div
-                    style={{ fontSize: "clamp(1.2rem, min(8cqw, 15cqi), 3rem)" }}
+                    style={{ 
+                      fontSize: `clamp(1rem, ${80 / (Math.max(10, feat.displayName?.length || 10) * 0.6)}cqi, 3rem)` 
+                    }}
                     className={cn(
-                      "font-black transition-colors uppercase leading-[1.1] whitespace-nowrap overflow-hidden text-ellipsis w-full pr-12 pb-1",
+                      "font-black transition-colors uppercase leading-[1.1] text-wrap break-words w-full pr-12 pb-1",
                       "text-zinc-900 dark:text-white",
                       feat.hoverText,
                     )}
@@ -923,25 +925,26 @@ export const HomeView = React.memo(() => {
         </motion.div>
       )}
 
-      {/* Recent Sets Heading */}
-      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-4 w-full max-w-4xl mx-auto px-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-emerald-500/10 rounded-xl">
-            <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+      {/* Unified Sets Section */}
+      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-8 sm:mb-12 w-full max-w-4xl mx-auto px-2">
+        <div className="flex flex-col bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-[2rem] p-4 sm:p-8 relative overflow-hidden backdrop-blur-md">
+          <div className="flex items-center gap-3 mb-6 px-2 sm:px-0">
+            <div className="p-2 bg-emerald-500/10 rounded-xl">
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Sets</h3>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Sets</h3>
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Recent Sets */}
-      {(isLoading || (recentSets && recentSets.length > 0)) && (
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col gap-3 mt-2 sm:mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto"
-        >
-          <div className="relative pl-4 sm:pl-6 sm:pr-2">
+          <div className="w-full pb-8 mb-6 border-b border-black/5 dark:border-white/5 px-2 sm:px-0">
+            <ASRWeeklyActivityChart runs={allSetsWithDates} type="set" themeColor="emerald" isLoading={isLoading} />
+          </div>
+
+          {/* Recent Sets Timeline */}
+          {(isLoading || (recentSets && recentSets.length > 0)) && (
+            <div className="flex flex-col gap-3 w-full">
+              <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
             <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent" />
 
@@ -1109,35 +1112,31 @@ export const HomeView = React.memo(() => {
               </div>
             )}
           </div>
-        </motion.div>
-      )}
-
-      {/* Global Sets Activity Chart */}
-      <motion.div variants={itemVariants} className="mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto">
-        <div className="bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md flex flex-col group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-          <ASRWeeklyActivityChart runs={allSetsWithDates} type="set" themeColor="emerald" isLoading={isLoading} />
+            </div>
+          )}
         </div>
       </motion.div>
 
-      {/* Recent Runs Heading */}
-      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-4 w-full max-w-4xl mx-auto px-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-pink-500/10 rounded-xl">
-            <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-pink-500" />
+      {/* Unified Runs Section */}
+      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-8 sm:mb-12 w-full max-w-4xl mx-auto px-2">
+        <div className="flex flex-col bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-[2rem] p-4 sm:p-8 relative overflow-hidden backdrop-blur-md">
+          <div className="flex items-center gap-3 mb-6 px-2 sm:px-0">
+            <div className="p-2 bg-pink-500/10 rounded-xl">
+              <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-pink-500" />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Runs</h3>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Runs</h3>
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Recent Activity */}
-      {(isLoading || (recentFeed && recentFeed.length > 0)) && (
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col gap-3 mt-2 sm:mt-4 w-full max-w-4xl mx-auto"
-        >
-          <div className="relative pl-4 sm:pl-6 sm:pr-2">
+          <div className="w-full pb-8 mb-6 border-b border-black/5 dark:border-white/5 px-2 sm:px-0">
+            <ASRWeeklyActivityChart runs={allRunsWithDates} type="run" themeColor="pink" isLoading={isLoading} />
+          </div>
+
+          {/* Recent Activity Timeline */}
+          {(isLoading || (recentFeed && recentFeed.length > 0)) && (
+            <div className="flex flex-col gap-3 w-full">
+              <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
             <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent" />
 
@@ -1364,13 +1363,8 @@ export const HomeView = React.memo(() => {
               </div>
             )}
           </div>
-        </motion.div>
-      )}
-
-      {/* Global Runs Activity Chart */}
-      <motion.div variants={itemVariants} className="mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto">
-        <div className="bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md flex flex-col group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-          <ASRWeeklyActivityChart runs={allRunsWithDates} type="run" themeColor="pink" isLoading={isLoading} />
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
