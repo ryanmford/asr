@@ -532,9 +532,9 @@ export const HomeView = React.memo(() => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/40 pointer-events-none"></div>
         </div>
 
-        {/* Get Started positioned securely out of the way of center-screen browser overlays */}
+        {/* Get Started positioned securely out of the way of center-screen browser overlays and the bottom navigation dock */}
         <div
-          className="absolute left-0 right-0 w-full max-w-5xl mx-auto px-4 pointer-events-none z-10 flex flex-col items-center bottom-[170px] md:bottom-[220px]"
+          className="absolute left-0 right-0 w-full max-w-5xl mx-auto px-4 pointer-events-none z-10 flex flex-col items-center bottom-[240px] md:bottom-[280px]"
           style={{
             marginBottom: "env(safe-area-inset-bottom, 0px)",
             gap: "24px",
