@@ -56,23 +56,23 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
     const players = [...playerList_M_AT, ...playerList_F_AT].filter(p => {
       const key = normalizeForSearch(`${p.name} ${p.igHandle} ${p.teams?.map(t => t.name).join(" ")} ${p.location} ${p.homeGym}`);
       return searchTerms.every(term => key.includes(term));
-    });
+    }).sort((a, b) => (b.runs || 0) - (a.runs || 0));
     const courses = masterCourseList.filter(c => {
       const key = normalizeForSearch(`${c.name} ${c.city} ${c.stateProv} ${c.country}`);
       return searchTerms.every(term => key.includes(term));
-    });
+    }).sort((a, b) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0));
     const gymsArr = ((teamsAggregated as Record<string, Record<string, SearchResultTeam[]>>)?.gyms?.allTime || []);
     const teamsArr = ((teamsAggregated as Record<string, Record<string, SearchResultTeam[]>>)?.teams?.allTime || []);
 
     const matchedGyms = gymsArr.filter((t: SearchResultTeam) => {
       const name = normalizeForSearch(t.name);
       return searchTerms.every(term => name.includes(term));
-    });
+    }).sort((a, b) => (b.pts || 0) - (a.pts || 0));
     
     const matchedTeams = teamsArr.filter((t: SearchResultTeam) => {
       const name = normalizeForSearch(t.name);
       return searchTerms.every(term => name.includes(term));
-    });
+    }).sort((a, b) => (b.pts || 0) - (a.pts || 0));
 
     const locationMap = new Map<string, SearchResultLocation>();
     masterCourseList.forEach(c => {

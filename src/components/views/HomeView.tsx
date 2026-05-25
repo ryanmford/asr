@@ -15,13 +15,14 @@ import {
   Timer,
   Waypoints,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { CountUp } from "../common/CountUp";
 import { ThemeContext } from "../../theme-context";
 import { useNavigate } from "react-router-dom";
 import { cn, fixCountryEntity, getCombinedFlags, isPlaceholderPlayer } from "../../lib/asr-utils";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
+import { ASRWeeklyActivityChart } from "../inspector/ASRWeeklyActivityChart";
 
 export const HomeView = React.memo(() => {
   const navigate = useNavigate();
@@ -49,6 +50,19 @@ export const HomeView = React.memo(() => {
   const atPerfs = useDataStore((s) => s.atPerfs);
   const atMet = useDataStore((s) => s.atMet);
   const dnMap = useDataStore((s) => s.dnMap);
+  const courseRunsHistory = useDataStore((s) => s.courseRunsHistory);
+
+  const allRunsWithDates = useMemo(() => {
+    if (!courseRunsHistory) return [];
+    return Object.values(courseRunsHistory).flatMap((runs: any) => 
+      runs.filter((r: any) => r.date).map((r: any) => ({ date: r.date }))
+    );
+  }, [courseRunsHistory]);
+
+  const allSetsWithDates = useMemo(() => {
+    if (!masterCourseList) return [];
+    return masterCourseList.filter((c: any) => c.dateSet).map((c: any) => ({ date: c.dateSet }));
+  }, [masterCourseList]);
 
   // Home Hero Background video rotation & self-healing fallback
   const ALL_HERO_VIDEOS = useMemo(() => [
@@ -469,17 +483,20 @@ export const HomeView = React.memo(() => {
               </span>
             </button>
           </div>
+          <div className="absolute bottom-32 sm:bottom-40 left-[calc(50%-1rem)] pointer-events-none z-40">
+            <ChevronDown className="w-8 h-8 text-white/50 animate-bounce" />
+          </div>
         </div>
       </motion.div>
 
       {/* Of The Day Section */}
       {(topPlayer || topCourse || dailyRecord) && (
-        <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-4 sm:mt-8 mb-4 sm:mb-8">
+        <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-4 sm:mt-8 mb-4 sm:mb-8 w-full max-w-4xl mx-auto">
           <div className="flex flex-col gap-4 px-2">
             {[
               dailyRecord && {
                 type: "video",
-                data: { name: dailyRecord.courseName, videoUrl: dailyRecord.videoUrl },
+                data: { name: dailyRecord.courseName, fallbackType: "course", videoUrl: dailyRecord.videoUrl },
                 displayName: dailyRecord.athleteName,
                 label: "Run of the Day",
                 icon: <Timer className="w-4 h-4" />,
@@ -525,98 +542,102 @@ export const HomeView = React.memo(() => {
                   { label: "CR (W)", value: topCourse.fRecord ? Number(topCourse.fRecord).toFixed(2) : "--" },
                 ],
               }
-            ].filter(Boolean).map((feat: any, idx: number) => (
+            ].filter(Boolean).map((feat: any, idx: number) => {
+              const hasVideo = feat.type === "video" && !!feat.data.videoUrl;
+              const isVideoBg = false; // Intentionally disabled per user request
+              return (
               <div
                 key={idx}
                 role="button"
                 tabIndex={0}
+                style={{ containerType: "inline-size" }}
                 onClick={() => {
-                  if (feat.type === "video" && feat.data.videoUrl) {
+                  if (hasVideo) {
                     setPlayingVideoUrl(feat.data.videoUrl);
                   } else {
-                    navigateToEntity(feat.type, feat.data);
+                    navigateToEntity(feat.data.fallbackType || feat.type, feat.data);
                   }
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    if (feat.type === "video" && feat.data.videoUrl) {
+                    if (hasVideo) {
                       setPlayingVideoUrl(feat.data.videoUrl);
                     } else {
-                      navigateToEntity(feat.type, feat.data);
+                      navigateToEntity(feat.data.fallbackType || feat.type, feat.data);
                     }
                   }
                 }}
                 className={cn(
-                  "relative text-left w-full min-h-[160px] flex flex-row items-center justify-between rounded-3xl p-5 sm:p-8 cursor-pointer group overflow-hidden bg-black/5 dark:bg-white/5 transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none",
+                  "relative text-left w-full flex flex-col items-start justify-between rounded-[2rem] p-6 sm:p-8 cursor-pointer group overflow-hidden transition-all hover:-translate-y-1 active:-translate-y-1 active:scale-[0.98] focus:outline-none appearance-none border border-transparent",
+                  "min-h-[160px] bg-black/5 dark:bg-white/5",
                 )}
               >
-                <div className="flex-1 flex min-w-0 pr-4 md:pr-6 relative z-30 self-center">
-                  <div className="flex flex-col md:flex-row md:items-center relative w-full min-w-0 gap-3 md:gap-4 md:justify-between">
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div
-                        className={cn(
-                          "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase mb-1 flex items-center gap-1.5",
-                          feat.color,
-                        )}
-                      >
-                        {feat.icon} {feat.label}
-                      </div>
-                      <div
-                        className={cn(
-                          "font-black text-zinc-900 dark:text-white transition-colors uppercase leading-none md:leading-none break-words whitespace-normal max-h-[4rem] overflow-hidden line-clamp-2 w-full",
-                          feat.displayName.length > 22
-                            ? "text-base sm:text-lg md:text-xl"
-                            : feat.displayName.length > 15
-                              ? "text-lg sm:text-xl md:text-2xl"
-                              : "text-xl sm:text-2xl md:text-3xl",
-                          feat.hoverText,
-                        )}
-                      >
-                        {feat.displayName}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 sm:gap-6 shrink-0 md:pl-4">
-                      {feat.metrics.map(
-                        (
-                          m: { label: string; value: React.ReactNode },
-                          i: number,
-                        ) => {
-                          const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
-                          const len = valStr.length || 5;
-                          return (
-                            <div key={i} className="flex flex-col min-w-0 flex-shrink">
-                              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-widest break-words w-full">
-                                {m.label}
-                              </span>
-                              <span className={cn(
-                                "font-black text-zinc-900 dark:text-white flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
-                                len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
-                                : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
-                                : "text-base sm:text-lg md:text-xl"
-                              )}>
-                                {m.value}
-                              </span>
-                            </div>
-                          )
-                        }
-                      )}
-                    </div>
+                {/* Header (Icon + Type + Title) */}
+                <div className="w-full relative z-30 flex flex-col gap-2">
+                  <div
+                    className={cn(
+                      "text-[10px] sm:text-xs md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-1.5",
+                      feat.color,
+                    )}
+                  >
+                    {feat.icon} {feat.label}
+                  </div>
+                  <div
+                    style={{ fontSize: "clamp(1.2rem, min(8cqw, 15cqi), 3rem)" }}
+                    className={cn(
+                      "font-black transition-colors uppercase leading-[1.1] whitespace-nowrap overflow-hidden text-ellipsis w-full pr-12 pb-1",
+                      "text-zinc-900 dark:text-white",
+                      feat.hoverText,
+                    )}
+                  >
+                    {feat.displayName}
                   </div>
                 </div>
 
-                <div
-                  className={cn(
-                    "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center relative z-30 transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 group-hover:text-white shrink-0 self-center",
-                    feat.bg,
-                    feat.color,
-                    feat.hoverBg,
-                  )}
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                {/* Footer (Metrics + Chevron) */}
+                <div className={cn(
+                  "w-full relative z-30 flex items-end justify-between mt-6 sm:mt-8",
+                )}>
+                  <div className="flex items-center flex-wrap gap-4 sm:gap-6 shrink-0">
+                    {feat.metrics.map(
+                      (
+                        m: { label: string; value: React.ReactNode },
+                        i: number,
+                      ) => {
+                        const valStr = typeof m.value === 'string' || typeof m.value === 'number' ? String(m.value) : "";
+                        const len = valStr.length || 5;
+                        return (
+                          <div key={i} className="flex flex-col min-w-0 flex-shrink">
+                            <span className={cn("text-[9px] sm:text-[10px] font-bold uppercase tracking-widest break-words w-full", isVideoBg ? "text-white/60" : "text-zinc-500")}>
+                              {m.label}
+                            </span>
+                            <span className={cn(
+                              "font-black flex flex-wrap items-center mt-0.5 leading-none break-words w-full max-w-[120px] sm:max-w-[180px]",
+                              isVideoBg ? "text-white" : "text-zinc-900 dark:text-white",
+                              len > 15 ? "text-xs sm:text-sm md:text-base leading-tight"
+                              : len > 10 ? "text-sm sm:text-base md:text-lg leading-tight"
+                              : "text-base sm:text-lg md:text-xl"
+                            )}>
+                              {m.value}
+                            </span>
+                          </div>
+                        )
+                      }
+                    )}
+                  </div>
+                  
+                  <div
+                    className={cn(
+                      "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex flex-shrink-0 items-center justify-center transition-all transform group-hover:scale-110 shadow-lg shadow-black/5 shrink-0 self-end ml-4",
+                      isVideoBg ? "bg-white/10 text-white backdrop-blur-md group-hover:bg-pink-500 border border-white/20" : cn(feat.bg, feat.color, feat.hoverBg, "group-hover:text-white"),
+                    )}
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </motion.div>
       )}
@@ -625,12 +646,12 @@ export const HomeView = React.memo(() => {
       {isLoading ? (
         <motion.div
           variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-12 gap-4 w-full max-w-4xl mx-auto px-2"
         >
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="bg-black/5 dark:bg-white/5 rounded-3xl p-6 h-[260px] flex flex-col items-center justify-center gap-4 animate-pulse"
+              className="col-span-12 sm:col-span-6 bg-black/5 dark:bg-white/5 rounded-3xl p-6 h-[260px] flex flex-col items-center justify-center gap-4 animate-pulse"
             >
               <div className="w-8 h-8 bg-black/10 dark:bg-white/10 rounded-full" />
               <div className="w-20 h-10 bg-black/10 dark:bg-white/10 rounded-lg" />
@@ -642,15 +663,15 @@ export const HomeView = React.memo(() => {
       ) : (
         <motion.div
           variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-12 gap-4 w-full max-w-4xl mx-auto px-2"
         >
           {/* Card 1: PLAYERS & RUNS */}
           <div
-            className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
+            className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
             onClick={() => navigate("/players")}
           >
             {/* Sparkline bg */}
-            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
+            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">
               {runsTrendData && runsTrendData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%" debounce={150}>
                   <LineChart data={runsTrendData}>
@@ -661,7 +682,7 @@ export const HomeView = React.memo(() => {
                       stroke="#3b82f6"
                       strokeWidth={2}
                       dot={false}
-                      isAnimationActive={false}
+                      isAnimationActive={true}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -710,11 +731,11 @@ export const HomeView = React.memo(() => {
 
           {/* Card 2: COURSES */}
           <div
-            className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
+            className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
             onClick={() => navigate("/courses")}
           >
             {/* Sparkline bg */}
-            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
+            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">
               {coursesTrendData && coursesTrendData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%" debounce={150}>
                   <LineChart data={coursesTrendData}>
@@ -725,7 +746,7 @@ export const HomeView = React.memo(() => {
                       stroke="#10b981"
                       strokeWidth={2}
                       dot={false}
-                      isAnimationActive={false}
+                      isAnimationActive={true}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -774,11 +795,11 @@ export const HomeView = React.memo(() => {
 
           {/* Card 3: GYMS & TEAMS */}
           <div
-            className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
+            className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
             onClick={() => navigate("/teams")}
           >
             {/* Sparkline bg */}
-            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
+            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">
               {countriesTrendData && countriesTrendData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%" debounce={150}>
                   <LineChart data={countriesTrendData}>
@@ -789,7 +810,7 @@ export const HomeView = React.memo(() => {
                       stroke="#6366f1"
                       strokeWidth={2}
                       dot={false}
-                      isAnimationActive={false}
+                      isAnimationActive={true}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -838,11 +859,11 @@ export const HomeView = React.memo(() => {
 
           {/* Card 4: HALL OF FAME */}
           <div
-            className="relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
+            className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
             onClick={() => navigate("/hof")}
           >
             {/* Sparkline bg */}
-            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 pointer-events-none transition-opacity flex items-end mask-image-bottom">
+            <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">
               {medalsTrendData && medalsTrendData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%" debounce={150}>
                   <LineChart data={medalsTrendData}>
@@ -853,7 +874,7 @@ export const HomeView = React.memo(() => {
                       stroke="#f59e0b"
                       strokeWidth={2}
                       dot={false}
-                      isAnimationActive={false}
+                      isAnimationActive={true}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -902,20 +923,24 @@ export const HomeView = React.memo(() => {
         </motion.div>
       )}
 
+      {/* Recent Sets Heading */}
+      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-4 w-full max-w-4xl mx-auto px-2">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-500/10 rounded-xl">
+            <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+          </div>
+          <div className="flex flex-col">
+            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Sets</h3>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Recent Sets */}
       {(isLoading || (recentSets && recentSets.length > 0)) && (
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-3 mt-2 sm:mt-4 mb-4 sm:mb-8"
+          className="flex flex-col gap-3 mt-2 sm:mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto"
         >
-          <div className="flex items-center gap-2 px-2">
-            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-            <h3 className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-              Recent Sets
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent ml-2" />
-          </div>
-
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
             <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent" />
@@ -1072,8 +1097,8 @@ export const HomeView = React.memo(() => {
                 <button
                   className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
-                    setHomeVisibleSets((prev) =>
-                      Math.min(prev + 10, 100, recentSets.length),
+                    setHomeVisibleSets(
+                      Math.min(homeVisibleSets + 10, 100, recentSets.length),
                     )
                   }
                   onTouchStart={() => {}}
@@ -1087,20 +1112,31 @@ export const HomeView = React.memo(() => {
         </motion.div>
       )}
 
+      {/* Global Sets Activity Chart */}
+      <motion.div variants={itemVariants} className="mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto">
+        <div className="bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md flex flex-col group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+          <ASRWeeklyActivityChart runs={allSetsWithDates} type="set" themeColor="emerald" isLoading={isLoading} />
+        </div>
+      </motion.div>
+
+      {/* Recent Runs Heading */}
+      <motion.div variants={itemVariants} className="mt-8 sm:mt-12 mb-4 w-full max-w-4xl mx-auto px-2">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-pink-500/10 rounded-xl">
+            <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-pink-500" />
+          </div>
+          <div className="flex flex-col">
+            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white leading-none">Recent Runs</h3>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Recent Activity */}
       {(isLoading || (recentFeed && recentFeed.length > 0)) && (
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-3 mt-2 sm:mt-4"
+          className="flex flex-col gap-3 mt-2 sm:mt-4 w-full max-w-4xl mx-auto"
         >
-          <div className="flex items-center gap-2 px-2">
-            <Timer className="w-3.5 h-3.5 text-pink-500" />
-            <h3 className="text-[10px] font-black text-pink-600 dark:text-pink-400 uppercase tracking-widest">
-              Recent Runs
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-pink-500/20 to-transparent ml-2" />
-          </div>
-
           <div className="relative pl-4 sm:pl-6 sm:pr-2">
             {/* Timeline Axis */}
             <div className="absolute top-4 bottom-4 left-[27.5px] sm:left-[39.5px] w-px bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent" />
@@ -1316,8 +1352,8 @@ export const HomeView = React.memo(() => {
                 <button
                   className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-pink-500 active:text-pink-500 transition-all duration-300 rounded-2xl"
                   onClick={() =>
-                    setHomeVisibleRuns((prev) =>
-                      Math.min(prev + 10, 100, recentFeed.length),
+                    setHomeVisibleRuns(
+                      Math.min(homeVisibleRuns + 10, 100, recentFeed.length),
                     )
                   }
                   onTouchStart={() => {}}
@@ -1330,6 +1366,13 @@ export const HomeView = React.memo(() => {
           </div>
         </motion.div>
       )}
+
+      {/* Global Runs Activity Chart */}
+      <motion.div variants={itemVariants} className="mt-4 mb-8 sm:mb-12 w-full max-w-4xl mx-auto">
+        <div className="bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md flex flex-col group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+          <ASRWeeklyActivityChart runs={allRunsWithDates} type="run" themeColor="pink" isLoading={isLoading} />
+        </div>
+      </motion.div>
     </motion.div>
   );
 });

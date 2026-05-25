@@ -62,19 +62,19 @@ export const ASRTimeSimulator = ({ theme, courseRecord, records, gender, dataCon
       >
         <div className="flex items-center gap-3">
           <div className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center",
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
             theme === "dark" ? "bg-white/10 text-white" : "bg-black/5 text-black"
           )}>
-            <Calculator size={16} />
+            <Calculator size={18} />
           </div>
-          <div className="flex flex-col text-left">
-            <span className={cn("font-black tracking-tight text-[15px]", "theme-text-base")}>STAT SIMULATOR</span>
-            <span className={cn("text-[11px] uppercase tracking-wider font-semibold opacity-60", "theme-text-faint")}>
+          <div className="flex flex-col text-left justify-center">
+            <span className={cn("font-black tracking-tight text-[15px] leading-[1]", "theme-text-base")}>STAT SIMULATOR</span>
+            <span className={cn("text-[11px] uppercase tracking-wider font-semibold opacity-60 leading-[1] mt-1", "theme-text-faint")}>
               Predict your stats
             </span>
           </div>
         </div>
-        <div>
+        <div className="flex items-center justify-center shrink-0">
             {isOpen ? <ChevronUp size={20} className="opacity-50" /> : <ChevronDown size={20} className="opacity-50" />}
         </div>
       </button>

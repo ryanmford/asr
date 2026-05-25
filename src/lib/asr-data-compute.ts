@@ -494,10 +494,14 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const courseRecords_M_OP: Record<string, unknown> = {};
   const courseRecords_F_OP: Record<string, unknown> = {};
 
-  const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined, cName: string) => {
+  const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined, cName: string, allTimeSourceSector?: Record<string, unknown>) => {
     const source = (sourceSector?.[cName] || {}) as Record<string, unknown>;
-    const times = Object.values(source) as number[];
-    const record = times.length > 0 ? Math.min(...times) : 0;
+    
+    // Find the record using the all-time source if available, otherwise fallback to the current source
+    const atSource = (allTimeSourceSector?.[cName] || source) as Record<string, unknown>;
+    const atTimes = Object.values(atSource) as number[];
+    const record = atTimes.length > 0 ? Math.min(...atTimes) : 0;
+
     const sorted = Object.entries(source)
       .map(([pKey, time]: [string, unknown]) => {
         const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
@@ -523,10 +527,10 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
 
   masterCourseList.forEach((c) => {
     const name = c.name;
-    courseRecords_M_AT[name] = computeRecords(lbAT?.M, atRawBest, name);
-    courseRecords_F_AT[name] = computeRecords(lbAT?.F, atRawBest, name);
-    courseRecords_M_OP[name] = computeRecords(lbOpen?.M, opRawBest, name);
-    courseRecords_F_OP[name] = computeRecords(lbOpen?.F, opRawBest, name);
+    courseRecords_M_AT[name] = computeRecords(lbAT?.M, atRawBest, name, lbAT?.M);
+    courseRecords_F_AT[name] = computeRecords(lbAT?.F, atRawBest, name, lbAT?.F);
+    courseRecords_M_OP[name] = computeRecords(lbOpen?.M, opRawBest, name, lbAT?.M);
+    courseRecords_F_OP[name] = computeRecords(lbOpen?.F, opRawBest, name, lbAT?.F);
   });
 
   return {
