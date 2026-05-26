@@ -304,9 +304,12 @@ export const CourseDetails = React.memo(
             </span>
           }
           subtitle={
-            <span className="flex items-center gap-1">
+            <span
+              className="flex items-center gap-1 cursor-pointer hover:opacity-80 active:opacity-60 transition-opacity"
+              onClick={() => onEntityClick("region", { name: formatLocation(meta) })}
+            >
               <MapPin size={12} className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"} />
-              <span className="truncate uppercase tracking-widest text-[11px] font-bold">
+              <span className="truncate uppercase tracking-widest text-[11px] font-bold underline decoration-dotted underline-offset-4">
                 {formatLocation(meta)}
               </span>
             </span>

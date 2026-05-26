@@ -1180,7 +1180,16 @@ export const HomeView = React.memo(() => {
                                         </span>
                                       </div>
                                       <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
-                                        <div className="flex items-center gap-1.5 max-w-full min-w-0">
+                                        <div
+                                          className="flex items-center gap-1.5 max-w-full min-w-0 hover:text-emerald-500 transition-colors cursor-pointer"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const locArr = [item.city, item.stateProv, item.country].filter(v => v && v.toUpperCase() !== "UNKNOWN").join(", ");
+                                            if (locArr) {
+                                              navigateToEntity("region", { name: locArr });
+                                            }
+                                          }}
+                                        >
                                           <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                                           <span className="truncate uppercase tracking-wider text-[10px] sm:text-[11px]">
                                             {[
@@ -1477,26 +1486,34 @@ export const HomeView = React.memo(() => {
                                         </div>
 
                                         <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
-                                          <div
-                                            className="course-target flex items-center hover:!text-pink-500 transition-colors cursor-pointer max-w-full min-w-0 -mx-1 px-1 rounded-md"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              navigateToEntity(
-                                                "course",
-                                                item.course || {
-                                                  name: item.courseName,
-                                                },
-                                              );
-                                            }}
-                                          >
+                                          <div className="flex items-center max-w-full min-w-0 -mx-1 px-1 rounded-md">
                                             <div className="flex items-center gap-1.5 min-w-0 max-w-full">
                                               <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                                              <span className="truncate uppercase tracking-wider text-[10px] sm:text-[11px]">
+                                              <span 
+                                                className="truncate uppercase tracking-wider text-[10px] sm:text-[11px] hover:!text-pink-500 transition-colors cursor-pointer"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigateToEntity(
+                                                    "course",
+                                                    item.course || {
+                                                      name: item.courseName,
+                                                    },
+                                                  );
+                                                }}
+                                              >
                                                 {courseName}
-                                                {item.course?.city
-                                                  ? `, ${item.course.city}`
-                                                  : ""}
                                               </span>
+                                              {item.course?.city && (
+                                                <span 
+                                                  className="truncate uppercase tracking-wider text-[10px] sm:text-[11px] text-zinc-500 hover:!text-pink-500 transition-colors cursor-pointer"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigateToEntity("region", { name: item.course.city });
+                                                  }}
+                                                >
+                                                  {`, ${item.course.city}`}
+                                                </span>
+                                              )}
                                             </div>
                                           </div>
 

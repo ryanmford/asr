@@ -93,6 +93,7 @@ export const useAppNavigation = () => {
           if (type === "course") prefix = "courses";
           if (type === "setter") prefix = "setters";
           if (type === "team") prefix = "teams";
+          if (type === "region") prefix = "regions";
 
           if (type === "location") {
             const searchParams = new URLSearchParams(location.search);
@@ -274,6 +275,9 @@ const getInspectorDataForPath = (
   }
   if (viewPrefix === "teams") {
     return { type: "team", data: { name: entitySlug } };
+  }
+  if (viewPrefix === "regions") {
+    return { type: "region", data: { name: entitySlug } };
   }
 
   return null;

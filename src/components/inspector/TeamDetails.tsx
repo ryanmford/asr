@@ -96,7 +96,22 @@ export const TeamDetails = React.memo(
               <span className="truncate">{team.name}</span>
             </span>
           }
-          subtitle={formatLocation(tMeta) || formatLocation(team)}
+          subtitle={
+            (() => {
+              const locationStr = formatLocation(tMeta) || formatLocation(team);
+              return locationStr && locationStr !== "UNKNOWN" ? (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEntityClick("region", { name: locationStr });
+                  }}
+                  className="hover:underline active:opacity-50 transition-all text-left truncate"
+                >
+                  {locationStr}
+                </button>
+              ) : locationStr;
+            })()
+          }
         />
 
         <div

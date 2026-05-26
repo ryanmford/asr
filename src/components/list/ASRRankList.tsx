@@ -194,12 +194,22 @@ export const ASRRankList = ({
  ? "--"
  : hideSubtitle
  ? null
- : isArray
- ? meta.location || meta.countryName || null
- : item.city ||
- item.location ||
- meta.location ||
- meta.city
+ : (() => {
+     const locText = isArray ? meta.location || meta.countryName || null : item.city || item.location || meta.location || meta.city;
+     if (!locText || locText === "UNKNOWN") return null;
+     return (
+       <button
+         type="button"
+         onClick={(e) => {
+           e.stopPropagation();
+           onEntityClick("region", { name: String(locText) });
+         }}
+         className="hover:underline active:opacity-50 transition-all text-left truncate"
+       >
+         {locText}
+       </button>
+     );
+   })()
  }
  flag={getCombinedFlags(item, meta)}
                 stats={stats}
