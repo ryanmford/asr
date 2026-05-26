@@ -270,6 +270,16 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                     <TeamsView theme={theme} />
                   </motion.div>
                 } />
+                <Route path="/regions/:id?" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                    <TeamsView theme={theme} />
+                  </motion.div>
+                } />
+                <Route path="/setters/:id?" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                    <PlayersView theme={theme} />
+                  </motion.div>
+                } />
                 <Route path="/home" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <HomeView />

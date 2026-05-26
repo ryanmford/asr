@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { cn, formatLocation, normalizeName } from "../../lib/asr-utils";
+import { cn, formatLocation, normalizeName, fixCountryEntity, getCombinedFlags } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
 import { FallbackAvatar } from "../common/FallbackAvatar";
 import { ProfileHeader, InspectorTabContainer } from "./InspectorComponents";
@@ -39,6 +39,13 @@ export const RegionDetails = React.memo(
 
     const regionNameUpper = region.name.toUpperCase().replace(/[\uD83C][\uDDE6-\uDDFF]|\p{Extended_Pictographic}/gu, '').trim();
     const targetTokens = regionNameUpper.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+
+    const parts = regionNameUpper.split(",");
+    const potentialCountry = parts[parts.length - 1]?.trim() || "";
+    const computedFlagInfo = fixCountryEntity(potentialCountry, region.flag || "");
+    const finalFlag = (computedFlagInfo.flag && computedFlagInfo.flag !== "🏳️") 
+      ? computedFlagInfo.flag 
+      : getCombinedFlags(region.name);
 
     const isTokenMatch = (objTokens: string[]): boolean => {
       if (!objTokens || objTokens.length === 0) return false;
@@ -163,6 +170,7 @@ export const RegionDetails = React.memo(
           avatar={<FallbackAvatar name={region.name} sizeCls="text-3xl" />}
           title={
             <span className="flex items-center gap-2">
+              {finalFlag && <span className="mr-1">{finalFlag}</span>}
               <span className="truncate">{region.name.replace(/[\uD83C][\uDDE6-\uDDFF]|\p{Extended_Pictographic}/gu, '').trim()}</span>
             </span>
           }

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React, { useMemo } from "react";
-import { cn, fixCountryEntity, formatFlagsWithSpace, THEME } from "../../lib/asr-utils";
-import { Trophy, Clock } from "lucide-react";
+import { cn, fixCountryEntity, formatFlagsWithSpace, THEME, trackEvent } from "../../lib/asr-utils";
+import { Trophy, Clock, Play } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { ASRLQGauge } from "../common/ASRLQGauge";
+import { useAppStore } from "../../store/useAppStore";
 
 interface ChampionsProps {
  runs: any[];
@@ -13,6 +14,7 @@ interface ChampionsProps {
 
 export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  const { navigateToEntity } = useAppNavigation();
+ const setPlayingVideoUrl = useAppStore(s => s.setPlayingVideoUrl);
 
  const getChampions = (genderFilter: string) => {
  const valid = runs
@@ -53,6 +55,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  athlete: run.athlete || run.pKey || "Unknown",
  country: run.country,
  flag: run.flag,
+ videoUrl: run.videoUrl || run.demoVideo,
  };
  } else {
  wrs.push({
@@ -63,6 +66,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  athlete: run.athlete || run.pKey || "Unknown",
  country: run.country,
  flag: run.flag,
+ videoUrl: run.videoUrl || run.demoVideo,
  });
  }
  }
@@ -119,8 +123,16 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  )}
  />
  {champs.map((champ, i) => (
- <button
+ <div
  key={i}
+ role="button"
+ tabIndex={0}
+ onKeyDown={(e) => {
+ if (e.key === 'Enter' || e.key === ' ') {
+ e.preventDefault();
+ navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete });
+ }
+ }}
  onClick={() => navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete })}
  className={cn(
  "group flex flex-col relative pl-[58px] pr-5 py-3.5 text-left w-full outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
@@ -182,6 +194,26 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  </span>
  </div>
  <div className="flex items-center gap-3 shrink-0">
+ {champ.videoUrl && (
+ <button
+ type="button"
+ onClick={(e) => {
+ e.preventDefault();
+ e.stopPropagation();
+ trackEvent("outbound_click", {
+ link_url: champ.videoUrl,
+ link_type: "video",
+ });
+ setPlayingVideoUrl(champ.videoUrl);
+ }}
+ className={THEME.ICON_BUTTON(theme)}
+ >
+ <Play
+ className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
+ strokeWidth={3}
+ />
+ </button>
+ )}
  <ASRLQGauge
  lq={i === 0 ? 100 : (champs[0].time / champ.time) * 100}
  theme={theme}
@@ -201,7 +233,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  </div>
  </div>
  </div>
- </button>
+ </div>
  ))}
  </div>
  </div>
