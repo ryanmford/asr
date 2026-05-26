@@ -9,7 +9,7 @@ import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { ASREmptyState } from "../common/ASREmptyState";
 import { useDataStore } from "../../store/useDataStore";
 
-import { ASRDataContext, PlayerProfile } from "../../types";
+import { ASRDataContext } from "../../types";
 
 interface RegionDetailsProps {
   region: { name: string; flag?: string };

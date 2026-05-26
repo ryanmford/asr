@@ -477,8 +477,17 @@ export const processLiveFeedData = (
             const sorted = Object.entries(board).sort(
               (a: [string, unknown], b: [string, unknown]) => (a[1] as number) - (b[1] as number),
             );
+            let currentRank = 1;
+            let prevTime = -1;
             const rankMap = new Map<string, number>();
-            sorted.forEach((e, idx) => rankMap.set(e[0], idx + 1));
+            sorted.forEach((e, idx) => {
+              const time = e[1] as number;
+              if (time !== prevTime) {
+                currentRank = idx + 1;
+                prevTime = time;
+              }
+              rankMap.set(e[0], currentRank);
+            });
             memoizedBoards[boardKey] = { record, rankMap };
           }
 

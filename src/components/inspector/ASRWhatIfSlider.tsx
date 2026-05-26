@@ -156,11 +156,12 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
 
   const globalImpact = useMemo(() => {
       if (!selectedAthlete || !dataContext || !cName) return null;
-      const existingTimesList = (dataContext.lbAT_Courses?.[gender]?.[cName] || {}) as Record<string, number>;
+      const fullLeaderboards = (dataContext.lbAT?.[gender] || {}) as Record<string, Record<string, number>>;
       return computeSimulatedGlobalImpact(
           selectedAthlete, 
           deferredTargetTime, 
-          existingTimesList, 
+          cName,
+          fullLeaderboards, 
           athletePool, 
           courseRecord, 
           originalRanks

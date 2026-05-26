@@ -189,8 +189,15 @@ export const HomeView = React.memo(() => {
   }, [masterCourseList]);
 
   const { topPlayer, topCourse, dailyRecord } = useMemo(() => {
-    const today = new Date();
-    const seedStr = `${today.getUTCFullYear()}-${today.getUTCMonth()}-${today.getUTCDate()}`;
+    const timeZone = "America/Denver";
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+    const now = new Date();
+    const seedStr = formatter.format(now);
 
     const sRandom = (str: string, max: number) => {
       let hash = 0;
@@ -222,8 +229,13 @@ export const HomeView = React.memo(() => {
 
     let pOfDay: Record<string, unknown> | null = null;
     if (uniquePlayers.length > 0) {
-      const idx = sRandom(seedStr + "feature_player", uniquePlayers.length);
-      const chosenPlayer = uniquePlayers[idx] as any;
+      let chosenPlayer;
+      if (seedStr === "5/26/2026") {
+        const forcedPlayer = uniquePlayers.find((p: any) => p.name?.toLowerCase().includes("matt jang"));
+        chosenPlayer = forcedPlayer || uniquePlayers[sRandom(seedStr + "feature_player", uniquePlayers.length)];
+      } else {
+        chosenPlayer = uniquePlayers[sRandom(seedStr + "feature_player", uniquePlayers.length)] as any;
+      }
       pOfDay = { ...chosenPlayer };
 
       // Attempt to find AT rank if available, else OR rank
@@ -279,11 +291,16 @@ export const HomeView = React.memo(() => {
     });
 
     if (validCoursesForDay.length > 0) {
-      const idx = sRandom(
-        seedStr + "feature_course",
-        validCoursesForDay.length,
-      );
-      cOfDay = validCoursesForDay[idx];
+      if (seedStr === "5/26/2026") {
+        const forcedCourse = sortedCourses.find((c: any) => c.name?.toLowerCase().includes("funda") && c.name?.toLowerCase().includes("mexico"));
+        cOfDay = forcedCourse || validCoursesForDay[sRandom(seedStr + "feature_course", validCoursesForDay.length)];
+      } else {
+        const idx = sRandom(
+          seedStr + "feature_course",
+          validCoursesForDay.length,
+        );
+        cOfDay = validCoursesForDay[idx];
+      }
     }
 
     let rOfDay: Record<string, unknown> | null = null;
@@ -318,8 +335,19 @@ export const HomeView = React.memo(() => {
     });
 
     if (allValidRuns.length > 0) {
-      const idx = sRandom(seedStr + "feature_record", allValidRuns.length);
-      const selected = allValidRuns[idx];
+      let selected;
+      if (seedStr === "5/26/2026") {
+        const forcedRun = allValidRuns.find((item: any) => {
+          const playerName = uniquePlayersMap.get(item.run[0])?.name || item.run[0];
+          return Boolean(
+            item.course?.name?.toLowerCase().includes("confluence") &&
+            playerName.toLowerCase().includes("joey")
+          );
+        });
+        selected = forcedRun || allValidRuns[sRandom(seedStr + "feature_record", allValidRuns.length)];
+      } else {
+        selected = allValidRuns[sRandom(seedStr + "feature_record", allValidRuns.length)];
+      }
       const bestRun = selected.run;
       const targetCourse = selected.course;
 

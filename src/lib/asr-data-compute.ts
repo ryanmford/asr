@@ -471,8 +471,29 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
       .filter((p: PlayerProfile) => p.gender === "F" && isQualifiedAthlete(p, isAllTime))
       .sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
       
-    const rankMapM = new Map<string, number>(qualifiedM.map((q: PlayerProfile, i: number) => [q.pKey, i + 1]));
-    const rankMapF = new Map<string, number>(qualifiedF.map((q: PlayerProfile, i: number) => [q.pKey, i + 1]));
+    const rankMapM = new Map<string, number>();
+    let currentRankM = 1;
+    let prevRatingM = -1;
+    qualifiedM.forEach((q: PlayerProfile, i: number) => {
+      const r = q.rating || 0;
+      if (Math.abs(r - prevRatingM) > 0.000001) {
+        currentRankM = i + 1;
+        prevRatingM = r;
+      }
+      rankMapM.set(q.pKey, currentRankM);
+    });
+
+    const rankMapF = new Map<string, number>();
+    let currentRankF = 1;
+    let prevRatingF = -1;
+    qualifiedF.forEach((q: PlayerProfile, i: number) => {
+      const r = q.rating || 0;
+      if (Math.abs(r - prevRatingF) > 0.000001) {
+        currentRankF = i + 1;
+        prevRatingF = r;
+      }
+      rankMapF.set(q.pKey, currentRankF);
+    });
 
     const mapM: Record<string, PlayerProfile> = {};
     const mapF: Record<string, PlayerProfile> = {};
@@ -563,11 +584,11 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
       .sort((a, b) => b.pts - a.pts);
 
     let currentRank = 1;
-    let prevPts = -1;
+    let prevTime = -1;
     return sorted.map((r, i) => {
-      if (r.pts !== prevPts) {
+      if (r.time !== prevTime) {
         currentRank = i + 1;
-        prevPts = r.pts;
+        prevTime = r.time;
       }
       return { ...r, rank: currentRank };
     });
@@ -685,11 +706,13 @@ export function computeLiveLadderWindow(
 export function computeSimulatedGlobalImpact(
   selectedAthlete: PlayerProfile,
   targetTime: number,
-  existingTimesList: Record<string, number>,
+  courseName: string,
+  fullLeaderboards: Record<string, Record<string, number>>,
   athletePool: PlayerProfile[],
   courseRecord: number,
   originalRanks: Record<string, number>
 ) {
+  const existingTimesList = fullLeaderboards[courseName] || {};
   let minOtherTime = Infinity;
   for (const pKey in existingTimesList) {
       const t = existingTimesList[pKey];
@@ -701,40 +724,59 @@ export function computeSimulatedGlobalImpact(
   const simulatedCR = Math.min(minOtherTime !== Infinity ? minOtherTime : courseRecord, targetTime > 0 ? targetTime : courseRecord);
   const oldCR = courseRecord || 1;
 
+  // Precompute course records for the entire state array
+  const courseRecords: Record<string, number> = {};
+  for (const cName in fullLeaderboards) {
+      if (cName === courseName) {
+          courseRecords[cName] = simulatedCR;
+      } else {
+          const times = Object.values(fullLeaderboards[cName]);
+          const validTimes = times.filter(t => typeof t === "number" && t > 0);
+          courseRecords[cName] = validTimes.length > 0 ? Math.min(...validTimes) : 0;
+      }
+  }
+
   const simulatedRatings: Record<string, number> = {};
   let totalPointsDestroyed = 0;
   
   for (const pt of athletePool) {
-      const baseRating = pt.rating || 0;
-      const runs = pt.runs || 1; 
-      const ptOriginalTime = existingTimesList[pt.pKey];
+      let totalPts = 0;
+      let totalRuns = 0;
       
-      let pointsDelta = 0;
-      let runDelta = 0;
-      
-      if (pt.pKey === selectedAthlete.pKey) {
-          const oldCoursePts = (typeof ptOriginalTime === "number" && ptOriginalTime > 0) ? Math.min(100, (oldCR / ptOriginalTime) * 100) : 0;
-          const newCoursePts = targetTime > 0 ? Math.min(100, (simulatedCR / targetTime) * 100) : 0;
+      for (const cName in fullLeaderboards) {
+          let time = fullLeaderboards[cName][pt.pKey];
           
-          pointsDelta = newCoursePts - oldCoursePts;
-          if (typeof ptOriginalTime !== "number" || ptOriginalTime <= 0) {
-              runDelta = 1;
-          }
-      } else {
-          if (typeof ptOriginalTime === "number" && ptOriginalTime > 0) {
-              const oldCoursePts = Math.min(100, (oldCR / ptOriginalTime) * 100);
-              const newCoursePts = Math.min(100, (simulatedCR / ptOriginalTime) * 100);
-              pointsDelta = newCoursePts - oldCoursePts;
-              if (pointsDelta < 0) {
-                  totalPointsDestroyed += Math.abs(pointsDelta);
+          if (cName === courseName) {
+              if (pt.pKey === selectedAthlete.pKey) {
+                  time = targetTime;
+              }
+              const cr = courseRecords[cName];
+              if (typeof time === "number" && time > 0 && cr > 0) {
+                  totalPts += Math.min(100, (cr / time) * 100);
+                  totalRuns++;
+              }
+          } else {
+              const cr = courseRecords[cName];
+              if (typeof time === "number" && time > 0 && cr > 0) {
+                  totalPts += Math.min(100, (cr / time) * 100);
+                  totalRuns++;
               }
           }
       }
       
-      if (runDelta > 0) {
-          simulatedRatings[pt.pKey] = ((baseRating * runs) + pointsDelta) / (runs + runDelta);
-      } else {
-          simulatedRatings[pt.pKey] = baseRating + (pointsDelta / runs);
+      simulatedRatings[pt.pKey] = totalRuns > 0 ? totalPts / totalRuns : 0;
+
+      // Track points destroyed for others
+      if (pt.pKey !== selectedAthlete.pKey) {
+          const ptOriginalTime = existingTimesList[pt.pKey];
+          if (typeof ptOriginalTime === "number" && ptOriginalTime > 0) {
+              const oldCoursePts = Math.min(100, (oldCR / ptOriginalTime) * 100);
+              const newCoursePts = Math.min(100, (simulatedCR / ptOriginalTime) * 100);
+              const pointsDelta = newCoursePts - oldCoursePts;
+              if (pointsDelta < 0) {
+                  totalPointsDestroyed += Math.abs(pointsDelta);
+              }
+          }
       }
   }
 
