@@ -195,7 +195,7 @@ export const usePlayerDetailsData = (
       vaultAtData.fires ??
       meta.fires ??
       0;
-    const impact = Math.round(setterInfo?.impact || 0);
+    const impact = setterInfo?.impact || 0;
     const rating = vaultAtData.rating || 0;
 
     const podium = { gold: golds, silver: silvers, bronze: bronzes };
@@ -295,8 +295,8 @@ export const usePlayerDetailsData = (
         icon: <Waypoints size={24} />,
         date: "Global Design",
         telemetry: [
-          { label: "LEAD SETS", value: Math.round(setterInfo?.leads || 0) },
-          { label: "ASSISTS", value: Math.round(setterInfo?.assists || 0) },
+          { label: "LEAD SETS", value: setterInfo?.leads || 0 },
+          { label: "ASSISTS", value: setterInfo?.assists || 0 },
         ],
       });
     }
@@ -391,9 +391,7 @@ export const useTeamDetailsData = (
 
   const playerStats = useMemo(
     () => ({
-      points: Math.round(
-        players.reduce((sum: number, p: PlayerProfile & { contribution?: number }) => sum + (p.contribution || 0), 0),
-      ),
+      points: players.reduce((sum: number, p: PlayerProfile & { contribution?: number }) => sum + (p.contribution || 0), 0),
       runs: players.reduce(
         (sum: number, p: PlayerProfile & { totalAllTimeRuns?: number }) => sum + (p.runs || p.totalAllTimeRuns || 0),
         0,
@@ -404,9 +402,7 @@ export const useTeamDetailsData = (
 
   const setterStats = useMemo(
     () => ({
-      impact: Math.round(
-        setters.reduce((sum: number, s: SetterProfile) => sum + (s.impact || 0), 0),
-      ),
+      impact: setters.reduce((sum: number, s: SetterProfile) => sum + (s.impact || 0), 0),
       sets: setters.reduce((sum: number, s: SetterProfile) => sum + (s.sets || 0), 0),
     }),
     [setters],

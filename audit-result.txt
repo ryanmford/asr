@@ -1,0 +1,35 @@
+Jean Sánchez: Runs differ. CSV=6, Calc=7
+Leon van der Zouwen: Runs differ. CSV=19, Calc=18
+Olof Wood: Rating differs. CSV=98.46, Calc=98.35
+Nate Rolon: Rating differs. CSV=95.03, Calc=92.62
+Kaden Lebsack: Rating differs. CSV=93.47, Calc=93.29
+Bobby Houser: Rating differs. CSV=87.47, Calc=86.58
+Max Boice: Rating differs. CSV=85.01, Calc=84.15
+Michael Sliger: Rating differs. CSV=81.65, Calc=81.35
+John Lunsford: Rating differs. CSV=80.30, Calc=79.99
+Andrés Gutzen: Rating differs. CSV=75.73, Calc=74.78
+Evan Wilson: Rating differs. CSV=75.73, Calc=75.55
+Kyle Sherk: Rating differs. CSV=55.21, Calc=54.96
+Di Li: Runs differ. CSV=12, Calc=13
+Seth Lambert: Rating differs. CSV=91.22, Calc=89.36
+Fabian Castany: Rating differs. CSV=81.42, Calc=79.14
+David Alexander Navarro López: Rating differs. CSV=58.88, Calc=59.43
+Eric Summers: Rating differs. CSV=91.04, Calc=84.55
+Samuel Navarro Rivera: Rating differs. CSV=74.13, Calc=75.83
+Norberto Jiménez: Rating differs. CSV=58.49, Calc=56.13
+Mauricio Larrauri: Rating differs. CSV=97.05, Calc=73.27
+Yuval Salah: Rating differs. CSV=81.63, Calc=72.22
+Derik Jepsen: Rating differs. CSV=33.36, Calc=32.18
+Karim: Rating differs. CSV=26.67, Calc=27.67
+Emilia Francois: Rating differs. CSV=63.73, Calc=64.04
+Vanessa Sherk: Rating differs. CSV=53.63, Calc=53.88
+Amy Jepsen: Rating differs. CSV=48.81, Calc=50.23
+Mel McQueen: Rating differs. CSV=43.89, Calc=42.20
+Kira Immordino: Rating differs. CSV=65.99, Calc=65.49
+Lily Carbajal: Rating differs. CSV=46.54, Calc=49.59
+Muhammad Steed Baloch: Runs differ. CSV=undefined, Calc=2
+Muhammad Steed Baloch: Rating differs. CSV=0.00, Calc=100.00
+INTERIM TOP TIME: Runs differ. CSV=undefined, Calc=55
+INTERIM TOP TIME: Rating differs. CSV=0.00, Calc=100.00
+INTERIM TOP TIME: Runs differ. CSV=undefined, Calc=6
+INTERIM TOP TIME: Rating differs. CSV=0.00, Calc=100.00

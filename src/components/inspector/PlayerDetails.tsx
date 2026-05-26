@@ -352,7 +352,7 @@ export const PlayerDetails = React.memo(
                     })(),
                     {
                       label: "IMPACT",
-                      value: Math.round(setterInfo?.impact || 0),
+                      value: setterInfo?.impact || 0,
                     },
                     { label: "SETS", value: coursesSet.length },
                     {

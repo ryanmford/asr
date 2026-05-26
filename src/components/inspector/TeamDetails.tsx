@@ -236,7 +236,7 @@ export const TeamDetails = React.memo(
 
               <div className="flex flex-col p-6 gap-10">
                 <div className="grid grid-cols-2 gap-4">
-                  <ASRStatCard label="POINTS" value={playerStats.points} />
+                  <ASRStatCard label="POINTS" value={playerStats.points.toFixed(2)} />
                   <ASRStatCard label="RUNS" value={playerStats.runs} />
                 </div>
 
@@ -261,7 +261,7 @@ export const TeamDetails = React.memo(
           {contentTab === "setters" && (
             <InspectorTabContainer>
               <div className="grid grid-cols-2 gap-4">
-                <ASRStatCard label="IMPACT" value={setterStats.impact} />
+                <ASRStatCard label="IMPACT" value={setterStats.impact.toFixed(2)} />
                 <ASRStatCard label="SETS" value={setterStats.sets} />
               </div>
 

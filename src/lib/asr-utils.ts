@@ -266,6 +266,18 @@ export const cleanNumeric = (v: string | number | null | undefined) => {
   const str = String(v);
   if (str.includes("#")) return null;
 
+  const timeVal = str.replace(/[^\d:.-]/g, "").trim();
+  if (timeVal.includes(":")) {
+    const parts = timeVal.split(":");
+    let totalSeconds = 0;
+    if (parts.length === 2) {
+      totalSeconds = parseInt(parts[0] || "0", 10) * 60 + parseFloat(parts[1] || "0");
+    } else if (parts.length === 3) {
+      totalSeconds = parseInt(parts[0] || "0", 10) * 3600 + parseInt(parts[1] || "0", 10) * 60 + parseFloat(parts[2] || "0");
+    }
+    if (!isNaN(totalSeconds)) return totalSeconds;
+  }
+
   const clean = str
     .replace(/,/g, "")
     .replace(/[^\d.-]/g, "")

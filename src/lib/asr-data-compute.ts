@@ -17,6 +17,15 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const pF = processRankingData(rF || "", "F");
   const initialMetadata: Record<string, PlayerProfile & { allTimeRank?: number | "UR", openRank?: number | "UR" }> = {};
 
+  pM.forEach(p => initialMetadata[p.pKey] = { ...p, gender: "M" });
+  pF.forEach(p => initialMetadata[p.pKey] = { ...p, gender: "F" });
+
+  const processed = processLiveFeedData(
+    rLive || "",
+    initialMetadata,
+    processSetListData(rSet || ""),
+  );
+
   const assignRanks = (
     arr: PlayerProfile[],
     gender: string,
@@ -28,24 +37,15 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     arr.forEach((p) => {
       const rankIdx = qualified.findIndex((q) => q.pKey === p.pKey);
       const rankVal = rankIdx !== -1 ? rankIdx + 1 : "UR";
-      if (!initialMetadata[p.pKey])
-        initialMetadata[p.pKey] = { ...p, gender };
       if (isAllTime) {
+        p.allTimeRank = rankVal;
         initialMetadata[p.pKey].allTimeRank = rankVal;
       } else {
+        p.openRank = rankVal;
         initialMetadata[p.pKey].openRank = rankVal;
       }
     });
   };
-
-  assignRanks(pM, "M", true);
-  assignRanks(pF, "F", true);
-
-  const processed = processLiveFeedData(
-    rLive || "",
-    initialMetadata,
-    processSetListData(rSet || ""),
-  );
 
   // Calculate Open Ranks after processing live feed
   const openM = processed.openRankings.filter(
@@ -56,13 +56,24 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   );
   assignRanks(openM, "M", false);
   assignRanks(openF, "F", false);
+
+  // Calculate All Time Ranks dynamically
+  const atM = processed.allTimeRankings.filter(
+    (p: PlayerProfile) => p.gender === "M",
+  );
+  const atF = processed.allTimeRankings.filter(
+    (p: PlayerProfile) => p.gender === "F",
+  );
+  assignRanks(atM, "M", true);
+  assignRanks(atF, "F", true);
+
   const allSetters = [
     ...processSettersData(rM || ""),
     ...processSettersData(rF || ""),
   ];
 
   const nextState = {
-    data: [...pM, ...pF],
+    data: processed.allTimeRankings,
     openData: processed.openRankings,
     atPerfs: processed.allTimePerformances,
     opPerfs: processed.openPerformances,
@@ -207,28 +218,65 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
 
   // Sample points to make it ~40 data points
   const numDataPoints = 40;
-  const chunkSize = Math.max(1, Math.floor(datedRuns.length / (numDataPoints - 1)));
-
-  for (let i = 0; i < datedRuns.length; i++) {
-    const r = datedRuns[i];
-    currentRunsCount++;
-    if (r.pKey) currentUniquePlayers.add(r.pKey);
-    const courseKey = String(r.course).toUpperCase();
-    if (courseKey) {
-      currentUniqueCourses.add(courseKey);
-      const countryStr = cMet?.[courseKey]?.country;
-      if (countryStr && countryStr !== "UNKNOWN") {
-         currentUniqueCountries.add(countryStr);
-      }
-    }
-
-    // Capture point at chunk intervals, or at the very end
-    if ((i + 1) % chunkSize === 0 || i === datedRuns.length - 1) {
+  
+  if (datedRuns.length === 0) {
+    for (let i = 0; i < numDataPoints - 1; i++) {
        runsTrend.push({ value: currentRunsCount });
        playersTrend.push({ value: currentUniquePlayers.size });
        coursesTrend.push({ value: currentUniqueCourses.size });
        countriesTrend.push({ value: currentUniqueCountries.size });
     }
+  } else {
+    const minTime = datedRuns[0].timeMs;
+    const maxTime = datedRuns[datedRuns.length - 1].timeMs;
+    const timeSpan = Math.max(maxTime - minTime, 1);
+    const chunkMs = timeSpan / (numDataPoints - 1);
+    
+    let runIdx = 0;
+    for (let step = 1; step < numDataPoints; step++) {
+      const bucketEndTime = minTime + (step * chunkMs);
+      
+      while (runIdx < datedRuns.length && datedRuns[runIdx].timeMs <= bucketEndTime) {
+        const r = datedRuns[runIdx];
+        currentRunsCount++;
+        if (r.pKey) currentUniquePlayers.add(r.pKey);
+        const courseKey = String(r.course).toUpperCase();
+        if (courseKey) {
+          currentUniqueCourses.add(courseKey);
+          const countryStr = cMet?.[courseKey]?.country;
+          if (countryStr && countryStr !== "UNKNOWN") {
+             currentUniqueCountries.add(countryStr);
+          }
+        }
+        runIdx++;
+      }
+      
+      runsTrend.push({ value: currentRunsCount });
+      playersTrend.push({ value: currentUniquePlayers.size });
+      coursesTrend.push({ value: currentUniqueCourses.size });
+      countriesTrend.push({ value: currentUniqueCountries.size });
+    }
+    
+    // Ensure any remaining runs exactly equal to maxTime are accounted for
+    while (runIdx < datedRuns.length) {
+        const r = datedRuns[runIdx];
+        currentRunsCount++;
+        if (r.pKey) currentUniquePlayers.add(r.pKey);
+        const courseKey = String(r.course).toUpperCase();
+        if (courseKey) {
+          currentUniqueCourses.add(courseKey);
+          const countryStr = cMet?.[courseKey]?.country;
+          if (countryStr && countryStr !== "UNKNOWN") {
+             currentUniqueCountries.add(countryStr);
+          }
+        }
+        runIdx++;
+    }
+    
+    runsTrend[runsTrend.length - 1].value = currentRunsCount;
+    playersTrend[playersTrend.length - 1].value = currentUniquePlayers.size;
+    coursesTrend[coursesTrend.length - 1].value = currentUniqueCourses.size;
+    countriesTrend[countriesTrend.length - 1].value = currentUniqueCountries.size;
   }
 
   const kpiTrends = {

@@ -187,7 +187,7 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
                                     <span className="opacity-50">|</span>
                                     <span>LQ: {(selectedAthlete.rating || 0).toFixed(2)}</span>
                                     <span className="opacity-50">|</span>
-                                    <span>PTS: {Math.round((selectedAthlete.rating || 0) * (selectedAthlete.runs || 0))}</span>
+                                    <span>PTS: {((selectedAthlete.rating || 0) * (selectedAthlete.runs || 0)).toFixed(2)}</span>
                                 </span>
                             </div>
                         </div>
@@ -275,7 +275,7 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
                     <div className={cn(
                         "text-2xl sm:text-3xl font-black tabular-nums leading-none tracking-tighter opacity-80"
                     )}>
-                       <RollingNumber value={simulatedPts} decimals={1} />
+                       <RollingNumber value={simulatedPts} decimals={2} />
                     </div>
                 </div>
 
@@ -477,7 +477,7 @@ export const ASRWhatIfSlider = ({ theme, courseRecord, records, gender, dataCont
                                         <div className="flex flex-col">
                                             <span className={cn("text-[10px] font-bold uppercase opacity-60", theme === "dark" ? "text-red-100" : "text-red-900")}>Points Destroyed</span>
                                             <span className="text-xl font-black text-red-500 tabular-nums">
-                                                -<RollingNumber value={globalImpact.pointsDestroyed} decimals={1} /> pts
+                                                -<RollingNumber value={globalImpact.pointsDestroyed} decimals={2} /> pts
                                             </span>
                                         </div>
                                         {globalImpact.athletesDemoted > 0 && (

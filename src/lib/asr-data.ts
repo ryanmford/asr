@@ -298,6 +298,7 @@ export const processLiveFeedData = (
   const result: Record<string, unknown> = {
     allTimePerformances: {},
     openPerformances: {},
+    allTimeRankings: [],
     openRankings: [],
     allTimeLeaderboards: { M: {}, F: {} },
     openLeaderboards: { M: {}, F: {} },
@@ -603,6 +604,35 @@ export const processLiveFeedData = (
       };
     })
     .sort((a: PlayerProfile & { rating?: number }, b: PlayerProfile & { rating?: number }) => (b.rating || 0) - (a.rating || 0));
+
+  result.allTimeRankings = Object.keys(athleteMetadata)
+    .filter((k) => {
+      const meta = athleteMetadata[k];
+      const perfs = result.allTimePerformances[k] || [];
+      // Include them if they have runs OR sets OR contribution score
+      return !isPlaceholderPlayer(meta.name) && (perfs.length > 0 || (meta.sets || 0) > 0 || (meta.contributionScore || 0) > 0);
+    })
+    .map((pKey) => {
+      const meta = athleteMetadata[pKey];
+      const perfs = result.allTimePerformances[pKey] || [];
+      const totalPts = perfs.reduce((sum: number, p: { points?: number }) => sum + (p.points || 0), 0);
+      return {
+        ...meta,
+        id: `at-${pKey}`,
+        rating: perfs.length > 0 ? totalPts / perfs.length : 0,
+        runs: perfs.length,
+        wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
+        pts: totalPts,
+        // Using their sets from metadata (which came from CSV columns)
+        sets: meta.sets || 0,
+        allTimeFireCount: perfs.reduce(
+          (sum: number, p: { fireCount?: number }) => sum + (p.fireCount || 0),
+          0,
+        ),
+      };
+    })
+    .sort((a: PlayerProfile & { rating?: number }, b: PlayerProfile & { rating?: number }) => (b.rating || 0) - (a.rating || 0));
+
   return result;
 };
 
