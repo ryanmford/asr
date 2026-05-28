@@ -158,30 +158,6 @@ export const PlayerDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
-        <ProfileHeader
-          theme={theme}
-          avatar={<FallbackAvatar name={meta.name} sizeCls="text-3xl" />}
-          title={
-            <span className="flex items-center gap-2">
-              <span className="drop-shadow-xl shrink-0 text-xl whitespace-nowrap">
-                {getCombinedFlags(meta)}
-              </span>
-              <span className="truncate">{meta.name}</span>
-            </span>
-          }
-          subtitle={
-            <span
-              className="flex items-center gap-1 cursor-pointer hover:opacity-80 active:opacity-60 transition-opacity"
-              onClick={() => onEntityClick("region", { name: formatLocation(meta) })}
-            >
-              <MapPin size={12} className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"} />
-              <span className="truncate uppercase tracking-widest text-[11px] font-bold underline decoration-dotted underline-offset-4">
-                {formatLocation(meta)}
-              </span>
-            </span>
-          }
-        />
-
         <div
           className={cn(
             "flex items-center justify-center border-b sticky top-0 z-40 backdrop-blur-3xl transition-colors py-2",

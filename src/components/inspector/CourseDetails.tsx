@@ -22,7 +22,6 @@ import {
 } from "../../lib/asr-utils";
 import { useAppStore } from "../../store/useAppStore";
 import {
-  ProfileHeader,
   ASRPatronPill,
   SectionTitle,
   InspectorTabContainer,
@@ -292,68 +291,43 @@ export const CourseDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
-        <ProfileHeader
-          theme={theme}
-          avatar={<FallbackAvatar name={cName} sizeCls="text-3xl" />}
-          title={
-            <span className="flex items-center gap-2">
-              <span className="drop-shadow-xl shrink-0 text-xl whitespace-nowrap">
-                {formatFlagsWithSpace(meta.flag || "🚩")}
-              </span>
-              <span className="truncate">{cName}</span>
-            </span>
-          }
-          subtitle={
-            <span
-              className="flex items-center gap-1 cursor-pointer hover:opacity-80 active:opacity-60 transition-opacity"
-              onClick={() => onEntityClick("region", { name: formatLocation(meta) })}
-            >
-              <MapPin size={12} className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"} />
-              <span className="truncate uppercase tracking-widest text-[11px] font-bold underline decoration-dotted underline-offset-4">
-                {formatLocation(meta)}
-              </span>
-            </span>
-          }
-          extra={
-            <div className="flex w-full gap-2 mt-0">
-              <ASRStandardButton
-                href={mapsUrl || undefined}
-                target="_blank"
-                rel="noreferrer"
-                variant="premium"
-                color="blue"
-                theme={theme}
-                disabled={!mapsUrl}
-                className="flex-1 py-2.5 px-0 justify-center rounded-xl text-[12px]"
-                onClick={(e: React.MouseEvent) =>
-                  !mapsUrl && e.preventDefault()
-                }
-              >
-                <MapPin size={16} strokeWidth={2.5} />
-                <span>MAP</span>
-              </ASRStandardButton>
-              <ASRStandardButton
-                href={rulesUrl || undefined}
-                target="_blank"
-                rel="noreferrer"
-                variant="premium"
-                color="red"
-                theme={theme}
-                disabled={!rulesUrl}
-                className="flex-1 py-2.5 px-0 justify-center rounded-xl text-[12px]"
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  if (rulesUrl) {
-                    setPlayingVideoUrl(rulesUrl);
-                  }
-                }}
-              >
-                <Play size={16} strokeWidth={2.5} />
-                <span>RULES</span>
-              </ASRStandardButton>
-            </div>
-          }
-        />
+        <div className="flex w-full gap-2 px-4 py-3 pt-4 border-b border-white/[0.05]">
+          <ASRStandardButton
+            href={mapsUrl || undefined}
+            target="_blank"
+            rel="noreferrer"
+            variant="premium"
+            color="blue"
+            theme={theme}
+            disabled={!mapsUrl}
+            className="flex-1 py-2.5 px-0 justify-center rounded-xl text-[12px]"
+            onClick={(e: React.MouseEvent) =>
+              !mapsUrl && e.preventDefault()
+            }
+          >
+            <MapPin size={16} strokeWidth={2.5} />
+            <span>MAP</span>
+          </ASRStandardButton>
+          <ASRStandardButton
+            href={rulesUrl || undefined}
+            target="_blank"
+            rel="noreferrer"
+            variant="premium"
+            color="red"
+            theme={theme}
+            disabled={!rulesUrl}
+            className="flex-1 py-2.5 px-0 justify-center rounded-xl text-[12px]"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              if (rulesUrl) {
+                setPlayingVideoUrl(rulesUrl);
+              }
+            }}
+          >
+            <Play size={16} strokeWidth={2.5} />
+            <span>RULES</span>
+          </ASRStandardButton>
+        </div>
 
         <div className="w-full px-4 py-3 border-b border-white/[0.05]">
           <ASRPatronPill course={meta} theme={theme} isBanner={false} />

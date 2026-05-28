@@ -243,7 +243,7 @@ export const ASRWallOfFame = React.memo(
  )}
  >
  <div className="overflow-x-auto no-scrollbar">
- <table className="w-full text-left border-collapse min-w-[280px] table-fixed">
+ <table className="w-full text-left border-collapse min-w-[340px] table-fixed">
  <thead
  className={cn(
  "border-b backdrop-blur-xl",
@@ -255,7 +255,7 @@ export const ASRWallOfFame = React.memo(
  <tr>
  <th
  className={cn(
- "py-3 sm:py-5 pl-6 sm:pl-10 w-20 sm:w-28 text-left uppercase text-[9px] sm:text-[11px] font-black tracking-widest",
+ "py-3 sm:py-5 pl-4 sm:pl-10 w-14 sm:w-28 text-left uppercase text-[9px] sm:text-[11px] font-black tracking-widest",
  theme === "dark"
  ? "text-white opacity-30"
  : "text-black opacity-40",
@@ -268,7 +268,7 @@ export const ASRWallOfFame = React.memo(
  k="name"
  a="left"
  sortable={false}
- className="w-auto px-3 sm:px-5"
+ className="w-auto min-w-[90px] px-2 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -277,7 +277,7 @@ export const ASRWallOfFame = React.memo(
  l="🥇"
  k="gold"
  a="right"
- className="w-16 sm:w-28 px-3 sm:px-5"
+ className="w-12 sm:w-28 px-1 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -286,7 +286,7 @@ export const ASRWallOfFame = React.memo(
  l="🥈"
  k="silver"
  a="right"
- className="w-16 sm:w-28 px-3 sm:px-5"
+ className="w-12 sm:w-28 px-1 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -295,7 +295,7 @@ export const ASRWallOfFame = React.memo(
  l="🥉"
  k="bronze"
  a="right"
- className="w-16 sm:w-28 px-3 sm:px-5"
+ className="w-12 sm:w-28 px-1 sm:px-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -304,7 +304,7 @@ export const ASRWallOfFame = React.memo(
  l="TOTAL"
  k="total"
  a="right"
- className="w-24 sm:w-36 !pr-6 sm:!pr-10 !pl-3 sm:!pl-5"
+ className="w-16 sm:w-36 pr-4 sm:pr-10 pl-1 sm:pl-5"
  theme={theme}
  medalSort={medalSort}
  onMedalSort={onMedalSort}
@@ -330,12 +330,12 @@ export const ASRWallOfFame = React.memo(
  : "hover:bg-blue-500/5",
  )}
  >
-  <td className="py-4 sm:py-6 pl-6 sm:pl-10 text-left">
+  <td className="py-4 sm:py-6 pl-4 sm:pl-10 text-left">
   <div className="flex items-center justify-start">
   <ASRRankBadge rank={c.displayRank} />
   </div>
   </td>
-  <td className="py-4 sm:py-6 px-3 sm:px-5 text-left max-w-[120px] sm:max-w-xs">
+  <td className="py-4 sm:py-6 px-2 sm:px-5 text-left max-w-[100px] sm:max-w-xs">
   <div className="flex items-center gap-1.5 sm:gap-3 text-left min-w-0 h-full">
   <span className="emoji-slot text-[14px] sm:text-2xl shrink-0">
   {formatFlagsWithSpace(c.flag)}
@@ -352,22 +352,22 @@ export const ASRWallOfFame = React.memo(
   </span>
   </div>
   </td>
-  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
   <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-amber-500">
   {String(c.gold)}
   </span>
   </td>
-  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
   <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-zinc-400">
   {String(c.silver)}
   </span>
   </td>
-  <td className="py-4 sm:py-6 px-3 sm:px-5 text-right">
+  <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
   <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-[#CE8946]">
   {String(c.bronze)}
   </span>
   </td>
-  <td className="py-4 sm:py-6 pr-6 sm:pr-10 pl-3 sm:pl-5 text-right">
+  <td className="py-4 sm:py-6 pr-4 sm:pr-10 pl-1 sm:pl-5 text-right">
   <span
   className={cn(
   "text-[12px] sm:text-[24px] font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",

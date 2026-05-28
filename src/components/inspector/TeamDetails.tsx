@@ -78,42 +78,6 @@ export const TeamDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
-        <ProfileHeader
-          theme={theme}
-          avatar={<FallbackAvatar name={team.name} sizeCls="text-3xl" />}
-          title={
-            <span className="flex items-center gap-2">
-              <span className="drop-shadow-xl shrink-0 text-xl whitespace-nowrap">
-                {formatFlagsWithSpace(
-                  tMeta.region ||
-                    tMeta.flag ||
-                    tMeta.country ||
-                    team.region ||
-                    team.flag ||
-                    team.country,
-                ) || "🛡️"}
-              </span>
-              <span className="truncate">{team.name}</span>
-            </span>
-          }
-          subtitle={
-            (() => {
-              const locationStr = formatLocation(tMeta) || formatLocation(team);
-              return locationStr && locationStr !== "UNKNOWN" ? (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEntityClick("region", { name: locationStr });
-                  }}
-                  className="hover:underline active:opacity-50 transition-all text-left truncate"
-                >
-                  {locationStr}
-                </button>
-              ) : locationStr;
-            })()
-          }
-        />
-
         <div
           className={cn(
             "flex items-center justify-center border-b sticky top-0 z-40 backdrop-blur-3xl transition-colors py-2",
