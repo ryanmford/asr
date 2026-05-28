@@ -16,16 +16,12 @@ import {
   cn,
   formatLocation,
   THEME,
-  formatFlagsWithSpace,
+  getCombinedFlags,
   normalizeName,
   getSetterLevel,
 } from "../../lib/asr-utils";
 import { useAppStore } from "../../store/useAppStore";
-import {
-  ASRPatronPill,
-  SectionTitle,
-  InspectorTabContainer,
-} from "./InspectorComponents";
+import { ProfileHeader, ASRPatronPill, SectionTitle, InspectorTabContainer } from "./InspectorComponents";
 import { FallbackAvatar } from "../common/FallbackAvatar";
 import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 import { ASRRankList } from "../list/ASRRankList";
@@ -291,6 +287,23 @@ export const CourseDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
+        <ProfileHeader
+          theme={theme}
+          avatar={<FallbackAvatar name={cName} sizeCls="text-3xl" />}
+          title={
+            <span className="flex items-center gap-2">
+              <span className="shrink-0 leading-none">{getCombinedFlags(meta)}</span>
+              <span className="truncate">{cName}</span>
+            </span>
+          }
+          subtitle={
+            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1">
+              <MapPin size={12} />
+              <span className="truncate">{formatLocation(meta)}</span>
+            </div>
+          }
+        />
+
         <div className="flex w-full gap-2 px-4 py-3 pt-4 border-b border-white/[0.05]">
           <ASRStandardButton
             href={mapsUrl || undefined}

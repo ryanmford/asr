@@ -3,85 +3,8 @@ import { useDataStore } from "../../store/useDataStore";
 import { useSettersDerived } from "../../hooks/useDerivedData";
 import { useLeaderboards } from "../../hooks/useAppCalculations";
 import { DetailsSkeleton } from "../common/Skeletons";
-import { cn, getCombinedFlags, formatFlagsWithSpace, normalizeName } from "../../lib/asr-utils";
+import { cn, normalizeName } from "../../lib/asr-utils";
 import { SearchX, AlertCircle } from "lucide-react";
-import { FallbackAvatar } from "../common/FallbackAvatar";
-
-export const ASRProfileHeader = React.memo(({
-  type,
-  data,
-  theme,
-  pRaw,
-}: {
-  type: string;
-  data: any;
-  theme: "light" | "dark";
-  pRaw?: Record<string, any>;
-}) => {
-  if (!data) return null;
-  const isDark = theme === "dark";
-  
-  const title = data.name || data.meta?.name || "PROFILE";
-  let flags = "";
-  let statLabel = "";
-  let statValue = "";
-
-  if (type === "player" || type === "setter") {
-    const meta = data.meta || data;
-    flags = getCombinedFlags(meta);
-    const safeKey = normalizeName(title);
-    if (pRaw && pRaw[safeKey]) {
-       statLabel = "LQ";
-       statValue = pRaw[safeKey].LQ?.toFixed(2) || "0.00";
-    }
-  } else if (type === "team") {
-    const tMeta = data.meta || {};
-    flags = formatFlagsWithSpace(tMeta.region || tMeta.flag || tMeta.country || data.region || data.flag || data.country) || "🛡️";
-  } else if (type === "region") {
-    const rMeta = data.meta || {};
-    flags = formatFlagsWithSpace(rMeta.flag || data.flag || rMeta.country || data.country) || "📍";
-  } else if (type === "course") {
-    const cMeta = data.meta || {};
-    flags = formatFlagsWithSpace(cMeta.country || cMeta.region || data.country || data.region) || "🏁";
-    statLabel = "CHK";
-    statValue = String(cMeta.checkpoints || data.checkpoints || 0);
-  }
-
-  return (
-    <div className={cn(
-      "px-4 py-3 flex items-center gap-4 relative overflow-hidden transition-colors border-b",
-      isDark ? "bg-[#030303] border-white/5 text-white" : "bg-white border-black/5 text-black"
-    )}>
-      {/* Background Element */}
-      <div className={cn(
-        "absolute inset-0 pointer-events-none opacity-40",
-        isDark 
-          ? "bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_60%)]" 
-          : "bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.04),transparent_60%)]"
-      )} />
-
-       <div className="relative shrink-0 z-10 w-[42px] h-[42px] sm:w-[50px] sm:h-[50px] rounded-full p-[2px] overflow-hidden transition-all duration-300">
-          <div className="w-full h-full rounded-full bg-[#030303] flex items-center justify-center overflow-hidden">
-             <FallbackAvatar name={title} sizeCls="text-xl" />
-          </div>
-       </div>
-
-       <div className="flex-1 min-w-0 z-10 flex flex-col justify-center">
-          <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight flex items-center gap-2 truncate whitespace-nowrap">
-            <span className="shrink-0">{flags}</span>
-            <span className="truncate">{title}</span>
-          </h1>
-       </div>
-
-       {statValue && (
-         <div className="shrink-0 z-10 text-right pr-2">
-           <div className="text-[9px] font-bold uppercase tracking-[0.15em] opacity-50 mb-0.5">{statLabel}</div>
-           <div className="text-lg sm:text-xl font-black tracking-tighter leading-none">{statValue}</div>
-         </div>
-       )}
-    </div>
-  );
-});
 
 const PlayerDetails = React.lazy(() =>
   import("./PlayerDetails").then((m) => ({ default: m.PlayerDetails })),
@@ -304,18 +227,8 @@ export const InspectorBody = React.memo(
         break;
     }
 
-    const needsHeader = ["player", "setter", "course", "team", "region"].includes(type);
-
     return (
       <React.Suspense fallback={<DetailsSkeleton />}>
-        {needsHeader && (
-          <ASRProfileHeader 
-            type={type} 
-            data={finalData} 
-            theme={theme} 
-            pRaw={pRaw} 
-          />
-        )}
         {content}
       </React.Suspense>
     );

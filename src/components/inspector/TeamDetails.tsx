@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Globe, Instagram, Youtube } from "lucide-react";
-import { cn, formatLocation, formatFlagsWithSpace } from "../../lib/asr-utils";
+import { cn, formatLocation, getCombinedFlags } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
 import { BioStat, BioRow } from "./BioComponents";
 import { FallbackAvatar } from "../common/FallbackAvatar";
@@ -78,6 +78,23 @@ export const TeamDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
+        <ProfileHeader
+          theme={theme}
+          avatar={<FallbackAvatar name={tMeta?.name || team.name} sizeCls="text-3xl" />}
+          title={
+            <span className="flex items-center gap-2">
+              <span className="shrink-0 leading-none">{getCombinedFlags(tMeta || team) || "🏳️"}</span>
+              <span className="truncate">{tMeta?.name || team.name}</span>
+            </span>
+          }
+          subtitle={
+            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1">
+              <Globe size={12} />
+              <span className="truncate">{formatLocation(tMeta || team) || "UNKNOWN LOC"}</span>
+            </div>
+          }
+        />
+
         <div
           className={cn(
             "flex items-center justify-center border-b sticky top-0 z-40 backdrop-blur-3xl transition-colors py-2",

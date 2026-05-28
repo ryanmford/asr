@@ -165,6 +165,17 @@ export const RegionDetails = React.memo(
           theme === "dark" ? "bg-[#0a0a0c]" : "bg-white",
         )}
       >
+        <ProfileHeader
+          theme={theme}
+          avatar={<FallbackAvatar name={region.name} sizeCls="text-3xl" />}
+          title={
+            <span className="flex items-center gap-2">
+              <span className="shrink-0 leading-none">{finalFlag}</span>
+              <span className="truncate">{region.name}</span>
+            </span>
+          }
+        />
+
         <div
           className={cn(
             "flex items-center justify-center border-y sticky top-0 z-40 backdrop-blur-3xl transition-colors py-2",

@@ -158,6 +158,30 @@ export const PlayerDetails = React.memo(
           theme === "dark" ? "bg-[#030303]" : "bg-white",
         )}
       >
+        <ProfileHeader
+          theme={theme}
+          avatar={<FallbackAvatar name={meta?.name || player.name} sizeCls="text-3xl" />}
+          title={
+            <span className="flex items-center gap-2">
+              <span className="shrink-0 leading-none">{getCombinedFlags(meta || player)}</span>
+              <span className="truncate">{meta?.name || player.name}</span>
+            </span>
+          }
+          subtitle={
+            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1">
+              <MapPin size={12} />
+              <span className="truncate">{formatLocation(meta || player)}</span>
+            </div>
+          }
+          extra={
+            <div className="flex items-center gap-2 mt-2">
+              <div className="px-2.5 py-1 rounded-[6px] border bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-[9px] font-black tracking-widest uppercase">
+                MEMBER SINCE {memberSince}
+              </div>
+            </div>
+          }
+        />
+
         <div
           className={cn(
             "flex items-center justify-center border-b sticky top-0 z-40 backdrop-blur-3xl transition-colors py-2",
