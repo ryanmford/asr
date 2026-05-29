@@ -1196,7 +1196,7 @@ export const HomeView = React.memo(() => {
                                   >
                                     <div className="flex flex-col items-start text-left gap-1 sm:gap-1.5 flex-1 min-w-0 pr-4">
                                       <div className="flex items-center gap-2 max-w-full w-full">
-                                        <span className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-emerald-500 group-has-[.setter-target:hover]/card:!text-zinc-900 dark:group-has-[.setter-target:hover]/card:!text-white">
+                                        <span className="text-sm sm:text-base font-black text-zinc-900 dark:text-white uppercase transition-colors flex items-center gap-1.5 min-w-0 max-w-full shrink group-hover/card:text-emerald-500 group-has-[.setter-target:hover]/card:!text-zinc-900 dark:group-has-[.setter-target:hover]/card:!text-white group-has-[.location-target:hover]/card:!text-zinc-900 dark:group-has-[.location-target:hover]/card:!text-white">
                                           {courseFlag && (
                                             <span className="text-[12px] opacity-90 shrink-0">
                                               {courseFlag}
@@ -1209,7 +1209,7 @@ export const HomeView = React.memo(() => {
                                       </div>
                                       <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
                                         <div
-                                          className="flex items-center gap-1.5 max-w-full min-w-0 hover:text-emerald-500 transition-colors cursor-pointer"
+                                          className="location-target flex items-center gap-1.5 max-w-full min-w-0 hover:text-emerald-500 transition-colors cursor-pointer"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             const locArr = [item.city, item.stateProv, item.country].filter(v => v && v.toUpperCase() !== "UNKNOWN").join(", ");
@@ -1515,8 +1515,8 @@ export const HomeView = React.memo(() => {
 
                                         <div className="flex flex-col items-start gap-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 max-w-full w-full min-w-0 pr-2">
                                           <div className="flex items-center max-w-full min-w-0 -mx-1 px-1 rounded-md">
-                                            <div className="flex items-center gap-1.5 min-w-0 max-w-full">
-                                              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                                            <div className="course-target flex items-baseline min-w-0 max-w-full">
+                                              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 mr-1.5 self-center" />
                                               <span 
                                                 className="truncate uppercase tracking-wider text-[10px] sm:text-[11px] hover:!text-pink-500 transition-colors cursor-pointer"
                                                 onClick={(e) => {
