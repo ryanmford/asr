@@ -44,6 +44,7 @@ export const PlayersView = React.memo(({ theme }: { theme: "light" | "dark" }) =
       onItemClick={handleItemClick}
       middleLabel="PLAYER"
       columns={columns}
+      categoryName="Players"
       headerControls={
         <ASRNeonToggle
           options={[

@@ -22,6 +22,7 @@ interface AnimatedListViewProps {
   viewType?: "card" | "list";
   hideSubtitle?: boolean;
   hideTitle?: boolean;
+  categoryName?: "Players" | "Teams" | "Courses";
 }
 
 export const AnimatedListView = React.memo(({
@@ -39,6 +40,7 @@ export const AnimatedListView = React.memo(({
   hideSubtitle = false,
   hideTitle = false,
   showVideoColumn = false,
+  categoryName,
   children,
 }: AnimatedListViewProps & { children?: React.ReactNode | ((props: { searchedData: any[] }) => React.ReactNode), showVideoColumn?: boolean }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -89,7 +91,7 @@ export const AnimatedListView = React.memo(({
               onChange={(e: any) => setSearch(e.target.value)}
               placeholder={searchPlaceholder}
               theme={theme}
-              className="flex-1"
+              className="flex-1 w-full"
             />
           )}
           {headerControls}

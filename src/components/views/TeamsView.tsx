@@ -44,6 +44,7 @@ export const TeamsView = React.memo(({ theme }: { theme: "light" | "dark" }) => 
       onItemClick={handleItemClick}
       middleLabel={teamCategory === "gyms" ? "GYM" : "TEAM"}
       columns={columns}
+      categoryName="Teams"
       headerControls={
         <ASRNeonToggle
           options={[

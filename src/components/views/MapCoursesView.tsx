@@ -3,7 +3,6 @@
 import React, { useMemo, startTransition, useRef } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { ASRDataTable } from "../ASRComponents";
-import { ASRSearchInput } from "../common/ASRSearchInput";
 import { ErrorBoundary } from "../common/ErrorBoundary";
 import { ASRBottomSheet } from "../common/ASRBottomSheet";
 import { CourseData } from "../../types";
@@ -14,6 +13,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { cn } from "../../lib/asr-utils";
 import { normalizeForSearch } from "../../lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ASRSearchInput } from "../common/ASRSearchInput";
 
 const ASRMap = React.lazy(() => import("../ASRMap").then((m) => ({ default: m.ASRMap })));
 
