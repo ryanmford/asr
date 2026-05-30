@@ -92,6 +92,7 @@ export const AnimatedListView = React.memo(({
               placeholder={searchPlaceholder}
               theme={theme}
               className="flex-1 w-full"
+              enableFocusShortcut="slash"
             />
           )}
           {headerControls}

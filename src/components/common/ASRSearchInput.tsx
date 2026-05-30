@@ -18,6 +18,7 @@ interface ASRSearchInputProps {
   className?: string;
   variant?: "default" | "pill" | "docked";
   rightElement?: React.ReactNode;
+  enableFocusShortcut?: "cmd-k" | "slash";
 }
 
 export const ASRSearchInput = React.memo(
@@ -32,9 +33,28 @@ export const ASRSearchInput = React.memo(
     className,
     variant = "default",
     rightElement,
+    enableFocusShortcut,
   }: ASRSearchInputProps) => {
     const [isFocused, setIsFocused] = React.useState(false);
+    const inputRef = React.useRef<HTMLInputElement>(null);
     const radiusClass = variant === "docked" ? "rounded-none" : variant === "pill" ? "rounded-full" : "rounded-2xl";
+
+    React.useEffect(() => {
+      if (!enableFocusShortcut) return;
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (enableFocusShortcut === "cmd-k" && (e.metaKey || e.ctrlKey) && e.key === "k") {
+          e.preventDefault();
+          inputRef.current?.focus();
+        } else if (enableFocusShortcut === "slash" && e.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
+          e.preventDefault();
+          inputRef.current?.focus();
+          // Select all text if it was already focused to easily overwrite
+          setTimeout(() => inputRef.current?.select(), 0);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [enableFocusShortcut]);
 
     return (
       <div className={cn("relative group", className)}>
@@ -78,6 +98,7 @@ export const ASRSearchInput = React.memo(
             }
           `}</style>
           <input
+            ref={inputRef}
             type="search"
             enterKeyHint="search"
             autoComplete="off"
@@ -86,7 +107,13 @@ export const ASRSearchInput = React.memo(
             spellCheck={false}
             value={value}
             onChange={onChange}
-            onKeyDown={onKeyDown}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                onChange({ target: { value: "" } } as any);
+                inputRef.current?.blur();
+              }
+              if (onKeyDown) onKeyDown(e);
+            }}
             onFocus={(e) => {
               setIsFocused(true);
               if (onFocus) onFocus(e);
@@ -98,11 +125,11 @@ export const ASRSearchInput = React.memo(
             style={{ scrollMarginBottom: '120px' }}
             placeholder={isFocused ? "" : placeholder}
             className={cn(
-              "w-full h-full pl-10 bg-transparent outline-none text-[16px] placeholder:text-[15px] sm:placeholder:text-[16px] font-black uppercase tracking-widest placeholder:opacity-40 placeholder:normal-case placeholder:font-medium placeholder:tracking-normal z-30 relative appearance-none text-ellipsis",
+              "w-full h-full pl-10 bg-transparent outline-none text-[16px] placeholder:text-[15px] sm:placeholder:text-[16px] font-black uppercase tracking-widest placeholder:opacity-40 placeholder:normal-case placeholder:font-medium placeholder:tracking-normal z-30 relative appearance-none",
               theme === "dark"
                 ? "text-white placeholder:text-white"
                 : "text-zinc-900 placeholder:text-zinc-900",
-              rightElement ? "pr-24" : "pr-4"
+              rightElement ? "pr-24" : enableFocusShortcut ? "pr-4 sm:pr-12" : "pr-4"
             )}
           />
           <div className="absolute right-1 flex items-center gap-1 z-30">
@@ -112,7 +139,10 @@ export const ASRSearchInput = React.memo(
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => onChange({ target: { value: "" } } as any)}
+                  onClick={() => {
+                    onChange({ target: { value: "" } } as any);
+                    inputRef.current?.focus();
+                  }}
                   className={cn(
                     "w-8 h-8 mr-1 flex flex-shrink-0 items-center justify-center rounded-full opacity-40 hover:opacity-80 transition-all outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 active:scale-95",
                     theme === "dark" ? "text-white hover:bg-white/10" : "text-zinc-900 hover:bg-black/5",
@@ -122,6 +152,11 @@ export const ASRSearchInput = React.memo(
                 </motion.button>
               )}
             </AnimatePresence>
+            {enableFocusShortcut && !value && !isFocused && (
+              <div className="hidden sm:flex items-center justify-center px-1.5 h-6 rounded bg-black/5 dark:bg-white/10 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 mr-2 border border-black/5 dark:border-white/5 pointer-events-none">
+                {enableFocusShortcut === "cmd-k" ? "⌘K" : "/"}
+              </div>
+            )}
             {rightElement}
           </div>
         </div>

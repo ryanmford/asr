@@ -143,6 +143,7 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
           onChange={(e: any) => setSearch(e.target.value)}
           theme={theme}
           placeholder="search courses..."
+          enableFocusShortcut="slash"
         />
       </div>
       <div 

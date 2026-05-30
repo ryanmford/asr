@@ -164,6 +164,7 @@ export const ASRGlobalSearch = React.memo(({ theme }: { theme: "light" | "dark" 
           placeholder="search Apex Speed Run..."
           theme={theme}
           className="w-full"
+          enableFocusShortcut="slash"
       />
       <AnimatePresence>
         {searchResults && (
