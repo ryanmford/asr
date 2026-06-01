@@ -200,18 +200,22 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       />
 
       <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)] relative z-[80]">
-        {!isLoading && view === "home" && (
+        {!isLoading && (
           <div className="flex flex-col">
-            <ASRLiveTicker
-              theme={theme}
-              onEntityClick={navigateToEntity}
-            />
-            <ASRCountdown
-              targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
-              eventType={"open"}
-              onHelp={() => setShowOnboarding(true)}
-              theme={theme as "light" | "dark"}
-            />
+            {view === "home" && (
+              <ASRLiveTicker
+                theme={theme}
+                onEntityClick={navigateToEntity}
+              />
+            )}
+            {(view === "home" || view === "players" || view === "teams") && (
+              <ASRCountdown
+                targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
+                eventType={"open"}
+                onHelp={() => setShowOnboarding(true)}
+                theme={theme as "light" | "dark"}
+              />
+            )}
           </div>
         )}
       </div>

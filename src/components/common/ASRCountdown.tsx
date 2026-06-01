@@ -112,7 +112,7 @@ export const ASRCountdown = React.memo(
                   "theme-text-base",
                 )}
               >
-                SEASON ENDED
+                DATABASE LOCKED
               </span>
             </div>
             {renderCloseButton()}
@@ -153,45 +153,36 @@ export const ASRCountdown = React.memo(
           >
             <div
               className={cn(
-                "flex items-center gap-3 sm:gap-8 font-black tracking-tight transition-colors pr-10 pl-2 sm:px-0",
+                "flex items-center gap-1.5 min-[375px]:gap-3 sm:gap-6 font-black tracking-tight transition-colors pr-8 sm:px-0",
                 "theme-text-base",
               )}
             >
-              <div className="flex items-center gap-2 hidden min-[360px]:flex shrink-0">
-                <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-widest opacity-60 whitespace-nowrap">
-                  OPEN CLIPS DUE IN:
+              <div className="flex items-center shrink-0">
+                <span className="text-[8px] min-[375px]:text-[9px] sm:text-[12px] font-black uppercase tracking-wider sm:tracking-widest opacity-60 whitespace-nowrap">
+                  OPEN COMMUNITY AUDIT ENDS IN:
                 </span>
               </div>
               <div className="flex items-center font-black tabular-nums tracking-tighter">
                 <div className="flex items-center">
-                  <span className="text-[16px] sm:text-[20px]">
-                    {String(currentTime.days).padStart(2, "0")}
-                  </span>
-                  <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
-                    D
-                  </span>
-                </div>
-                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
-                <div className="flex items-center">
-                  <span className="text-[16px] sm:text-[20px]">
-                    {String(currentTime.hours).padStart(2, "0")}
+                  <span className="text-[14px] min-[375px]:text-[16px] sm:text-[20px]">
+                    {String(Math.floor(currentTime.total / (1000 * 60 * 60))).padStart(2, "0")}
                   </span>
                   <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                     H
                   </span>
                 </div>
-                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
+                <span className="opacity-30 mx-1 min-[375px]:mx-1.5 sm:mx-3">:</span>
                 <div className="flex items-center">
-                  <span className="text-[16px] sm:text-[20px]">
+                  <span className="text-[14px] min-[375px]:text-[16px] sm:text-[20px]">
                     {String(currentTime.minutes).padStart(2, "0")}
                   </span>
                   <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">
                     M
                   </span>
                 </div>
-                <span className="opacity-30 mx-1.5 sm:mx-3">:</span>
+                <span className="opacity-30 mx-1 min-[375px]:mx-1.5 sm:mx-3">:</span>
                 <div className="flex items-center">
-                  <span className="text-[16px] sm:text-[20px]">
+                  <span className="text-[14px] min-[375px]:text-[16px] sm:text-[20px]">
                     {String(currentTime.seconds).padStart(2, "0")}
                   </span>
                   <span className="text-[10px] sm:text-[12px] ml-1 opacity-50">

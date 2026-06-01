@@ -173,13 +173,6 @@ export const PlayerDetails = React.memo(
               <span className="truncate">{formatLocation(meta || player)}</span>
             </div>
           }
-          extra={
-            <div className="flex items-center gap-2 mt-2">
-              <div className="px-2.5 py-1 rounded-[6px] border bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-[9px] font-black tracking-widest uppercase">
-                MEMBER SINCE {memberSince}
-              </div>
-            </div>
-          }
         />
 
         <div
