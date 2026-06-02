@@ -159,8 +159,9 @@ export const CourseDetails = React.memo(
     const meta = cMet[cName] || course || {};
 
     const allCourseRuns = useMemo(() => {
+      let runList: Record<string, unknown>[] = [];
       if (courseRunsHistory[cName]) {
-        return courseRunsHistory[cName].map((r: Record<string, unknown>) => ({
+        runList = courseRunsHistory[cName].map((r: Record<string, unknown>) => ({
           ...r,
           athlete: atMet[r.pKey]?.name || r.athlete || r.pKey,
           gender: atMet[r.pKey]?.gender || r.gender || "M",
@@ -168,31 +169,40 @@ export const CourseDetails = React.memo(
             atMet[r.pKey]?.countryName || atMet[r.pKey]?.country || r.country,
           flag: atMet[r.pKey]?.region || atMet[r.pKey]?.flag || r.flag,
         }));
-      }
-
-      const allRuns: Record<string, unknown>[] = [];
-      const allTimePlayers = pRaw["all-time"] || {};
-      Object.entries(allTimePlayers).forEach(
-        ([pKey, playerRuns]: [string, unknown]) => {
-          if (Array.isArray(playerRuns)) {
-            const filtered = playerRuns.filter(
-              (r) => (r.course || r.label || "").toUpperCase() === cName,
-            );
-            filtered.forEach((r) => {
-              allRuns.push({
-                ...r,
-                pKey,
-                athlete: atMet[pKey]?.name || pKey,
-                gender: atMet[pKey]?.gender || "M",
-                country: atMet[pKey]?.countryName || atMet[pKey]?.country,
-                flag: atMet[pKey]?.region || atMet[pKey]?.flag,
+      } else {
+        const allTimePlayers = pRaw["all-time"] || {};
+        Object.entries(allTimePlayers).forEach(
+          ([pKey, playerRuns]: [string, unknown]) => {
+            if (Array.isArray(playerRuns)) {
+              const filtered = playerRuns.filter(
+                (r) => (r.course || r.label || "").toUpperCase() === cName,
+              );
+              filtered.forEach((r) => {
+                runList.push({
+                  ...r,
+                  pKey,
+                  athlete: atMet[pKey]?.name || pKey,
+                  gender: atMet[pKey]?.gender || "M",
+                  country: atMet[pKey]?.countryName || atMet[pKey]?.country,
+                  flag: atMet[pKey]?.region || atMet[pKey]?.flag,
+                });
               });
-            });
-          }
-        },
-      );
-      return allRuns;
-    }, [pRaw, cName, atMet, courseRunsHistory]);
+            }
+          },
+        );
+      }
+      
+      const mInterims = (dataContext.courseRecords_M_AT?.[cName] || []).filter((r: any) => r.isInterim);
+      mInterims.forEach((r: any) => {
+        runList.push({ ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "M", num: r.time, isInterim: true });
+      });
+      const fInterims = (dataContext.courseRecords_F_AT?.[cName] || []).filter((r: any) => r.isInterim);
+      fInterims.forEach((r: any) => {
+        runList.push({ ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "F", num: r.time, isInterim: true });
+      });
+
+      return runList;
+    }, [pRaw, cName, atMet, courseRunsHistory, dataContext.courseRecords_M_AT, dataContext.courseRecords_F_AT]);
 
     const [searchParams] = useSearchParams();
     const urlTab = searchParams.get("tab");
@@ -223,7 +233,7 @@ export const CourseDetails = React.memo(
       {
         label: "CR (M)",
         value: (() => {
-          const times = Object.values(lbAT_Courses?.M[cName] || {}) as number[];
+          const times = atRecordsM.map(r => r.time).filter(t => t > 0);
           return times.length > 0 ? Math.min(...times).toFixed(2) : "-";
         })(),
         icon: <Zap className="w-3.5 h-3.5" />,
@@ -231,7 +241,7 @@ export const CourseDetails = React.memo(
       {
         label: "CR (W)",
         value: (() => {
-          const times = Object.values(lbAT_Courses?.F[cName] || {}) as number[];
+          const times = atRecordsF.map(r => r.time).filter(t => t > 0);
           return times.length > 0 ? Math.min(...times).toFixed(2) : "-";
         })(),
         icon: <Zap className="w-3.5 h-3.5" />,
@@ -244,8 +254,8 @@ export const CourseDetails = React.memo(
       {
         label: "Players",
         value: String(
-          Object.keys(lbAT_Courses?.M[cName] || {}).length +
-            Object.keys(lbAT_Courses?.F[cName] || {}).length || 0,
+          atRecordsM.filter(r => !r.isInterim).length +
+          atRecordsF.filter(r => !r.isInterim).length
         ),
         icon: <Users className="w-3.5 h-3.5" />,
       },
@@ -419,7 +429,7 @@ export const CourseDetails = React.memo(
                     <ASRTimeSimulator 
                       theme={theme}
                       courseRecord={atRecordsM.length > 0 ? Math.min(...atRecordsM.filter(r => r.time > 0).map(r => r.time)) : 0}
-                      records={atRecordsM}
+                      records={atRecordsM.filter(r => !r.isInterim)}
                       gender="M"
                       dataContext={dataContext}
                       cName={cName}
@@ -483,7 +493,7 @@ export const CourseDetails = React.memo(
                     <ASRTimeSimulator 
                       theme={theme}
                       courseRecord={atRecordsF.length > 0 ? Math.min(...atRecordsF.filter(r => r.time > 0).map(r => r.time)) : 0}
-                      records={atRecordsF}
+                      records={atRecordsF.filter(r => !r.isInterim)}
                       gender="F"
                       dataContext={dataContext}
                       cName={cName}

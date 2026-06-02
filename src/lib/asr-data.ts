@@ -598,11 +598,18 @@ export const processLiveFeedData = (
       const meta = athleteMetadata[pKey];
       const perfs = result.openPerformances[pKey] || [];
       const totalPts = perfs.reduce((sum: number, p: { points?: number }) => sum + (p.points || 0), 0);
+      const latestRunDate = perfs.reduce((latest: Date, p: { date?: string | null }) => {
+        if (!p.date) return latest;
+        const runDate = new Date(p.date);
+        if (isNaN(runDate.getTime())) return latest;
+        return runDate > latest ? runDate : latest;
+      }, new Date(0));
       return {
         ...meta,
         id: `open-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
         runs: perfs.length,
+        latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
         sets: openAthleteTotalSubmissions[pKey] || 0,
@@ -612,7 +619,15 @@ export const processLiveFeedData = (
         ),
       };
     })
-    .sort((a: PlayerProfile & { rating?: number }, b: PlayerProfile & { rating?: number }) => (b.rating || 0) - (a.rating || 0));
+    .sort((a: any, b: any) => {
+      if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+      if ((b.runs || 0) !== (a.runs || 0)) {
+        return (b.runs || 0) - (a.runs || 0);
+      }
+      return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
+    });
 
   result.allTimeRankings = Object.keys(athleteMetadata)
     .filter((k) => {
@@ -625,11 +640,18 @@ export const processLiveFeedData = (
       const meta = athleteMetadata[pKey];
       const perfs = result.allTimePerformances[pKey] || [];
       const totalPts = perfs.reduce((sum: number, p: { points?: number }) => sum + (p.points || 0), 0);
+      const latestRunDate = perfs.reduce((latest: Date, p: { date?: string | null }) => {
+        if (!p.date) return latest;
+        const runDate = new Date(p.date);
+        if (isNaN(runDate.getTime())) return latest;
+        return runDate > latest ? runDate : latest;
+      }, new Date(0));
       return {
         ...meta,
         id: `at-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
         runs: perfs.length,
+        latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
         // Using their sets from metadata (which came from CSV columns)
@@ -640,7 +662,15 @@ export const processLiveFeedData = (
         ),
       };
     })
-    .sort((a: PlayerProfile & { rating?: number }, b: PlayerProfile & { rating?: number }) => (b.rating || 0) - (a.rating || 0));
+    .sort((a: any, b: any) => {
+      if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+      if ((b.runs || 0) !== (a.runs || 0)) {
+        return (b.runs || 0) - (a.runs || 0);
+      }
+      return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
+    });
 
   return result;
 };
@@ -778,7 +808,15 @@ export const calculateWofStats = (
       medalCount: sortedMedalCount,
       topStats: {
         rating: [...qualifiedAthletes]
-          .sort((a, b) => b.rating - a.rating)
+          .sort((a: any, b: any) => {
+            if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
+              return (b.rating || 0) - (a.rating || 0);
+            }
+            if ((b.runs || 0) !== (a.runs || 0)) {
+              return (b.runs || 0) - (a.runs || 0);
+            }
+            return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
+          })
           .slice(0, 10),
         runs: [...qualifiedAthletes]
           .sort((a, b) => b.runs - a.runs)

@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 import { cn, fixCountryEntity, formatFlagsWithSpace, THEME, trackEvent } from "../../lib/asr-utils";
 import { Trophy, Clock, Play } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
-import { ASRLQGauge } from "../common/ASRLQGauge";
 import { useAppStore } from "../../store/useAppStore";
 
 interface ChampionsProps {
@@ -56,6 +55,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  country: run.country,
  flag: run.flag,
  videoUrl: run.videoUrl || run.demoVideo,
+ isInterim: run.isInterim,
  };
  } else {
  wrs.push({
@@ -67,6 +67,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  country: run.country,
  flag: run.flag,
  videoUrl: run.videoUrl || run.demoVideo,
+ isInterim: run.isInterim,
  });
  }
  }
@@ -126,19 +127,25 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  <div
  key={i}
  role="button"
- tabIndex={0}
+ tabIndex={champ.isInterim ? -1 : 0}
  onKeyDown={(e) => {
+ if (champ.isInterim) return;
  if (e.key === 'Enter' || e.key === ' ') {
  e.preventDefault();
  navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete });
  }
  }}
- onClick={() => navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete })}
+ onClick={() => {
+   if (!champ.isInterim) {
+     navigateToEntity("player", { pKey: champ.pKey || champ.athlete, name: champ.athlete });
+   }
+ }}
  className={cn(
  "group flex flex-col relative pl-[58px] pr-5 py-3.5 text-left w-full outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
  "theme-focus",
  THEME.BENTO_CARD(theme),
- i === 0 ? "border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]" : ""
+ i === 0 ? "border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]" : "",
+ champ.isInterim ? "opacity-60 grayscale pointer-events-none" : ""
  )}
  >
  <div
@@ -193,45 +200,54 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  ) : null}
  </span>
  </div>
- <div className="flex items-center gap-3 shrink-0">
- {champ.videoUrl && (
- <button
- type="button"
- onClick={(e) => {
- e.preventDefault();
- e.stopPropagation();
- trackEvent("outbound_click", {
- link_url: champ.videoUrl,
- link_type: "video",
- });
- setPlayingVideoUrl(champ.videoUrl);
- }}
- className={THEME.ICON_BUTTON(theme)}
- >
- <Play
- className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
- strokeWidth={3}
- />
- </button>
- )}
- <ASRLQGauge
- lq={i === 0 ? 100 : (champs[0].time / champ.time) * 100}
- theme={theme}
- size={44}
- />
- <div
- className={cn(
- "font-black text-lg tabular-nums tracking-tighter w-12 text-right",
- i === 0
- ? "text-amber-500"
- : theme === "dark"
- ? "text-zinc-400"
- : "text-zinc-600",
- )}
- >
- {champ.time.toFixed(2)}
- </div>
- </div>
+ <div className="flex items-center gap-4 pr-0 shrink-0 h-full">
+  <div className="flex flex-col items-end justify-center text-right min-w-[50px] sm:min-w-[60px]">
+  <div
+  className={cn(
+  "font-black text-lg sm:text-[20px] tabular-nums tracking-tighter transition-colors",
+  i === 0
+  ? "text-amber-500"
+  : theme === "dark"
+  ? "text-white"
+  : "text-zinc-900"
+  )}
+  >
+  {champ.time.toFixed(2)}
+  </div>
+  <div
+  className={cn(
+  "text-[11px] sm:text-[12px] font-bold tabular-nums transition-colors mt-[-2px]",
+  i === 0
+  ? theme === "dark" ? "text-amber-500/80" : "text-amber-600/80"
+  : theme === "dark" ? "text-white/50" : "text-zinc-500"
+  )}
+  >
+  {i === 0 ? "100.00" : ((champs[0].time / champ.time) * 100).toFixed(2)}
+  </div>
+  </div>
+  <div className="flex items-center justify-center shrink-0 w-8">
+  {champ.videoUrl ? (
+  <button
+  type="button"
+  onClick={(e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  trackEvent("outbound_click", {
+  link_url: champ.videoUrl,
+  link_type: "video",
+  });
+  setPlayingVideoUrl(champ.videoUrl);
+  }}
+  className={THEME.ICON_BUTTON(theme)}
+  >
+  <Play
+  className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]"
+  strokeWidth={3}
+  />
+  </button>
+  ) : null}
+  </div>
+  </div>
  </div>
  </div>
  ))}

@@ -111,7 +111,7 @@ export const ASRRankList = ({
  atMet[pKey] ||
  cMet[String(pKey).toUpperCase()] ||
  (isArray ? { name: pKey } : item);
- if (isPlaceholderPlayer(meta.name) && pKey !== "UNCLAIMED RANK")
+ if (isPlaceholderPlayer(meta.name) && pKey !== "UNCLAIMED RANK" && !(item as any).isInterim)
  return null;
 
  const stats = [];
@@ -167,6 +167,8 @@ export const ASRRankList = ({
 
  const titleStr = isUnclaimedItem
  ? "--"
+ : (item as any).isInterim 
+ ? "INTERIM TOP TIME"
  : String(
  isArray
  ? meta.name || pKey
@@ -174,7 +176,7 @@ export const ASRRankList = ({
  ).toUpperCase();
 
  return (
-            <div key={`${pKey}-${i}`} data-index={i}>
+            <div key={`${pKey}-${i}`} data-index={i} className={(item as any).isInterim ? "opacity-60 grayscale pointer-events-none" : ""}>
               <div className="pb-3">
                 <ASRListItem
  variant="card"
@@ -187,7 +189,7 @@ export const ASRRankList = ({
  (isUnclaimedItem ? i + 1 : "UR")
  }
  title={titleStr}
- isUnclaimed={isUnclaimedItem}
+ isUnclaimed={isUnclaimedItem || (item as any).isInterim}
  shouldFade={isUnclaimedItem || item.shouldFade}
  subtitle={
  isUnclaimedItem

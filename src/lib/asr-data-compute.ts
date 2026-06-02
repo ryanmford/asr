@@ -10,6 +10,16 @@ import {
 } from "./asr-data.ts";
 import { normalizeForSearch } from "./utils";
 
+export const sortAthletesWithTiebreakers = (a: PlayerProfile, b: PlayerProfile) => {
+  if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
+    return (b.rating || 0) - (a.rating || 0);
+  }
+  if ((b.runs || 0) !== (a.runs || 0)) {
+    return (b.runs || 0) - (a.runs || 0);
+  }
+  return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
+};
+
 export function computeAllState(payload: { rM: string; rF: string; rLive: string; rSet: string; hasTotalError: boolean; hasPartialError: boolean }) {
   const { rM, rF, rLive, rSet, hasTotalError, hasPartialError } = payload;
 
@@ -33,10 +43,40 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   ) => {
     const qualified = arr
       .filter((p) => isQualifiedAthlete(p, isAllTime))
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      .sort(sortAthletesWithTiebreakers);
+    
+    // Build tiebreaker-aware rank mapping
+    const buildRankMap = (qualifiedArr: PlayerProfile[]) => {
+      const rm = new Map<string, number>();
+      let currRank = 1;
+      let prevRating = -1;
+      let prevRuns = -1;
+      let prevDate = -1;
+      
+      qualifiedArr.forEach((q, i) => {
+        const r = q.rating || 0;
+        const runs = q.runs || 0;
+        const date = q.latestRunDate?.getTime() || Infinity;
+
+        const diffRating = Math.abs(r - prevRating) > 0.000001;
+        const diffRuns = runs !== prevRuns;
+        const diffDate = date !== prevDate;
+        
+        if (diffRating || diffRuns || diffDate) {
+          currRank = i + 1;
+          prevRating = r;
+          prevRuns = runs;
+          prevDate = date;
+        }
+        rm.set(q.pKey, currRank);
+      });
+      return rm;
+    };
+    
+    const rankMap = buildRankMap(qualified);
+
     arr.forEach((p) => {
-      const rankIdx = qualified.findIndex((q) => q.pKey === p.pKey);
-      const rankVal = rankIdx !== -1 ? rankIdx + 1 : "UR";
+      const rankVal = rankMap.has(p.pKey) ? rankMap.get(p.pKey)! : "UR";
       if (isAllTime) {
         p.allTimeRank = rankVal;
         initialMetadata[p.pKey].allTimeRank = rankVal;
@@ -466,34 +506,40 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const calculateLeaderboard = (sourceData: PlayerProfile[], isAllTime: boolean) => {
     const qualifiedM = (sourceData || [])
       .filter((p: PlayerProfile) => p.gender === "M" && isQualifiedAthlete(p, isAllTime))
-      .sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
+      .sort(sortAthletesWithTiebreakers);
     const qualifiedF = (sourceData || [])
       .filter((p: PlayerProfile) => p.gender === "F" && isQualifiedAthlete(p, isAllTime))
-      .sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
+      .sort(sortAthletesWithTiebreakers);
       
-    const rankMapM = new Map<string, number>();
-    let currentRankM = 1;
-    let prevRatingM = -1;
-    qualifiedM.forEach((q: PlayerProfile, i: number) => {
-      const r = q.rating || 0;
-      if (Math.abs(r - prevRatingM) > 0.000001) {
-        currentRankM = i + 1;
-        prevRatingM = r;
-      }
-      rankMapM.set(q.pKey, currentRankM);
-    });
+    const buildRankMap = (qualifiedArr: PlayerProfile[]) => {
+      const rm = new Map<string, number>();
+      let currRank = 1;
+      let prevRating = -1;
+      let prevRuns = -1;
+      let prevDate = -1;
+      
+      qualifiedArr.forEach((q, i) => {
+        const r = q.rating || 0;
+        const runs = q.runs || 0;
+        const date = q.latestRunDate?.getTime() || Infinity;
 
-    const rankMapF = new Map<string, number>();
-    let currentRankF = 1;
-    let prevRatingF = -1;
-    qualifiedF.forEach((q: PlayerProfile, i: number) => {
-      const r = q.rating || 0;
-      if (Math.abs(r - prevRatingF) > 0.000001) {
-        currentRankF = i + 1;
-        prevRatingF = r;
-      }
-      rankMapF.set(q.pKey, currentRankF);
-    });
+        const diffRating = Math.abs(r - prevRating) > 0.000001;
+        const diffRuns = runs !== prevRuns;
+        const diffDate = date !== prevDate;
+        
+        if (diffRating || diffRuns || diffDate) {
+          currRank = i + 1;
+          prevRating = r;
+          prevRuns = runs;
+          prevDate = date;
+        }
+        rm.set(q.pKey, currRank);
+      });
+      return rm;
+    }
+
+    const rankMapM = buildRankMap(qualifiedM);
+    const rankMapF = buildRankMap(qualifiedF);
 
     const mapM: Record<string, PlayerProfile> = {};
     const mapF: Record<string, PlayerProfile> = {};
@@ -524,7 +570,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const allTimeRankedKeys = new Set((data || []).map((p: PlayerProfile) => p.pKey));
     const filtered = athletePool.filter((p: PlayerProfile) => p && p.gender === gen && !isPlaceholderPlayer(p.name) && (p.runs || 0) > 0);
     
-    filtered.sort((a: PlayerProfile, b: PlayerProfile) => (b.rating || 0) - (a.rating || 0));
+    filtered.sort(sortAthletesWithTiebreakers);
 
     const qual: PlayerProfile[] = [];
     const unranked: PlayerProfile[] = [];
@@ -574,11 +620,14 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const sorted = Object.entries(source)
       .map(([pKey, time]: [string, unknown]) => {
         const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
+        const isInterim = isPlaceholderPlayer(pKey);
         return {
           pKey,
           time: num,
           pts: num > 0 ? (record / num) * 100 : 0,
           videoUrl: (rawBestSector?.[pKey] as Record<string, Record<string, { videoUrl?: string }>>)?.[cName]?.videoUrl,
+          isInterim,
+          name: isInterim ? "INTERIM TOP TIME" : undefined
         };
       })
       .sort((a, b) => b.pts - a.pts);
@@ -653,7 +702,7 @@ export function computeOriginalRanks(athletePool: PlayerProfile[]) {
   const ranks: Record<string, number> = {};
   const sorted = [...athletePool]
       .filter(a => a.currentRank !== "UR" && a.rating !== undefined)
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      .sort(sortAthletesWithTiebreakers);
   sorted.forEach((a, idx) => ranks[a.pKey] = idx + 1);
   return ranks;
 }
