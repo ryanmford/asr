@@ -11,6 +11,8 @@ export interface AppState {
   setPlayingVideoUrl: (url: string | null) => void;
   showOnboarding: boolean;
   setShowOnboarding: (show: boolean) => void;
+  isSubmitModalOpen: boolean;
+  setIsSubmitModalOpen: (val: boolean) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
 
@@ -81,6 +83,8 @@ export const useAppStore = create<AppState>((set) => ({
   setPlayingVideoUrl: (playingVideoUrl) => set({ playingVideoUrl }),
   showOnboarding: false,
   setShowOnboarding: (showOnboarding) => set({ showOnboarding }),
+  isSubmitModalOpen: false,
+  setIsSubmitModalOpen: (isSubmitModalOpen) => set({ isSubmitModalOpen }),
   activeCourseId: null,
   setActiveCourseId: (activeCourseId) => set({ activeCourseId }),
 

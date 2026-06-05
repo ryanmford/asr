@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { User, Users, MapPin, Trophy, Home } from "lucide-react";
+import { MapPin, Trophy, Plus, Home, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "../../lib/asr-utils";
 import { useDataStore } from "../../store/useDataStore";
@@ -18,6 +18,7 @@ export const ASRNavDock = React.memo(
     const isKeyboardOpen = useAppStore(s => s.isKeyboardOpen);
     const setIsKeyboardOpen = useAppStore(s => s.setIsKeyboardOpen);
     const triggerRefresh = useDataStore((s) => s.triggerRefresh);
+    const setIsSubmitModalOpen = useAppStore(s => s.setIsSubmitModalOpen);
 
     useEffect(() => {
       const handleFocusIn = (e: Event) => {
@@ -81,9 +82,9 @@ export const ASRNavDock = React.memo(
     const navItems = [
       { id: "home", icon: Home, label: "HOME" },
       { id: "courses", icon: MapPin, label: "COURSES" },
-      { id: "players", icon: User, label: "PLAYERS" },
-      { id: "teams", icon: Users, label: "TEAM" },
-      { id: "hof", icon: Trophy, label: "HOF" },
+      { id: "submit", icon: Plus, label: "SUBMIT" },
+      { id: "rankings", icon: Users, label: "RANKINGS" },
+      { id: "hof", icon: Trophy, label: "HOF" }
     ];
 
     return (
@@ -120,6 +121,10 @@ export const ASRNavDock = React.memo(
                   key={item.id}
                   aria-label={`View ${item.label}`}
                   onClick={() => {
+                    if (item.id === "submit") {
+                      setIsSubmitModalOpen(true);
+                      return;
+                    }
                     if (isActive) {
                       window.scrollTo({ top: 0, behavior: "smooth" });
                       triggerRefresh();
@@ -155,14 +160,14 @@ export const ASRNavDock = React.memo(
                       animate={{
                         y: isActive ? -1.5 : 0,
                         color: isActive
-                          ? "#3b82f6" // text-blue-500
-                          : theme === "dark" ? "#a1a1aa" : "#71717a", // text-zinc-400 / text-zinc-500
+                            ? "#3b82f6" // text-blue-500
+                            : theme === "dark" ? "#a1a1aa" : "#71717a", // text-zinc-400 / text-zinc-500
                       }}
                       transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
                     >
                       <Icon
-                        size={isCompact ? 18 : 22}
-                        strokeWidth={isActive ? 2.5 : 2}
+                        size={item.id === "submit" ? (isCompact ? 22 : 26) : (isCompact ? 18 : 22)}
+                        strokeWidth={item.id === "submit" && !isActive ? 2.5 : (isActive ? 2.5 : 2)}
                         className={cn(
                           "transition-shadow duration-300",
                           isActive && theme === "dark" ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" : ""

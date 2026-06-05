@@ -1,10 +1,6 @@
 import { useDataStore } from "../store/useDataStore";
 import { useMemo } from "react";
 
-export const useKpiStats = () => {
-  return useDataStore((s) => s.kpiStats);
-};
-
 export const useLeaderboards = () => {
   const atPerfs = useDataStore((s) => s.atPerfs);
   const opPerfs = useDataStore((s) => s.opPerfs);

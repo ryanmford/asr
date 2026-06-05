@@ -23,9 +23,9 @@ import {
   ASRFooter,
 } from "./components/ASRComponents";
 import { ASRVideoModal } from "./components/common/ASRVideoModal";
+import { ASRSubmitModal } from "./components/common/ASRSubmitModal";
 
-const PlayersView = React.lazy(() => import("./components/views/PlayersView").then(m => ({ default: m.PlayersView })));
-const TeamsView = React.lazy(() => import("./components/views/TeamsView").then(m => ({ default: m.TeamsView })));
+const RankingsView = React.lazy(() => import("./components/views/RankingsView").then(m => ({ default: m.RankingsView })));
 const HomeView = React.lazy(() => import("./components/views/HomeView").then(m => ({ default: m.HomeView })));
 const MapCoursesView = React.lazy(() => import("./components/views/MapCoursesView").then(m => ({ default: m.MapCoursesView })));
 const ASRWallOfFame = React.lazy(() => import("./components/views/ASRWallOfFame").then(m => ({ default: m.ASRWallOfFame })));
@@ -144,7 +144,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
   const inspectorDataObj = useInspectorData() || { current: null, history: [], historyIndex: -1 };
   const inspectorData = inspectorDataObj.current;
 
-  const view = backgroundLocation.pathname.split("/")[1] || "players";
+  const view = backgroundLocation.pathname.split("/")[1] || "rankings";
 
   const handleViewChange = useCallback((v: string) => {
     navigate(`/${v}`);
@@ -208,7 +208,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                 onEntityClick={navigateToEntity}
               />
             )}
-            {(view === "home" || view === "players" || view === "teams") && (
+            {(view === "home" || view === "rankings") && (
               <ASRCountdown
                 targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
                 eventType={"open"}
@@ -234,7 +234,12 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           setEventType={setEventType}
           hideTabs={view === "hof" || view === "setters" || view === "home"}
           isTransparent={view === "home"}
-          showSearch={view === "home" || view === "hof"}
+          showSearch={view === "home"}
+          leftSlot={view === "hof" ? (
+            <div className="flex items-center">
+              <h1 className="text-lg sm:text-xl font-black italic uppercase tracking-widest text-zinc-900 dark:text-zinc-100">HALL OF FAME</h1>
+            </div>
+          ) : undefined}
         />
       </div>
 
@@ -264,24 +269,19 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
             <AnimatePresence mode="wait">
               <Routes location={backgroundLocation} key={backgroundLocation.pathname}>
                 <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/players/:id?" element={
+                <Route path="/rankings" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
-                    <PlayersView theme={theme} />
-                  </motion.div>
-                } />
-                <Route path="/teams/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
-                    <TeamsView theme={theme} />
+                    <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/regions/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
-                    <TeamsView theme={theme} />
+                    <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/setters/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
-                    <PlayersView theme={theme} />
+                    <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/home" element={
@@ -324,7 +324,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                       </p>
                       <button
                         onClick={() => {
-                          navigate("/players", { replace: false });
+                          navigate("/rankings", { replace: false });
                         }}
                         className="mt-6 px-6 py-2 rounded-full border border-current text-[9px] font-black uppercase tracking-widest hover:bg-current/5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
                       >
@@ -400,6 +400,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
       </ASRBaseModal>
 
       <ASRVideoModal />
+      <ASRSubmitModal />
     </div>
   );
 }

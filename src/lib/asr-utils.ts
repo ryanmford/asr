@@ -91,7 +91,7 @@ export const normalizeName = (n: string) => {
     .trim();
 };
 
-export const normalizeCountryName = (name: string) => {
+const normalizeCountryName = (name: string) => {
   if (!name) return "";
   let n = String(name)
     .toUpperCase()
@@ -287,7 +287,7 @@ export const cleanNumeric = (v: string | number | null | undefined) => {
   return isNaN(num) ? null : num;
 };
 
-export const parseLine = (line: string = "") => {
+const parseLine = (line: string = "") => {
   const result: string[] = [];
   let inQuotes = false;
   let start = 0;
@@ -746,19 +746,4 @@ export const getNormalizedNameList = (listStr: string) => {
     .split(/[,&/]| and /i)
     .map((n) => normalizeName(n))
     .filter(Boolean);
-};
-
-export const isNameInList = (name: string, listStr: string | string[]) => {
-  if (!listStr || !name) return false;
-  const searchName = normalizeName(name);
-  if (Array.isArray(listStr)) {
-    return listStr.some(
-      (p) =>
-        p === searchName || p.includes(searchName) || searchName.includes(p),
-    );
-  }
-  const parts = getNormalizedNameList(listStr);
-  return parts.some(
-    (p) => p === searchName || p.includes(searchName) || searchName.includes(p),
-  );
 };

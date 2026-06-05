@@ -3,7 +3,7 @@ import { useDataStore } from "../../store/useDataStore";
 import { useSettersDerived } from "../../hooks/useDerivedData";
 import { useLeaderboards } from "../../hooks/useAppCalculations";
 import { DetailsSkeleton } from "../common/Skeletons";
-import { cn, normalizeName } from "../../lib/asr-utils";
+import { cn } from "../../lib/asr-utils";
 import { SearchX, AlertCircle } from "lucide-react";
 
 const PlayerDetails = React.lazy(() =>

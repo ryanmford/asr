@@ -40,7 +40,7 @@ export const AnimatedListView = React.memo(({
   hideSubtitle = false,
   hideTitle = false,
   showVideoColumn = false,
-  categoryName,
+  _categoryName,
   children,
 }: AnimatedListViewProps & { children?: React.ReactNode | ((props: { searchedData: any[] }) => React.ReactNode), showVideoColumn?: boolean }) => {
   const [searchParams, setSearchParams] = useSearchParams();

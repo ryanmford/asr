@@ -11,7 +11,7 @@ import {
 } from "./asr-utils";
 import { normalizeForSearch } from "./utils";
 
-export const isFootwearTeam = (name: string, shoeField?: string): boolean => {
+const isFootwearTeam = (name: string, shoeField?: string): boolean => {
   if (!name) return false;
   const nLow = name.toLowerCase().trim();
   const shoeKeywords = [
@@ -33,7 +33,7 @@ export const isFootwearTeam = (name: string, shoeField?: string): boolean => {
   return false;
 };
 
-export const RANKING_MAPPING = {
+const RANKING_MAPPING = {
   name: ["athlete", "name", "player"],
   country: ["country"],
   flag: ["flag"],
@@ -53,7 +53,7 @@ export const RANKING_MAPPING = {
   shoeSize: ["size", "shoe size"],
 };
 
-export const SET_LIST_MAPPING = {
+const SET_LIST_MAPPING = {
   course: ["course", "track", "level"],
   length: ["length", "dist"],
   elev: ["elev", "gain"],
@@ -71,7 +71,7 @@ export const SET_LIST_MAPPING = {
   assists: ["assistant", "assistants", "assistant setter", "assistantsetters"],
 };
 
-export const SETTER_MAPPING = {
+const SETTER_MAPPING = {
   name: ["setter", "name"],
   leads: ["leads"],
   assists: ["assist", "assists", "assistant"],
@@ -85,7 +85,7 @@ export const SETTER_MAPPING = {
   homeGym: ["gym", "home gym"],
 };
 
-export const LIVE_FEED_MAPPING = {
+const LIVE_FEED_MAPPING = {
   athlete: ["athlete", "name", "player"],
   course: ["course", "track", "level"],
   result: ["result", "time", "pb"],
@@ -673,59 +673,6 @@ export const processLiveFeedData = (
     });
 
   return result;
-};
-
-export const getAggregatedStats = (
-  rawCourseList: CourseData[],
-  groupBy: string,
-  dnMap: Record<string, string> = {},
-) => {
-  const map: Record<string, { key: string; name: string; flag: string; courses: number; runs: number; playersSet: Set<string>; players?: number }> = {};
-  (rawCourseList || []).forEach((c) => {
-    let name = c[groupBy];
-    let flag = c.flag;
-    let key = name;
-    if (groupBy === "country") {
-      const fixed = fixCountryEntity(c.country, c.flag);
-      name = fixed.name;
-      flag = fixed.flag;
-      key = name;
-    } else if (groupBy === "continent") {
-      if (c.continent === "GLOBAL") return;
-      name = c.continent || "OTHER";
-      flag = c.continentFlag || "🌐";
-      key = name;
-    }
-    if (!name) return;
-    if (!map[key]) {
-      map[key] = {
-        name,
-        flag,
-        courses: 0,
-        runs: 0,
-        playersSet: new Set(),
-        coords: c.coords || c.parsedCoords,
-        ...(groupBy === "city"
-          ? { countryName: c.country, continent: c.continent }
-          : {}),
-        ...(groupBy === "country" ? { continent: c.continent } : {}),
-      };
-    }
-    const entry = map[key];
-    entry.courses++;
-    entry.runs += c.totalRuns || 0;
-    (c.athletesMAll || []).forEach((a: string | [string, number]) => {
-      const pId = Array.isArray(a) ? a[0] : a;
-      if (!isPlaceholderPlayer(dnMap[pId] || pId)) entry.playersSet.add(pId);
-    });
-    (c.athletesFAll || []).forEach((a: string | [string, number]) => {
-      const pId = Array.isArray(a) ? a[0] : a;
-      if (!isPlaceholderPlayer(dnMap[pId] || pId)) entry.playersSet.add(pId);
-    });
-  });
-  return Object.values(map)
-    .map((item) => ({ ...item, players: item.playersSet.size }))
-    .sort((a, b) => b.courses - a.courses);
 };
 
 export const calculateWofStats = (

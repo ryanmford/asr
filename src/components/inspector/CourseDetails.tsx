@@ -148,7 +148,6 @@ const SetterDisplay = ({
 export const CourseDetails = React.memo(
   ({ course, dataContext, onEntityClick, theme }: CourseDetailsProps) => {
     const {
-      lbAT_Courses = { M: {}, F: {} },
       cMet = {},
       atMet = {},
       pRaw = {},

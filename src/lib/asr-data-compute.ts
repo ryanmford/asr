@@ -10,7 +10,7 @@ import {
 } from "./asr-data.ts";
 import { normalizeForSearch } from "./utils";
 
-export const sortAthletesWithTiebreakers = (a: PlayerProfile, b: PlayerProfile) => {
+const sortAthletesWithTiebreakers = (a: PlayerProfile, b: PlayerProfile) => {
   if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
     return (b.rating || 0) - (a.rating || 0);
   }

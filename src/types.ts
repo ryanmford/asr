@@ -16,16 +16,6 @@ export interface PlayerProfile {
   isDivider?: boolean;
 }
 
-export interface PerformanceRecord {
-  pKey: string;
-  time: number;
-  pts?: number;
-  rank?: number;
-  videoUrl?: string;
-  isInterim?: boolean;
-  name?: string;
-}
-
 export interface CourseData {
   name: string;
   videoUrl?: string;

@@ -178,10 +178,6 @@ export const useAppNavigation = () => {
   }), [navigateToEntity, closeModals, goBackOne, canGoForward, goForwardOne, prefetchEntity]);
 };
 
-export const useMasterCourseList = () => {
-  return useDataStore((s) => s.masterCourseList);
-};
-
 export const useSettersDerived = () => {
   const settersWithImpact = useDataStore((s) => s.settersWithImpact);
   const setterMet = useDataStore((s) => s.setterMet);
@@ -287,7 +283,7 @@ export const useInspectorData = () => {
   const location = useLocation();
 
   const atMet = useDataStore((s) => s.atMet as Record<string, PlayerProfile>);
-  const masterCourseList = useMasterCourseList();
+  const masterCourseList = useDataStore((s) => s.masterCourseList);
   const settersWithImpact = useDataStore((s) => s.settersWithImpact);
   const setterMet = useDataStore((s) => s.setterMet as Record<string, SetterProfile>);
   const cMet = useDataStore((s) => s.cMet as Record<string, unknown>);

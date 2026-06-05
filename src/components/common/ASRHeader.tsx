@@ -14,6 +14,7 @@ interface ASRHeaderProps {
   setEventType: (type: "open" | "all-time") => void;
   hideTabs?: boolean;
   centerSlot?: React.ReactNode;
+  leftSlot?: React.ReactNode;
   isTransparent?: boolean;
   showSearch?: boolean;
 }
@@ -26,6 +27,7 @@ export const ASRHeader = React.memo(
     setEventType,
     hideTabs,
     centerSlot,
+    leftSlot,
     isTransparent,
     showSearch,
   }: ASRHeaderProps) => {
@@ -47,6 +49,11 @@ export const ASRHeader = React.memo(
             {showSearch && (
               <div className="w-full">
                 <ASRGlobalSearch theme={theme} />
+              </div>
+            )}
+            {leftSlot && (
+              <div className="w-full flex items-center">
+                {leftSlot}
               </div>
             )}
           </div>
