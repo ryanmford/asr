@@ -108,11 +108,11 @@ export const ASRCountdown = React.memo(
             >
               <span
                 className={cn(
-                  "text-[10px] sm:text-[11px] font-black uppercase tracking-[0.4em] relative pr-6 pl-2 sm:px-0",
+                  "text-[8.5px] min-[375px]:text-[10px] sm:text-[11px] font-black uppercase tracking-widest sm:tracking-[0.3em] relative pr-8 pl-4 sm:px-0 text-center line-clamp-1",
                   "theme-text-base",
                 )}
               >
-                DATABASE LOCKED
+                OFFICIAL ASR OPEN RESULTS COMING SOON
               </span>
             </div>
             {renderCloseButton()}
