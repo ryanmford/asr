@@ -19,7 +19,6 @@ import {
   ASRBaseModal,
   ASRIntroOverlay,
   ASROnboarding,
-  ASRCountdown,
   ASRFooter,
 } from "./components/ASRComponents";
 import { ASRVideoModal } from "./components/common/ASRVideoModal";
@@ -206,14 +205,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
               <ASRLiveTicker
                 theme={theme}
                 onEntityClick={navigateToEntity}
-              />
-            )}
-            {(view === "home" || view === "rankings") && (
-              <ASRCountdown
-                targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
-                eventType={"open"}
-                onHelp={() => setShowOnboarding(true)}
-                theme={theme as "light" | "dark"}
               />
             )}
           </div>

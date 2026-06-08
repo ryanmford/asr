@@ -168,7 +168,7 @@ export function ASRSubmitModal() {
               >
                 <div className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-md bg-white px-4 py-3 font-mono text-sm font-semibold text-black transition-transform hover:scale-[1.02] active:scale-95">
                   <div className="absolute inset-0 bg-blue-500/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  GET VERIFIED
+                  VERIFY
                   <ExternalLink size={16} className="ml-1" />
                 </div>
               </a>

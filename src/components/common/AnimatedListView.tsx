@@ -13,6 +13,7 @@ interface AnimatedListViewProps {
   theme: "light" | "dark";
   data: any[];
   searchPlaceholder?: string;
+  searchSubtext?: React.ReactNode;
   headerControls?: React.ReactNode;
   topControls?: React.ReactNode;
   isLoading: boolean;
@@ -30,6 +31,7 @@ export const AnimatedListView = React.memo(({
   theme,
   data,
   searchPlaceholder,
+  searchSubtext,
   headerControls,
   topControls,
   isLoading,
@@ -84,18 +86,25 @@ export const AnimatedListView = React.memo(({
             {topControls}
           </div>
         )}
-        <div className="flex w-full gap-2 items-center">
-          {searchPlaceholder && (
-            <ASRSearchInput
-              value={search}
-              onChange={(e: any) => setSearch(e.target.value)}
-              placeholder={searchPlaceholder}
-              theme={theme}
-              className="flex-1 w-full"
-              enableFocusShortcut="slash"
-            />
+        <div className="flex flex-col w-full gap-1">
+          <div className="flex w-full gap-2 items-center">
+            {searchPlaceholder && (
+              <ASRSearchInput
+                value={search}
+                onChange={(e: any) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder}
+                theme={theme}
+                className="flex-1 w-full"
+                enableFocusShortcut="slash"
+              />
+            )}
+            {headerControls}
+          </div>
+          {searchSubtext && (
+            <div>
+              {searchSubtext}
+            </div>
           )}
-          {headerControls}
         </div>
       </PageHeader>
       

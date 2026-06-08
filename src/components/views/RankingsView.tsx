@@ -4,7 +4,7 @@ import { AnimatedListView } from "../common/AnimatedListView";
 import { PlayerProfile, TeamProfile } from "../../types";
 import { useDataStore } from "../../store/useDataStore";
 import { useAppStore } from "../../store/useAppStore";
-import { useAppNavigation, usePlayerList, useTeamList } from "../../hooks/useDerivedData";
+import { useAppNavigation, usePlayerList, useTeamList, useURLState } from "../../hooks/useDerivedData";
 
 export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) => {
   const isLoading = useDataStore(s => s.isLoading);
@@ -13,6 +13,7 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
   const teamCategory = useAppStore(s => s.teamCategory);
   const setTeamCategory = useAppStore(s => s.setTeamCategory);
   const { navigateToEntity } = useAppNavigation();
+  const { eventType } = useURLState();
 
   const [mode, setMode] = useState<"players" | "teams">("players");
 
@@ -64,11 +65,41 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
     }
   }, []);
 
-  const listData = mode === "players" ? playerList : teamList;
+  const listData = React.useMemo(() => {
+    if (mode === "teams") return teamList;
+    if (eventType === "open") {
+      return playerList.map((p) => {
+        // We know 'currentRank' might be typed slightly generically in PlayerProfile,
+        // but it comes through via usePlayerList
+        const rank = (p as any).currentRank;
+        if (typeof rank === "number" && rank >= 1 && rank <= 6) {
+          if (rank <= 3) {
+            return { ...p, name: `${p.name} * *` };
+          } else {
+            return { ...p, name: `${p.name} *` };
+          }
+        }
+        return p;
+      });
+    }
+    return playerList;
+  }, [mode, eventType, playerList, teamList]);
+
   const listColumns = mode === "players" ? playerColumns : teamColumns;
   const itemClick = mode === "players" ? handlePlayerClick : handleTeamClick;
   const searchPlaceholder = mode === "players" ? "search players..." : "search gyms & teams...";
   const middleLabel = mode === "players" ? "PLAYER" : (teamCategory === "gyms" ? "GYM" : "TEAM");
+
+  const searchSubtext = (mode === "players" && eventType === "open") ? (
+    <div className="flex flex-col gap-1 mt-2 mb-1 w-full">
+      <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+        * * QUALIFIED FOR USPK NATIONALS & PKE WORLDS
+      </p>
+      <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+        * QUALIFIED FOR PKE WORLDS
+      </p>
+    </div>
+  ) : undefined;
 
   return (
     <AnimatedListView
@@ -77,6 +108,7 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
       theme={theme}
       data={listData}
       searchPlaceholder={searchPlaceholder}
+      searchSubtext={searchSubtext}
       isLoading={isLoading}
       onItemClick={itemClick}
       middleLabel={middleLabel}
