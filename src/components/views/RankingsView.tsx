@@ -74,9 +74,9 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
         const rank = (p as any).currentRank;
         if (typeof rank === "number" && rank >= 1 && rank <= 6) {
           if (rank <= 3) {
-            return { ...p, name: `${p.name} * *` };
+            return { ...p, displayName: `${p.name} * *` };
           } else {
-            return { ...p, name: `${p.name} *` };
+            return { ...p, displayName: `${p.name} *` };
           }
         }
         return p;
