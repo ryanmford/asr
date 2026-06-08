@@ -570,21 +570,6 @@ export const HomeView = React.memo(() => {
         >
           <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
             <button
-              className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-black transition-all duration-500 active:scale-[0.98] shadow-2xl bg-white backdrop-blur-md border border-white"
-              onClick={() => navigate("/rankings?eventType=open")}
-              onTouchStart={() => {}}
-            >
-              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500 z-10"></div>
-              <div className="absolute inset-0 ring-1 ring-inset ring-white rounded-full z-[15]"></div>
-              <span className="relative z-20 flex items-center justify-center gap-2 uppercase font-black tracking-widest text-[#000]">
-                ASR OPEN RESULTS
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1.5 transition-transform duration-500 opacity-90" />
-              </span>
-            </button>
-          </div>
-
-          <div className="flex w-auto mx-auto relative z-30 pointer-events-auto">
-            <button
               className="group/btn relative px-8 py-4 sm:py-5 overflow-hidden rounded-full font-medium text-sm sm:text-base tracking-[0.2em] text-white transition-all duration-500 active:scale-[0.98] shadow-2xl bg-black/40 backdrop-blur-md border border-white/20"
               onClick={() => setShowOnboarding(true)}
               onTouchStart={() => {}}
