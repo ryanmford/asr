@@ -51,7 +51,7 @@ export const TeamDetails = React.memo(
     
     const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") ||
       initialMode ||
-      "open";
+      "all-time";
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
@@ -198,8 +198,8 @@ export const TeamDetails = React.memo(
               >
                 <ASRNeonToggle
                   options={[
-                    { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
+                    { label: "OPEN", value: "open" },
                   ]}
                   activeOption={uiMode}
                   onChange={(m) => {

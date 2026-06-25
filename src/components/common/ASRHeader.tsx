@@ -62,8 +62,8 @@ export const ASRHeader = React.memo(
             <div className="flex w-full min-w-0 justify-center">
               <ASRNeonToggle
                 options={[
-                  { label: "OPEN", value: "open" },
                   { label: "ALL-TIME", value: "all-time" },
+                  { label: "OPEN", value: "open" },
                 ]}
                 activeOption={eventType}
                 onChange={(t) => setEventType(t as any)}

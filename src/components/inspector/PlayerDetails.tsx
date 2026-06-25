@@ -67,7 +67,7 @@ export const PlayerDetails = React.memo(
     const [uiTab, setUiTab] = useState<string>(initialTabSafe);
     const [contentTab, setContentTab] = useState<string>(initialTabSafe);
 
-    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") || "open";
+    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") || "all-time";
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
@@ -222,8 +222,8 @@ export const PlayerDetails = React.memo(
               >
                 <ASRNeonToggle
                   options={[
-                    { label: "OPEN", value: "open" },
                     { label: "ALL-TIME", value: "all-time" },
+                    { label: "OPEN", value: "open" },
                   ]}
                   activeOption={uiMode}
                   onChange={(m) => {

@@ -19,7 +19,7 @@ import { CourseData, SetterProfile, TeamProfile } from "../types";
 export const useURLState = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const eventType = searchParams.get("eventType") || "open";
+  const eventType = searchParams.get("eventType") || "all-time";
   const isAllTimeContext = eventType === "all-time";
 
   const setEventType = useCallback(
