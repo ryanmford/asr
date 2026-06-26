@@ -93,7 +93,7 @@ export const FallbackAvatar = React.memo(
       <img
         src={src}
         alt={name || "Avatar"}
-        className={cn("rounded-full object-cover", sizeCls, className)}
+        className={cn("rounded-full object-cover ring-1 ring-inset ring-black/10 dark:ring-white/10", sizeCls, className)}
         style={style}
         loading="lazy"
         decoding="async"

@@ -153,7 +153,7 @@ export const ASRSearchInput = React.memo(
               )}
             </AnimatePresence>
             {enableFocusShortcut && !value && !isFocused && (
-              <div className="hidden sm:flex items-center justify-center px-1.5 h-6 rounded bg-black/5 dark:bg-white/10 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 mr-2 border border-black/5 dark:border-white/5 pointer-events-none">
+              <div className="hidden sm:flex items-center justify-center px-1.5 h-6 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 mr-2 border border-b-2 border-black/5 dark:border-white/10 pointer-events-none shadow-sm">
                 {enableFocusShortcut === "cmd-k" ? "⌘K" : "/"}
               </div>
             )}

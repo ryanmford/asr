@@ -123,7 +123,7 @@ export const ASRBottomSheet: React.FC<BottomSheetProps> = ({
         dragMomentum={false}
       >
         <div className="w-full flex justify-center py-3 shrink-0 touch-none cursor-grab active:cursor-grabbing">
-           <div className="w-9 h-1.5 rounded-full bg-black/20 dark:bg-white/20" />
+           <div className="w-10 h-1 rounded-full bg-black/15 dark:bg-white/15 shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" />
         </div>
         
         <div 

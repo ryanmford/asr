@@ -43,7 +43,7 @@ export const ASRNeonToggle = ({
    onChange(value);
  }}
  className={cn(
- "relative flex-1 font-black uppercase tracking-[0.1em] transition-colors z-10 flex items-center justify-center basis-0 min-w-0 rounded-full",
+ "relative flex-1 font-black uppercase tracking-[0.1em] transition-all duration-300 active:scale-[0.96] z-10 flex items-center justify-center basis-0 min-w-0 rounded-full",
  "py-1.5 px-3 text-[9px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
  theme === "dark" ? "focus-visible:ring-offset-zinc-900" : "theme-focus",
  isActive

@@ -21,7 +21,7 @@ export const DetailsSkeleton = () => {
           <div className={cn("w-[76px] h-[76px] rounded-full", bgClass)} />
           <div className="flex flex-col gap-3 flex-1 min-w-0 pr-2">
             <div className={cn("h-6 w-48 rounded-full", bgClass)} />
-            <div className={cn("h-3 w-32 rounded-full", theme === "dark" ? "bg-white/[0.02]" : "bg-black/[0.02]")} />
+            <div className={cn("h-3 w-32 rounded-full", theme === "dark" ? "bg-white/[0.04]" : "bg-black/[0.04]")} />
           </div>
         </div>
       </div>
