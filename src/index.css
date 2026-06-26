@@ -87,6 +87,7 @@ body {
   background-color: #000; /* Dark background matches dark theme default */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
   transition: background-color 0.5s ease, color 0.5s ease;

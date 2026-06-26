@@ -544,7 +544,7 @@ export const CourseDetails = React.memo(
               <div className="flex flex-col gap-4">
                 <SectionTitle>WEEKLY ACTIVITY</SectionTitle>
                 <div className="px-2 pb-2">
-                  <ASRWeeklyActivityChart runs={allCourseRuns} type="run" />
+                  <ASRWeeklyActivityChart runs={allCourseRuns} type="run" themeColor="pink" />
                 </div>
               </div>
 

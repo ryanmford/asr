@@ -79,9 +79,11 @@ export const BioRow = React.memo(
  {icon}
  </div>
  <div className="flex flex-col min-w-0">
+ {label && (
  <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-0.5 group-hover:text-blue-500 transition-colors">
  {label}
  </span>
+ )}
  <span
  className={cn(
  fontSizeCls,

@@ -92,7 +92,7 @@ export const ASRHeader = React.memo(
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               className={cn(
-                "group/theme min-w-12 h-12 flex items-center justify-center rounded-full border transition-all duration-300 active:scale-95 outline-none overflow-hidden backdrop-blur-md relative",
+                "group/theme min-w-12 h-12 flex items-center justify-center rounded-full border transition-all duration-300 active:scale-[0.97] outline-none overflow-hidden backdrop-blur-md relative",
                 theme === "dark"
                   ? "bg-zinc-900/80 border-white/10 text-white/70 hover:text-white hover:bg-zinc-800 hover:border-white/20 shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
                   : "bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 shadow-sm shadow-black/5",

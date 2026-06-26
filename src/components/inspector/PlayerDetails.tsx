@@ -290,7 +290,7 @@ export const PlayerDetails = React.memo(
 
               {contentMode === "all-time" && (
                 <div className="px-6 pb-2">
-                  <ASRWeeklyActivityChart runs={allRuns} />
+                  <ASRWeeklyActivityChart runs={allRuns} themeColor="pink" />
                 </div>
               )}
 
@@ -378,7 +378,7 @@ export const PlayerDetails = React.memo(
               </div>
 
               <div className="px-6 pb-2">
-                <ASRWeeklyActivityChart runs={mappedSetsChartData} type="set" />
+                <ASRWeeklyActivityChart runs={mappedSetsChartData} type="set" themeColor="emerald" />
               </div>
 
               <div className="p-6 flex flex-col gap-6 pt-6 relative min-h-[300px]">
@@ -586,11 +586,11 @@ export const PlayerDetails = React.memo(
 
               {/* Membership Registration */}
               <div className="flex flex-col gap-4">
-                <SectionTitle>REGISTRY</SectionTitle>
+                <SectionTitle>JOINED</SectionTitle>
                 <BioRow
                   theme={theme}
                   icon={<Calendar size={18} />}
-                  label="JOINED IN"
+                  label=""
                   value={memberSince}
                 />
               </div>

@@ -157,7 +157,7 @@ export const ASRStatCard = React.memo(
  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
  )}
  >
- <p className="text-[9px] font-black uppercase leading-[1.2] text-inherit tracking-tight overflow-y-auto [&::-webkit-scrollbar]:hidden w-full max-h-full">
+ <p className="text-[9px] font-black uppercase leading-[1.35] text-inherit tracking-[0.05em] overflow-y-auto [&::-webkit-scrollbar]:hidden w-full max-h-full">
  {description}
  </p>
  </div>

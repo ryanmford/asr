@@ -85,7 +85,7 @@ export const ASRStandardButton = ({
         "relative flex items-center justify-center gap-2 group",
         "py-3.5 px-6 font-black uppercase tracking-[0.2em] transition-colors",
         "rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-        !disabled ? "active:scale-95 cursor-pointer" : "cursor-not-allowed",
+        !disabled ? "active:scale-[0.98] cursor-pointer" : "cursor-not-allowed",
         getBaseStyles(),
         className
       )}
