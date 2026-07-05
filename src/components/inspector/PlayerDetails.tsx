@@ -299,9 +299,8 @@ export const PlayerDetails = React.memo(
                 {rankListRuns.length > 0 ? (
                   <ASRRankList
                     athletes={rankListRuns}
-                    valueLabel="PTS"
+                    valueLabel="LQ"
                     onEntityClick={onEntityClick}
-                    limit={100}
                     dataContext={dataContext}
                     hideSubtitle={true}
                     entityType="course"
@@ -388,7 +387,6 @@ export const PlayerDetails = React.memo(
                     athletes={rankListSets}
                     valueLabel="RUNS"
                     onEntityClick={onEntityClick}
-                    limit={100}
                     dataContext={dataContext}
                     hideSubtitle={true}
                     entityType="course"

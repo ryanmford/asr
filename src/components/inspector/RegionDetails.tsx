@@ -225,7 +225,6 @@ export const RegionDetails = React.memo(
                     valueLabel="LQ"
                     dataContext={dataContext}
                     onEntityClick={onEntityClick}
-                    limit={20}
                     entityType="player"
                     hideSubtitle={true}
                   />
@@ -258,7 +257,6 @@ export const RegionDetails = React.memo(
                     athletes={regionalCourses}
                     valueLabel="RUNS"
                     onEntityClick={onEntityClick}
-                    limit={100}
                     dataContext={dataContext}
                     hideSubtitle={true}
                     entityType="course"

@@ -228,7 +228,6 @@ export const TeamDetails = React.memo(
                     valueLabel="PTS"
                     dataContext={dataContext}
                     onEntityClick={onEntityClick}
-                    limit={20}
                     entityType="player"
                     hideSubtitle={true}
                   />
@@ -253,7 +252,6 @@ export const TeamDetails = React.memo(
                   valueLabel="IMPACT"
                   dataContext={dataContext}
                   onEntityClick={onEntityClick}
-                  limit={20}
                   entityType="setter"
                   hideSubtitle={true}
                 />

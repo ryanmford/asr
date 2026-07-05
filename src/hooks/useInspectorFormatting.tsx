@@ -70,8 +70,16 @@ export const usePlayerDetailsData = (
         courseMeta: cMet[(r.label || "").toUpperCase()],
       }))
       .sort(
-        (a: Record<string, unknown>, b: Record<string, unknown>) =>
-          (b.pts ?? b.points) - (a.pts ?? a.points),
+        (a: Record<string, unknown>, b: Record<string, unknown>) => {
+          const aPts = (a.pts ?? a.points ?? 0) as number;
+          const bPts = (b.pts ?? b.points ?? 0) as number;
+          if (bPts !== aPts) {
+            return bPts - aPts;
+          }
+          const aTime = (a.num ?? a.time ?? Infinity) as number;
+          const bTime = (b.num ?? b.time ?? Infinity) as number;
+          return aTime - bTime;
+        }
       );
   }, [pRaw, pKey, activeMode, cMet]);
 
