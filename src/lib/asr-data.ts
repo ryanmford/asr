@@ -329,6 +329,7 @@ export const processLiveFeedData = (
   const OPEN_END = new Date(CONFIG.DATES.OPEN_END);
   const allTimeAthleteBestTimes: Record<string, { [loc: string]: any }> = {};
   const allTimeCourseLeaderboards: { M: Record<string, unknown>; F: Record<string, unknown> } = { M: {}, F: {} };
+  const allTimeAthleteTotalSubmissions: Record<string, number> = {};
   const openAthleteBestTimes: Record<string, { [loc: string]: any }> = {};
   const openCourseLeaderboards: { M: Record<string, unknown>; F: Record<string, unknown> } = { M: {}, F: {} };
   const openAthleteTotalSubmissions: Record<string, number> = {};
@@ -357,7 +358,9 @@ export const processLiveFeedData = (
     const normC = rawCourse.toUpperCase();
     const isCourseOpen = courseSetMap[normC]?.is2026;
 
-    if (!isPlaceholderPlayer(pName)) {
+    const isPlaceholder = isPlaceholderPlayer(pName);
+
+    if (!isPlaceholder) {
       if (!courseRunsHistory[normC]) courseRunsHistory[normC] = [];
       courseRunsHistory[normC].push({
         pKey,
@@ -369,49 +372,51 @@ export const processLiveFeedData = (
         videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
         date: vals.date ? new Date(vals.date).toISOString() : null,
       });
-    }
 
-    if (!athleteDisplayNameMap[pKey]) athleteDisplayNameMap[pKey] = pName;
+      if (!athleteDisplayNameMap[pKey]) athleteDisplayNameMap[pKey] = pName;
 
-    const rawFilmer = (
-      vals.filmer ||
-      (vals.__raw && vals.__raw[8]) ||
-      ""
-    ).trim();
-    if (rawFilmer) {
-      const filmerKey = normalizeName(rawFilmer);
-      filmerCreditsCount[filmerKey] = (filmerCreditsCount[filmerKey] || 0) + 1;
-    }
+      allTimeAthleteTotalSubmissions[pKey] = (allTimeAthleteTotalSubmissions[pKey] || 0) + 1;
 
-    if (!athleteMetadata[pKey]) {
-      athleteMetadata[pKey] = {
-        pKey,
-        name: pName,
-        gender: pGender,
-        region: "🏳️",
-        location: "",
-        homeGym: "",
-        teamLocation: "",
-        countryName: "",
-        searchKey: normalizeForSearch(pName),
-      };
-    } else if (pName.length > (athleteMetadata[pKey].name || "").length) {
-      athleteMetadata[pKey].name = pName;
-      athleteDisplayNameMap[pKey] = pName;
-    }
+      const rawFilmer = (
+        vals.filmer ||
+        (vals.__raw && vals.__raw[8]) ||
+        ""
+      ).trim();
+      if (rawFilmer) {
+        const filmerKey = normalizeName(rawFilmer);
+        filmerCreditsCount[filmerKey] = (filmerCreditsCount[filmerKey] || 0) + 1;
+      }
 
-    if (!allTimeAthleteBestTimes[pKey]) allTimeAthleteBestTimes[pKey] = {};
-    if (
-      !allTimeAthleteBestTimes[pKey][normC] ||
-      numericValue < allTimeAthleteBestTimes[pKey][normC].num
-    ) {
-      allTimeAthleteBestTimes[pKey][normC] = {
-        label: rawCourse,
-        value: vals.result,
-        num: numericValue,
-        videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-        date: vals.date ? new Date(vals.date).toISOString() : null,
-      };
+      if (!athleteMetadata[pKey]) {
+        athleteMetadata[pKey] = {
+          pKey,
+          name: pName,
+          gender: pGender,
+          region: "🏳️",
+          location: "",
+          homeGym: "",
+          teamLocation: "",
+          countryName: "",
+          searchKey: normalizeForSearch(pName),
+        };
+      } else if (pName.length > (athleteMetadata[pKey].name || "").length) {
+        athleteMetadata[pKey].name = pName;
+        athleteDisplayNameMap[pKey] = pName;
+      }
+
+      if (!allTimeAthleteBestTimes[pKey]) allTimeAthleteBestTimes[pKey] = {};
+      if (
+        !allTimeAthleteBestTimes[pKey][normC] ||
+        numericValue < allTimeAthleteBestTimes[pKey][normC].num
+      ) {
+        allTimeAthleteBestTimes[pKey][normC] = {
+          label: rawCourse,
+          value: vals.result,
+          num: numericValue,
+          videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
+          date: vals.date ? new Date(vals.date).toISOString() : null,
+        };
+      }
     }
     if (!allTimeCourseLeaderboards[pGender][normC])
       allTimeCourseLeaderboards[pGender][normC] = {};
@@ -430,18 +435,22 @@ export const processLiveFeedData = (
       runDate <= OPEN_END;
 
     if ((isASROpenTag || isInOpenWindow) && isCourseOpen) {
-      if (!openAthleteBestTimes[pKey]) openAthleteBestTimes[pKey] = {};
-      if (
-        !openAthleteBestTimes[pKey][normC] ||
-        numericValue < openAthleteBestTimes[pKey][normC].num
-      ) {
-        openAthleteBestTimes[pKey][normC] = {
-          label: rawCourse,
-          value: vals.result,
-          num: numericValue,
-          videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-          date: vals.date ? new Date(vals.date).toISOString() : null,
-        };
+      if (!isPlaceholder) {
+        if (!openAthleteBestTimes[pKey]) openAthleteBestTimes[pKey] = {};
+        if (
+          !openAthleteBestTimes[pKey][normC] ||
+          numericValue < openAthleteBestTimes[pKey][normC].num
+        ) {
+          openAthleteBestTimes[pKey][normC] = {
+            label: rawCourse,
+            value: vals.result,
+            num: numericValue,
+            videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
+            date: vals.date ? new Date(vals.date).toISOString() : null,
+          };
+        }
+        openAthleteTotalSubmissions[pKey] =
+          (openAthleteTotalSubmissions[pKey] || 0) + 1;
       }
       if (!openCourseLeaderboards[pGender][normC])
         openCourseLeaderboards[pGender][normC] = {};
@@ -451,8 +460,6 @@ export const processLiveFeedData = (
       ) {
         openCourseLeaderboards[pGender][normC][pKey] = numericValue;
       }
-      openAthleteTotalSubmissions[pKey] =
-        (openAthleteTotalSubmissions[pKey] || 0) + 1;
     }
   });
 
@@ -608,7 +615,8 @@ export const processLiveFeedData = (
         ...meta,
         id: `open-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
-        runs: perfs.length,
+        courses: perfs.length,
+        runs: Math.max(openAthleteTotalSubmissions[pKey] || 0, perfs.length),
         latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
@@ -650,7 +658,8 @@ export const processLiveFeedData = (
         ...meta,
         id: `at-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
-        runs: perfs.length,
+        courses: perfs.length,
+        runs: Math.max(meta.runs || 0, allTimeAthleteTotalSubmissions[pKey] || 0, perfs.length),
         latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,

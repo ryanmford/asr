@@ -2,9 +2,10 @@
  
 import React, { useMemo } from "react";
 import { cn, fixCountryEntity, formatFlagsWithSpace, THEME, trackEvent } from "../../lib/asr-utils";
-import { Trophy, Clock, Play } from "lucide-react";
+import { Trophy, Calendar, Play } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useDerivedData";
 import { useAppStore } from "../../store/useAppStore";
+import { formatYYYYMMDD } from "../../lib/asr-utils";
 
 interface ChampionsProps {
  runs: any[];
@@ -30,7 +31,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  ...r,
  timeVal,
  dateMs: isDateValid ? validDate.getTime() : 0,
- dateStr: isDateValid ? validDate.toLocaleDateString() : "Unknown Date"
+ dateStr: isDateValid ? formatYYYYMMDD(validDate) : "Unknown Date"
  };
  })
  .sort((a, b) => a.dateMs - b.dateMs);
@@ -188,7 +189,7 @@ export const CourseChampions = ({ runs, theme }: ChampionsProps) => {
  "theme-text-muted",
  )}
  >
- <Clock size={10} /> {champ.date}
+ <Calendar size={10} /> {champ.date}
  {champ.daysHeld > 0 ? (
  <span className="opacity-60 font-medium ml-1">
  • {i === 0 ? "Active for" : "Held for"} {champ.daysHeld} {champ.daysHeld === 1 ? 'day' : 'days'}

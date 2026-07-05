@@ -3,6 +3,7 @@ export interface PlayerProfile {
   name: string;
   gender: "M" | "F";
   rating: number;
+  courses?: number;
   runs: number;
   latestRunDate?: Date;
   wins?: number;

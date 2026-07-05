@@ -37,6 +37,7 @@ export const usePlayerDetailsData = (
       rank: pData.rank || "UR",
       rating: pData.rating || 0,
       pts: pData.pts || 0,
+      courses: pData.courses || 0,
       runs: pData.runs || 0,
       wins: pData.wins || 0,
       fires:

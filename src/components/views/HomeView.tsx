@@ -47,6 +47,7 @@ export const HomeView = React.memo(() => {
   const setHomeVisibleRuns = useAppStore((s) => s.setHomeVisibleRuns);
   const homeVisibleSets = useAppStore((s) => s.homeVisibleSets);
   const setHomeVisibleSets = useAppStore((s) => s.setHomeVisibleSets);
+  const setTeamCategory = useAppStore((s) => s.setTeamCategory);
   const { navigateToEntity } = useAppNavigation();
 
   const courseList_AT = useDataStore((s) => s.courseList_AT);
@@ -841,7 +842,7 @@ export const HomeView = React.memo(() => {
           {/* Card 1: PLAYERS & RUNS */}
           <div
             className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
-            onClick={() => navigate("/players")}
+            onClick={() => navigate("/players?eventType=all-time&mode=players")}
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">
@@ -969,7 +970,10 @@ export const HomeView = React.memo(() => {
           {/* Card 3: GYMS & TEAMS */}
           <div
             className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
-            onClick={() => navigate("/teams")}
+            onClick={() => {
+              setTeamCategory("gyms");
+              navigate("/teams?eventType=all-time&mode=teams");
+            }}
           >
             {/* Sparkline bg */}
             <div className="absolute inset-x-0 bottom-0 top-1/4 opacity-20 group-hover:opacity-40 pointer-events-none transition-opacity duration-500 flex items-end mask-image-bottom">

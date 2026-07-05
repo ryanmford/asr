@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { AnimatedListView } from "../common/AnimatedListView";
 import { PlayerProfile, TeamProfile } from "../../types";
@@ -13,9 +14,22 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
   const teamCategory = useAppStore(s => s.teamCategory);
   const setTeamCategory = useAppStore(s => s.setTeamCategory);
   const { navigateToEntity } = useAppNavigation();
-  const { eventType } = useURLState();
+  const { eventType, searchParams, setSearchParams } = useURLState();
+  const location = useLocation();
 
-  const [mode, setMode] = useState<"players" | "teams">("players");
+  const queryMode = searchParams.get("mode");
+  const pathMode = location.pathname.includes("/teams") ? "teams" : (location.pathname.includes("/players") ? "players" : null);
+  const initialMode = pathMode || (queryMode === "teams" ? "teams" : "players");
+
+  const [mode, setMode] = useState<"players" | "teams">(initialMode);
+
+  useEffect(() => {
+    if (queryMode === "teams" || queryMode === "players") {
+      setMode(queryMode);
+    } else if (pathMode) {
+      setMode(pathMode);
+    }
+  }, [queryMode, pathMode]);
 
   const playerList = usePlayerList();
   const teamList = useTeamList();
@@ -60,10 +74,17 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
 
   const handleModeChange = React.useCallback((newMode: string) => {
     setMode(newMode as "players" | "teams");
+    setSearchParams(
+      (prev) => {
+        prev.set("mode", newMode);
+        return prev;
+      },
+      { replace: true }
+    );
     if (window.scrollY > 150) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, []);
+  }, [setSearchParams]);
 
   const listData = React.useMemo(() => {
     if (mode === "teams") return teamList;

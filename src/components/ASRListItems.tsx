@@ -21,41 +21,26 @@ export const ASRRankBadge = React.memo(
       : size === "sm"
       ? "text-[8px] sm:text-[9px]"
       : "text-[10px] sm:text-xs ";
- const isPodium = rank === 1 || rank === 2 || rank === 3;
+ const isPodium = false;
  const styles: Record<string, { border: string; text: string; glow: string }> = {
- 1: {
- border: "border-amber-500",
- text: "text-amber-500",
- glow: "shadow-[0_0_15px_rgba(245,158,11,0.5)]",
- },
- 2: {
- border: "border-zinc-400",
- text: theme === "dark" ? "text-zinc-300" : "text-zinc-500",
- glow: "shadow-[0_0_15px_rgba(161,161,170,0.3)]",
- },
- 3: {
- border: "border-[#CE8946]",
- text: "text-[#CE8946]",
- glow: "shadow-[0_0_15px_rgba(206,137,70,0.4)]",
- },
  unranked: {
  border: theme === "dark" ? "border-zinc-700" : "border-zinc-200",
  text: "text-zinc-500",
- glow: "shadow-none",
+ glow: "drop-shadow-none",
  },
  default: {
  border: "border-none",
- text: theme === "dark" ? "text-white" : "text-zinc-500",
- glow: "shadow-none",
+ text: theme === "dark" ? "text-white" : "text-black",
+ glow: "drop-shadow-none",
  },
  };
  const current = isUnranked
  ? styles.unranked
- : styles[rank] || styles.default;
+ : styles.default;
  return (
  <span
  style={{ transform: `scale(${scale})` }}
- className={`inline-flex items-center justify-center rounded-full font-black tabular-nums tracking-tighter transition-all duration-300 shrink-0 ${dim} ${textClass} ${current.border} ${current.text} ${current.glow} ${isPodium ? "border-[3px] animate-subtle-pulse" : isUnranked ? "border-2" : "border-0"} ios-clip-fix`}
+ className={`inline-flex items-center justify-center rounded-full font-black tabular-nums tracking-tighter transition-all duration-300 shrink-0 ${dim} ${textClass} ${current.border} ${current.text} ${current.glow} ${isUnranked ? "border-2" : "border-0"} ios-clip-fix`}
  >
  {rankNum}
  </span>
@@ -252,7 +237,7 @@ export const ASRListItem = React.memo(
  {showVideoIcon && (
  <div
  className={cn(
- "flex items-center justify-center shrink-0 w-10 pr-4 ml-2",
+ "flex items-center justify-center shrink-0 w-10 sm:w-16 lg:w-20 pr-4 sm:pr-6 lg:pr-8 ml-2",
  )}
  >
  {videoUrl ? (
@@ -329,7 +314,7 @@ export const ASRListItem = React.memo(
  {icon}
  </div>
  ) : (
- <div className="w-10 sm:w-16 lg:w-20 shrink-0 flex items-center justify-center">
+ <div className="w-6 sm:w-10 lg:w-12 shrink-0 flex items-center justify-center">
                   {mapUrl ? (
  <a
  href={mapUrl}
@@ -358,7 +343,7 @@ export const ASRListItem = React.memo(
  <div
  className={cn(
  "flex items-center font-black uppercase whitespace-normal leading-tight transition-colors line-clamp-2",
- isCompact ? "text-[10px]" : "text-[10px] sm:text-[18px] lg:text-[22px]",
+ isCompact ? "text-[13px] sm:text-[14px]" : "text-[14px] sm:text-[18px] lg:text-[22px]",
  onClick && !isUnclaimed ? "" : "",
  isUnclaimed
  ? theme === "dark"
@@ -393,7 +378,7 @@ export const ASRListItem = React.memo(
  <div
  className={cn(
  "font-black uppercase whitespace-normal break-words line-clamp-2",
- isCompact ? "text-[8px]" : "text-[8px] sm:text-[12px] lg:text-[16px]",
+ isCompact ? "text-[11px] sm:text-[12px]" : "text-[12px] sm:text-[14px] lg:text-[16px]",
  isUnclaimed
  ? theme === "dark"
  ? "text-zinc-600"
@@ -423,7 +408,7 @@ export const ASRListItem = React.memo(
  "text-right transition-colors",
  idx === 0
  ? cn(
- isCompact ? "text-[13px]" : "text-[13px] sm:text-[24px] lg:text-[28px] tracking-tight",
+ isCompact ? "text-[15px] sm:text-[16px]" : "text-[16px] sm:text-[24px] lg:text-[28px] tracking-tight",
  s.value
  ? cn(accentColor, "")
  : "opacity-20",
@@ -431,11 +416,11 @@ export const ASRListItem = React.memo(
  : theme === "dark"
  ? cn(
  "text-white/50",
- isCompact ? "text-[11px] font-bold" : "text-[11px] sm:text-[14px] lg:text-[18px] font-bold",
+ isCompact ? "text-[12px] sm:text-[13px] font-bold" : "text-[12px] sm:text-[14px] lg:text-[18px] font-bold",
  )
  : cn(
  "text-zinc-500",
- isCompact ? "text-[11px] font-bold" : "text-[11px] sm:text-[14px] lg:text-[18px] font-bold",
+ isCompact ? "text-[12px] sm:text-[13px] font-bold" : "text-[12px] sm:text-[14px] lg:text-[18px] font-bold",
  ),
  )}
  >
@@ -447,7 +432,7 @@ export const ASRListItem = React.memo(
  <div
  className={cn(
  "flex items-center justify-center shrink-0 ml-2 sm:ml-3",
- isCompact ? "w-10" : "w-12",
+ isCompact ? "w-10" : "w-10 sm:w-12",
  )}
  >
  {videoUrl ? (

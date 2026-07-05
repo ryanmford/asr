@@ -3,6 +3,7 @@ import { cn } from "../../lib/utils";
 import { ThemeContext } from "../../theme-context";
 import { motion, AnimatePresence } from "motion/react";
 import { ASREmptyState } from "../common/ASREmptyState";
+import { formatYYYYMMDD } from "../../lib/asr-utils";
 
 interface ActivityChartProps {
   runs: { date?: string | null }[];
@@ -63,7 +64,7 @@ export const ASRWeeklyActivityChart = ({
       wEnd.setDate(wStart.getDate() + 6);
       return {
         count: 0,
-        dateStr: `${wStart.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - ${wEnd.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`,
+        dateStr: `week of ${wStart.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`,
       };
     });
 
@@ -160,7 +161,7 @@ export const ASRWeeklyActivityChart = ({
           </div>
           <div className="w-16 h-3 bg-black/10 dark:bg-white/10 rounded animate-pulse" />
         </div>
-        <div className="w-full relative overflow-hidden pb-1">
+        <div className="w-full relative pb-1">
           <div
             className="grid gap-[2px] sm:gap-1 relative w-full"
             style={{ gridTemplateColumns: `repeat(13, minmax(0, 1fr))` }}
@@ -211,7 +212,7 @@ export const ASRWeeklyActivityChart = ({
 
       <div 
         ref={scrollContainerRef}
-        className="w-full relative overflow-hidden pb-1 no-scrollbar"
+        className="w-full relative pb-1 no-scrollbar"
       >
         <div
           ref={containerRef}

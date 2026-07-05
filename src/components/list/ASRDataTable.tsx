@@ -318,7 +318,7 @@ export const ASRDataTable = React.memo(
  >
  {viewType === "card" ? (
           <div className={cn("flex items-center min-w-0 pr-1 flex-1", isCompact ? "gap-2" : "gap-2 sm:gap-4 lg:gap-6")}>
-            <div className="w-10 sm:w-16 lg:w-20 shrink-0 flex items-center justify-center text-center">RANK</div>
+            <div className="w-6 sm:w-10 lg:w-12 shrink-0 flex items-center justify-center text-center">RANK</div>
             <div className="flex flex-col min-w-0 flex-1 text-left">{middleLabel}</div>
           </div>
         ) : (

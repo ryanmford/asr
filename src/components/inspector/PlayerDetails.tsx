@@ -16,6 +16,7 @@ import {
   formatLocation,
   getCombinedFlags,
   getSetterLevel,
+  formatYYYYMMDD,
 } from "../../lib/asr-utils";
 import { ASRStatCard } from "../common/ASRStatCard";
 import { BioRow } from "./BioComponents";
@@ -67,7 +68,16 @@ export const PlayerDetails = React.memo(
     const [uiTab, setUiTab] = useState<string>(initialTabSafe);
     const [contentTab, setContentTab] = useState<string>(initialTabSafe);
 
-    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") || "all-time";
+    const urlMode = searchParams.get("mode");
+    const eventTypeMode = searchParams.get("eventType");
+    const validModes = ["open", "all-time"];
+    
+    let initialModeSafe: "open" | "all-time" = "all-time";
+    if (validModes.includes(urlMode as string)) {
+      initialModeSafe = urlMode as "open" | "all-time";
+    } else if (validModes.includes(eventTypeMode as string)) {
+      initialModeSafe = eventTypeMode as "open" | "all-time";
+    }
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 
@@ -139,16 +149,12 @@ export const PlayerDetails = React.memo(
       });
 
       if (dates.length === 0) {
-        return "MARCH 2024"; // fallback for default members
+        return "2024-03-01"; // fallback for default members
       }
 
       dates.sort((a, b) => a.getTime() - b.getTime());
       const earliestDate = dates[0];
-      const months = [
-        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
-        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
-      ];
-      return `${months[earliestDate.getMonth()]} ${earliestDate.getFullYear()}`;
+      return formatYYYYMMDD(earliestDate);
     }, [allRuns, rankListSets]);
 
     return (
@@ -252,11 +258,13 @@ export const PlayerDetails = React.memo(
                     {
                       label: "RANK",
                       value: stats.rank,
-                      glow: stats.rank <= 3 ? "text-amber-500" : "",
+                      glow: "",
                     },
                     { label: "LQ", value: stats.rating.toFixed(2) },
-                    { label: "POINTS", value: stats.pts.toFixed(2) },
+                    { label: "COURSES", value: stats.courses },
                     { label: "RUNS", value: stats.runs },
+                    { label: "POINTS", value: stats.pts.toFixed(2) },
+                    { label: "🔥", value: stats.fires },
                     { label: "WINS", value: stats.wins },
                     {
                       label: "WIN %",
@@ -265,8 +273,6 @@ export const PlayerDetails = React.memo(
                           ? `${((stats.wins / stats.runs) * 100).toFixed(2)}`
                           : "0.00",
                     },
-                    { label: "AVG TIME", value: avgTime },
-                    { label: "🔥", value: stats.fires },
                   ].map((s, i) => (
                     <motion.div
                       key={s.label}
@@ -302,7 +308,8 @@ export const PlayerDetails = React.memo(
                     valueLabel="LQ"
                     onEntityClick={onEntityClick}
                     dataContext={dataContext}
-                    hideSubtitle={true}
+                    hideSubtitle={false}
+                    showDateSubtitle={true}
                     entityType="course"
                   />
                 ) : (

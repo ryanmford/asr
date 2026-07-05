@@ -49,9 +49,18 @@ export const TeamDetails = React.memo(
     const [uiTab, setUiTab] = useState<string>(initialTabSafe);
     const [contentTab, setContentTab] = useState<string>(initialTabSafe);
     
-    const initialModeSafe = (searchParams.get("mode") as "open" | "all-time") ||
-      initialMode ||
-      "all-time";
+    const urlMode = searchParams.get("mode");
+    const eventTypeMode = searchParams.get("eventType");
+    const validModes = ["open", "all-time"];
+    
+    let initialModeSafe: "open" | "all-time" = "all-time";
+    if (validModes.includes(urlMode as string)) {
+      initialModeSafe = urlMode as "open" | "all-time";
+    } else if (validModes.includes(eventTypeMode as string)) {
+      initialModeSafe = eventTypeMode as "open" | "all-time";
+    } else if (initialMode && validModes.includes(initialMode)) {
+      initialModeSafe = initialMode as "open" | "all-time";
+    }
     const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
 

@@ -81,14 +81,19 @@ export const THEME = {
 
 export const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(" ");
 
+const ALIAS_MAP: Record<string, string> = {
+  "muhammadsteedbaloch": "muhammadbaloch",
+};
+
 export const normalizeName = (n: string) => {
   if (!n) return "";
-  return String(n)
+  const raw = String(n)
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "")
     .trim();
+  return ALIAS_MAP[raw] || raw;
 };
 
 const normalizeCountryName = (name: string) => {
@@ -746,4 +751,8 @@ export const getNormalizedNameList = (listStr: string) => {
     .split(/[,&/]| and /i)
     .map((n) => normalizeName(n))
     .filter(Boolean);
+};
+
+export const formatYYYYMMDD = (date: Date): string => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };

@@ -274,6 +274,16 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
+                <Route path="/players/:id?" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                    <RankingsView theme={theme} />
+                  </motion.div>
+                } />
+                <Route path="/teams/:id?" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                    <RankingsView theme={theme} />
+                  </motion.div>
+                } />
                 <Route path="/regions/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />

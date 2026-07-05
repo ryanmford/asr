@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Activity } from "lucide-react";
+import { Activity, Calendar, Timer } from "lucide-react";
 import { motion } from "motion/react";
-import { cn, isPlaceholderPlayer, cleanNumeric, getCombinedFlags } from "../../lib/asr-utils";
+import { cn, isPlaceholderPlayer, cleanNumeric, getCombinedFlags, formatYYYYMMDD } from "../../lib/asr-utils";
 import { ThemeContext } from "../../theme-context";
 import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASRSectionHeading } from "../common/ASRSectionHeading";
@@ -19,6 +19,7 @@ interface ASRRankListProps {
  limit?: number | null;
  className?: string;
  hideSubtitle?: boolean;
+ showDateSubtitle?: boolean;
  entityType?: "player" | "setter" | "course" | "team" | "region";
  padTo?: number;
  isCompact?: boolean;
@@ -35,6 +36,7 @@ export const ASRRankList = ({
  limit = 0,
  className,
  hideSubtitle,
+ showDateSubtitle,
  entityType,
  padTo = 0,
  isCompact = true,
@@ -119,19 +121,29 @@ export const ASRRankList = ({
 
  if (isUnclaimedItem) {
  stats.push({ value: "---", label: "PTS" });
- stats.push({ value: "---", label: "TIME" });
+ stats.push({
+					value: (
+						<span className="inline-flex items-center justify-end gap-[0.2em] baseline-normal">
+							<Timer className="w-[0.9em] h-[0.9em] opacity-70" strokeWidth={2.5} />
+							---
+						</span>
+					),
+					label: "TIME"
+				});
  } else if (!isArray && points !== undefined && time !== undefined) {
  stats.push({
  value: (cleanNumeric(points) || 0).toFixed(2),
  label: "PTS",
  });
  stats.push({
- value:
- item.timeDisplay ||
- (typeof time === "number" ? `${time.toFixed(2)}s` : time) ||
- "--:--",
- label: "TIME",
- });
+					value: (
+						<span className="inline-flex items-center justify-end gap-[0.2em] baseline-normal">
+							<Timer className="w-[0.9em] h-[0.9em] opacity-70" strokeWidth={2.5} />
+							{item.timeDisplay || (typeof time === "number" ? time.toFixed(2) : time) || "--:--"}
+						</span>
+					),
+					label: "TIME",
+				});
  } else {
  const value = isArray
  ? item[1]
@@ -196,8 +208,14 @@ export const ASRRankList = ({
  ? "--"
  : hideSubtitle
  ? null
+ : showDateSubtitle
+ ? ((item as any).date ? (
+     <span className="flex items-center gap-1">
+       <Calendar size={10} className="opacity-70" /> {formatYYYYMMDD(new Date((item as any).date))}
+     </span>
+   ) : null)
  : (() => {
-     const locText = isArray ? meta.location || meta.countryName || null : item.city || item.location || meta.location || meta.city;
+     const locText = isArray ? meta.location || meta.countryName || null : (item as any).city || (item as any).location || meta.location || meta.city;
      if (!locText || locText === "UNKNOWN") return null;
      return (
        <button
