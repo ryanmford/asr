@@ -705,7 +705,7 @@ export const calculateWofStats = (
         return {
           ...p,
           allTimeFireCount: calculatedFires,
-          winPercentage: p.runs > 0 ? (p.wins / p.runs) * 100 : 0,
+          winPercentage: (p.courses || p.runs) > 0 ? (p.wins / (p.courses || p.runs)) * 100 : 0,
         };
       });
     const medalsBase: Record<string, { gold: number; silver: number; bronze: number; points: number }> = {};

@@ -269,8 +269,8 @@ export const PlayerDetails = React.memo(
                     {
                       label: "WIN %",
                       value:
-                        stats.runs > 0
-                          ? `${((stats.wins / stats.runs) * 100).toFixed(2)}`
+                        (stats.courses || stats.runs) > 0
+                          ? `${((stats.wins / (stats.courses || stats.runs)) * 100).toFixed(2)}`
                           : "0.00",
                     },
                   ].map((s, i) => (
