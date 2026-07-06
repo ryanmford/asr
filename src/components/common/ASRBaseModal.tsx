@@ -112,13 +112,12 @@ export const ASRBaseModal = React.memo(
     }, [isOpen]);
 
     return (
-      <AnimatePresence>
+      <>
         {isOpen && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-auto p-0 sm:p-6 lg:p-12 overflow-hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
               onClick={onClose}
@@ -128,7 +127,6 @@ export const ASRBaseModal = React.memo(
               layoutId={layoutId || "global-modal"}
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 10 }}
               transition={{
                 type: "spring",
                 damping: 20,
@@ -331,7 +329,7 @@ export const ASRBaseModal = React.memo(
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </>
     );
   },
 );

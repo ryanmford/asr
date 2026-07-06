@@ -32,7 +32,7 @@ const ASRWallOfFame = React.lazy(() => import("./components/views/ASRWallOfFame"
 const ASRVideoAnnotator = React.lazy(() => import("./components/views/ASRVideoAnnotator").then(m => ({ default: m.ASRVideoAnnotator })));
 const InspectorBody = React.lazy(() => import("./components/inspector/InspectorBody").then(m => ({ default: m.InspectorBody })));
 
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { RouteScrollRestoration } from "./components/common/RouteScrollRestoration";
 import { useAppStore } from "./store/useAppStore";
 import { useDataStore } from "./store/useDataStore";
@@ -266,47 +266,46 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                 <div className="w-10 h-10 border-4 border-zinc-900 dark:border-zinc-100 border-t-transparent dark:border-t-transparent rounded-full animate-spin opacity-50" />
               </div>
             }>
-            <AnimatePresence mode="wait">
-              <Routes location={backgroundLocation} key={backgroundLocation.pathname}>
+            <Routes location={backgroundLocation}>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/rankings" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/players/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/teams/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/regions/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/setters/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/home" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <HomeView />
                   </motion.div>
                 } />
                 <Route path="/map/:id?" element={<Navigate to="/courses" replace />} />
                 <Route path="/courses/:id?" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <MapCoursesView theme={theme} />
                   </motion.div>
                 } />
                 <Route path="/hof" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex flex-col">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex flex-col">
                     <ASRWallOfFame
                       theme={theme}
                       onEntityClick={navigateToEntity}
@@ -316,7 +315,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                   </motion.div>
                 } />
                 <Route path="/admin/annotator" element={
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col bg-black min-h-0 z-50 relative">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col bg-black min-h-0 z-50 relative">
                     <ASRVideoAnnotator theme={theme} />
                   </motion.div>
                 } />
@@ -344,7 +343,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                   ) : <div />
                 } />
               </Routes>
-            </AnimatePresence>
           </React.Suspense>
           </RouteErrorBoundary>
         </div>
