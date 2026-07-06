@@ -139,7 +139,7 @@ export const ASRListItem = React.memo(
  <div className="w-16 sm:w-24 lg:w-32 pl-3 sm:pl-10 lg:pl-12 shrink-0 flex items-center justify-center">
  {mapUrl ? (
  <a
- href={mapUrl}
+ href={mapUrl.startsWith('http') ? mapUrl : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapUrl)}`}
  target="_blank"
  rel="noopener noreferrer"
  onClick={(e) => e.stopPropagation()}
@@ -317,7 +317,7 @@ export const ASRListItem = React.memo(
  <div className="w-6 sm:w-10 lg:w-12 shrink-0 flex items-center justify-center">
                   {mapUrl ? (
  <a
- href={mapUrl}
+ href={mapUrl.startsWith('http') ? mapUrl : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapUrl)}`}
  target="_blank"
  rel="noopener noreferrer"
  onClick={(e) => e.stopPropagation()}
