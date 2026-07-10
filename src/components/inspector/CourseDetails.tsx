@@ -34,6 +34,7 @@ import { ASRTimeSimulator } from "./ASRTimeSimulator";
 import { motion } from "motion/react";
 
 import { ASRNeonToggle } from "../common/ASRNeonToggle";
+import { ModalScrollContext } from "../common/ASRBaseModal";
 
 import { CourseData, ASRDataContext } from "../../types";
 
@@ -156,6 +157,16 @@ export const CourseDetails = React.memo(
     const setPlayingVideoUrl = useAppStore(s => s.setPlayingVideoUrl);
     const cName = (course?.name || "").toUpperCase();
     const meta = cMet[cName] || course || {};
+
+    const scrollRef = React.useContext(ModalScrollContext);
+
+    const scrollToTop = () => {
+      if (scrollRef?.current) {
+        if (scrollRef.current.scrollTop > 150) {
+          scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    };
 
     const allCourseRuns = useMemo(() => {
       let runList: Record<string, unknown>[] = [];
@@ -385,6 +396,7 @@ export const CourseDetails = React.memo(
                 React.startTransition(() => {
                   setContentTab(t);
                 });
+                scrollToTop();
               }}
               layoutId="course-tabs"
               theme={theme}
@@ -421,6 +433,7 @@ export const CourseDetails = React.memo(
                     React.startTransition(() => {
                       setContentMode(nextMode);
                     });
+                    scrollToTop();
                   }}
                   layoutId="course-mode-pill-m"
                   theme={theme}
@@ -447,7 +460,7 @@ export const CourseDetails = React.memo(
                       dataContext={dataContext}
                       onEntityClick={onEntityClick}
                       entityType="player"
-                      hideSubtitle={true}
+                      showDateSubtitle={true}
                       padTo={3}
                     />
                   </div>
@@ -485,6 +498,7 @@ export const CourseDetails = React.memo(
                     React.startTransition(() => {
                       setContentMode(nextMode);
                     });
+                    scrollToTop();
                   }}
                   layoutId="course-mode-pill-f"
                   theme={theme}
@@ -511,7 +525,7 @@ export const CourseDetails = React.memo(
                       dataContext={dataContext}
                       onEntityClick={onEntityClick}
                       entityType="player"
-                      hideSubtitle={true}
+                      showDateSubtitle={true}
                       padTo={3}
                     />
                   </div>

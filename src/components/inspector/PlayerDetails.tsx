@@ -38,6 +38,7 @@ import {
 import { ASRRankList } from "../list/ASRRankList";
 
 import { ASREmptyState } from "../common/ASREmptyState";
+import { ModalScrollContext } from "../common/ASRBaseModal";
 
 import { PlayerProfile, ASRDataContext } from "../../types";
 import { usePlayerDetailsData } from "../../hooks/useInspectorFormatting";
@@ -87,6 +88,16 @@ export const PlayerDetails = React.memo(
       const types: PromoType[] = ["coach"];
       return types[Math.floor(Math.random() * types.length)];
     }, []);
+
+    const scrollRef = React.useContext(ModalScrollContext);
+
+    const scrollToTop = () => {
+      if (scrollRef?.current) {
+        if (scrollRef.current.scrollTop > 150) {
+          scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    };
 
     const {
       meta,
@@ -202,6 +213,7 @@ export const PlayerDetails = React.memo(
                 React.startTransition(() => {
                   setContentTab(t);
                 });
+                scrollToTop();
               }}
               layoutId="profile-tabs"
               theme={theme}
@@ -238,6 +250,7 @@ export const PlayerDetails = React.memo(
                     React.startTransition(() => {
                       setContentMode(nextMode);
                     });
+                    scrollToTop();
                   }}
                   layoutId="player-mode-pill"
                   theme={theme}

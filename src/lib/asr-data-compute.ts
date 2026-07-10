@@ -616,16 +616,22 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const atSource = (allTimeSourceSector?.[cName] || source) as Record<string, unknown>;
     const atTimes = Object.values(atSource) as number[];
     const record = atTimes.length > 0 ? Math.min(...atTimes) : 0;
+    
+    const runsForCourse = (courseRunsHistory?.[cName] || []) as Record<string, unknown>[];
 
     const sorted = Object.entries(source)
       .map(([pKey, time]: [string, unknown]) => {
         const num = typeof time === "number" ? time : parseFloat(time as string) || 0;
         const isInterim = isPlaceholderPlayer(pKey);
+        
+        const run = runsForCourse.find(r => r.pKey === pKey && Math.abs((r.time as number) - num) < 0.001);
+        
         return {
           pKey,
           time: num,
           pts: num > 0 ? (record / num) * 100 : 0,
           videoUrl: (rawBestSector?.[pKey] as Record<string, Record<string, { videoUrl?: string }>>)?.[cName]?.videoUrl,
+          date: run?.date,
           isInterim,
           name: isInterim ? "INTERIM TOP TIME" : undefined
         };

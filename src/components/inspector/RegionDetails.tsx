@@ -6,6 +6,7 @@ import { ProfileHeader, InspectorTabContainer } from "./InspectorComponents";
 import { ASRRankList } from "../list/ASRRankList";
 
 import { ASRNeonToggle } from "../common/ASRNeonToggle";
+import { ModalScrollContext } from "../common/ASRBaseModal";
 import { ASREmptyState } from "../common/ASREmptyState";
 import { useDataStore } from "../../store/useDataStore";
 
@@ -36,6 +37,16 @@ export const RegionDetails = React.memo(
     }, [playerList_M_AT, playerList_F_AT]);
 
     const [activeTab, setActiveTab] = useState("players");
+
+    const scrollRef = React.useContext(ModalScrollContext);
+
+    const scrollToTop = () => {
+      if (scrollRef?.current) {
+        if (scrollRef.current.scrollTop > 150) {
+          scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    };
 
     const regionNameUpper = region.name.toUpperCase().replace(/[\uD83C][\uDDE6-\uDDFF]|\p{Extended_Pictographic}/gu, '').trim();
     const targetTokens = regionNameUpper.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -191,7 +202,10 @@ export const RegionDetails = React.memo(
                 { label: "COURSES", value: "courses" },
               ]}
               activeOption={activeTab}
-              onChange={(t) => setActiveTab(t)}
+              onChange={(t) => {
+                setActiveTab(t);
+                scrollToTop();
+              }}
               layoutId="region-tabs"
               theme={theme}
               className="w-full"

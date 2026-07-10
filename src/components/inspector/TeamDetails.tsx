@@ -14,6 +14,7 @@ import { ASRRankList } from "../list/ASRRankList";
 import { ASRPromotionBanner, PromoType } from "../common/ASRPromotionBanner";
 
 import { ASRNeonToggle } from "../common/ASRNeonToggle";
+import { ModalScrollContext } from "../common/ASRBaseModal";
 import { TokenChip } from "./VaultComponents";
 
 import { TeamProfile, ASRDataContext } from "../../types";
@@ -80,6 +81,16 @@ export const TeamDetails = React.memo(
       return types[Math.floor(Math.random() * types.length)];
     }, []);
 
+    const scrollRef = React.useContext(ModalScrollContext);
+
+    const scrollToTop = () => {
+      if (scrollRef?.current) {
+        if (scrollRef.current.scrollTop > 150) {
+          scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    };
+
     return (
       <div
         className={cn(
@@ -124,6 +135,7 @@ export const TeamDetails = React.memo(
                 React.startTransition(() => {
                   setContentTab(t);
                 });
+                scrollToTop();
               }}
               layoutId="team-tabs"
               theme={theme}
@@ -217,6 +229,7 @@ export const TeamDetails = React.memo(
                     React.startTransition(() => {
                       setContentMode(nextMode);
                     });
+                    scrollToTop();
                   }}
                   layoutId="team-mode-pill"
                   theme={theme}
