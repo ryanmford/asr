@@ -620,7 +620,7 @@ export const processLiveFeedData = (
         latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
-        sets: openAthleteTotalSubmissions[pKey] || 0,
+        sets: meta.sets || 0,
         openFireCount: perfs.reduce(
           (sum: number, p: { fireCount?: number }) => sum + (p.fireCount || 0),
           0,
@@ -659,7 +659,7 @@ export const processLiveFeedData = (
         id: `at-${pKey}`,
         rating: perfs.length > 0 ? totalPts / perfs.length : 0,
         courses: perfs.length,
-        runs: Math.max(meta.runs || 0, allTimeAthleteTotalSubmissions[pKey] || 0, perfs.length),
+        runs: Math.max(allTimeAthleteTotalSubmissions[pKey] || 0, perfs.length),
         latestRunDate,
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,

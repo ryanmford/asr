@@ -386,6 +386,50 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     setterMet[normalizeName(s.name)] = s;
   });
 
+  // RECALCULATE COIN STAT IN REAL TIME
+  // Formula: (runs * 0.1) + (wins * 0.1) + (leads * 0.2) + (assists * 0.1)
+  const atDataMap = new Map<string, any>();
+  data.forEach((p: any) => atDataMap.set(p.pKey, p));
+
+  const allKeys = new Set([
+    ...Object.keys(atMet || {}),
+    ...Object.keys(setterMet || {}),
+  ]);
+
+  allKeys.forEach((pKey) => {
+    const atPlayer = atDataMap.get(pKey);
+    const runs = atPlayer?.runs || atMet[pKey]?.runs || 0;
+    const wins = atPlayer?.wins || atMet[pKey]?.wins || 0;
+    
+    const setter = setterMet[pKey];
+    const leads = setter?.leads || 0;
+    const assists = setter?.assists || 0;
+
+    const newCoins = (runs * 0.1) + (wins * 0.1) + (leads * 0.2) + (assists * 0.1);
+
+    if (atMet[pKey]) atMet[pKey].contributionScore = newCoins;
+    if (setterMet[pKey]) setterMet[pKey].contributionScore = newCoins;
+
+    if (atMet[pKey] && setter) {
+      atMet[pKey].sets = setter.sets || 0;
+    }
+  });
+
+  data.forEach((p: any) => {
+    p.contributionScore = atMet[p.pKey]?.contributionScore || 0;
+    p.sets = atMet[p.pKey]?.sets || setterMet[p.pKey]?.sets || 0;
+  });
+
+  openData.forEach((p: any) => {
+    p.contributionScore = atMet[p.pKey]?.contributionScore || 0;
+    p.sets = atMet[p.pKey]?.sets || setterMet[p.pKey]?.sets || 0;
+  });
+
+  settersWithImpact.forEach((s: any) => {
+    const pKey = s.pKey || normalizeName(s.name);
+    s.contributionScore = atMet[pKey]?.contributionScore || setterMet[pKey]?.contributionScore || 0;
+  });
+
   // TEAM STATS (Gyms and Countries)
   const computeTeamStats = (teamCategory: string, isAllTime: boolean) => {
     const aggregated: Record<string, TeamProfile & { pts: number; players: (PlayerProfile & { contribution: number })[], playersCount: number }> = {};
