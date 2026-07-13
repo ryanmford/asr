@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React from "react";
-import { Zap, ChevronsRight, Award, MapPin, Rocket } from "lucide-react";
+import { Zap, ChevronsRight, Network, MapPin, Rocket } from "lucide-react";
 import { cn, CONFIG } from "../../lib/asr-utils";
 import { ASRPremiumButton } from "./ASRPremiumButton";
 
-export type PromoType = "coach" | "setter" | "crowdfund" | "sponsor";
+export type PromoType = "skool" | "setter" | "crowdfund" | "sponsor";
 
 interface ASRPromotionBannerProps {
  type: PromoType;
@@ -111,7 +111,7 @@ export const ASRPromotionBanner = React.memo(
  },
  link: CONFIG.SKOOL_LINK,
  };
- case "coach":
+ case "skool":
  default:
  return {
  colorClass: "text-blue-500",
@@ -119,18 +119,17 @@ export const ASRPromotionBanner = React.memo(
  borderFocus: "border-blue-500/20",
  borderGhost: "border-blue-500/10",
  icon: (
- <Award className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-blue-500" />
+ <Network className="w-10 h-10 @2xl:w-16 @2xl:h-16 text-blue-500" />
  ),
- subtitle: "ELITE TRAINING",
+ subtitle: "JOIN THE ASR COMMUNITY",
  title: (
  <>
- SPEED PARKOUR{" "}
- <span className="text-blue-500">COACHING CERTIFICATION</span>
+ PARKOUR SKOOL APP
  </>
  ),
- desc: "Learn the training methods used by the world's fastest athletes and become an officially certified ASR Speed Parkour Coach.",
- btnText: "APPLY",
- btnSubText: "ACCESS ELITE TRAINING NOW",
+ desc: "Join the official ASR community to share tips and clips, get your runs verified, learn new training methods, and connect with other speed parkour athletes.",
+ btnText: "JOIN NOW",
+ btnSubText: "CONNECT WITH THE WORLDWIDE COMMUNITY",
  btnProps: { variant: "solid" as any, effect: "none" as any },
  link: CONFIG.SKOOL_LINK,
  };

@@ -85,7 +85,7 @@ export const PlayerDetails = React.memo(
     const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);
 
     const randomRunsPromo = useMemo(() => {
-      const types: PromoType[] = ["coach"];
+      const types: PromoType[] = ["skool"];
       return types[Math.floor(Math.random() * types.length)];
     }, []);
 

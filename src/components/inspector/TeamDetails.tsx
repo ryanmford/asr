@@ -77,7 +77,7 @@ export const TeamDetails = React.memo(
     } = useTeamDetailsData(team, contentMode, dataContext);
 
     const randomPlayersPromo = useMemo(() => {
-      const types: PromoType[] = ["coach"];
+      const types: PromoType[] = ["skool"];
       return types[Math.floor(Math.random() * types.length)];
     }, []);
 

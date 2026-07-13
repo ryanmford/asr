@@ -388,7 +388,7 @@ export const ASRWallOfFame = React.memo(
  <div className="px-4 sm:px-6 mt-8">
  <ASRPromotionBanner
  type={
- ["coach", "setter"][
+ ["skool", "setter"][
  Math.floor(Math.random() * 2)
  ] as any
  }
