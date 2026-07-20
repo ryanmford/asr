@@ -21,7 +21,6 @@ export const ASRRankBadge = React.memo(
       : size === "sm"
       ? "text-[8px] sm:text-[9px]"
       : "text-[10px] sm:text-xs ";
- const isPodium = false;
  const styles: Record<string, { border: string; text: string; glow: string }> = {
  unranked: {
  border: theme === "dark" ? "border-zinc-700" : "border-zinc-200",

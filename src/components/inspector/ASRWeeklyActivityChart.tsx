@@ -3,7 +3,6 @@ import { cn } from "../../lib/utils";
 import { ThemeContext } from "../../theme-context";
 import { motion, AnimatePresence } from "motion/react";
 import { ASREmptyState } from "../common/ASREmptyState";
-import { formatYYYYMMDD } from "../../lib/asr-utils";
 
 interface ActivityChartProps {
   runs: { date?: string | null }[];

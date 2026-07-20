@@ -11,7 +11,6 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
   const isLoading = useDataStore(s => s.isLoading);
   const gen = useAppStore(s => s.gen);
   const setGen = useAppStore(s => s.setGen);
-  const teamCategory = useAppStore(s => s.teamCategory);
   const setTeamCategory = useAppStore(s => s.setTeamCategory);
   const { navigateToEntity } = useAppNavigation();
   const { eventType, searchParams, setSearchParams } = useURLState();

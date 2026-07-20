@@ -102,7 +102,6 @@ export const PlayerDetails = React.memo(
     const {
       meta,
       stats,
-      avgTime,
       allRuns,
       setterInfo,
       coursesSet,
