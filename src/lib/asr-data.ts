@@ -695,7 +695,7 @@ export const calculateWofStats = (
   try {
     if (!data || !data.length) return null;
     const qualifiedAthletes = data
-      .filter((p) => !isPlaceholderPlayer(p.name) && (p.runs || 0) >= 10)
+      .filter((p) => !isPlaceholderPlayer(p.name) && (p.courses || 0) >= 10)
       .map((p) => {
         const performances = atPerfs?.[p.pKey] || [];
         const calculatedFires = performances.reduce(
