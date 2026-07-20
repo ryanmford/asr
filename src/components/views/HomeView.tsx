@@ -972,7 +972,7 @@ export const HomeView = React.memo(() => {
             className="col-span-12 sm:col-span-6 relative overflow-hidden bg-black/5 dark:bg-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md flex flex-col items-start text-left cursor-pointer transition-all duration-300 group hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98] active:bg-black/10 dark:active:bg-white/10 min-h-[220px]"
             onClick={() => {
               setTeamCategory("gyms");
-              navigate("/teams?eventType=all-time&mode=teams");
+              navigate("/gyms?eventType=all-time&mode=gyms");
             }}
           >
             {/* Sparkline bg */}

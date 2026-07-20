@@ -72,6 +72,9 @@ export interface TeamProfile {
 export interface ASRDataContext {
   lbAT?: { M?: Record<string, unknown>; F?: Record<string, unknown> };
   lbOP?: { M?: Record<string, unknown>; F?: Record<string, unknown> };
+  lbSeason26?: { M?: Record<string, unknown>; F?: Record<string, unknown> };
+  season26Data?: unknown[];
+  season26Perfs?: Record<string, unknown>;
   atMet?: Record<string, unknown>;
   cMet?: Record<string, unknown>;
   pRaw?: Record<string, Record<string, unknown[]>>;

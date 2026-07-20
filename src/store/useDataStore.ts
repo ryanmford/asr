@@ -6,14 +6,17 @@ interface ASRDataState {
   openData: PlayerProfile[];
   atPerfs: Record<string, unknown>;
   opPerfs: Record<string, unknown>;
+  season26Perfs: Record<string, unknown>;
   lbAT: { M: Record<string, unknown>; F: Record<string, unknown> };
   lbOpen: { M: Record<string, unknown>; F: Record<string, unknown> };
+  lbSeason26: { M: Record<string, unknown>; F: Record<string, unknown> };
   atMet: Record<string, unknown>;
   dnMap: Record<string, string>;
   cMet: Record<string, unknown>;
   settersData: SetterProfile[];
   atRawBest: Record<string, unknown>;
   opRawBest: Record<string, unknown>;
+  season26RawBest: Record<string, unknown>;
   recentFeed: unknown[];
   courseRunsHistory: Record<string, unknown[]>;
   
@@ -26,6 +29,7 @@ interface ASRDataState {
   teamsAggregated: TeamProfile[];
   playerLB_AT: { M: PlayerProfile[]; F: PlayerProfile[] };
   playerLB_OP: { M: PlayerProfile[]; F: PlayerProfile[] };
+  playerLB_2026: { M: PlayerProfile[]; F: PlayerProfile[] };
 
   // Pre-computed lists
   courseRecords_M_AT: Record<string, unknown>;
@@ -36,13 +40,18 @@ interface ASRDataState {
   playerList_F_AT: PlayerProfile[];
   playerList_M_OP: PlayerProfile[];
   playerList_F_OP: PlayerProfile[];
+  playerList_M_2026: PlayerProfile[];
+  playerList_F_2026: PlayerProfile[];
   courseList_AT: CourseData[];
   courseList_OP: CourseData[];
+  courseList_2026: CourseData[];
   settersList: SetterProfile[];
   teamList_gyms_AT: TeamProfile[];
   teamList_teams_AT: TeamProfile[];
   teamList_gyms_OP: TeamProfile[];
   teamList_teams_OP: TeamProfile[];
+  teamList_gyms_2026: TeamProfile[];
+  teamList_teams_2026: TeamProfile[];
 
   isLoading: boolean;
   isSyncing: boolean;
@@ -69,16 +78,20 @@ export const useDataStore = create<ASRDataState>((set) => {
   return {
     data: [],
     openData: [],
+    season26Data: [],
     atPerfs: {},
     opPerfs: {},
+    season26Perfs: {},
     lbAT: { M: {}, F: {} },
     lbOpen: { M: {}, F: {} },
+    lbSeason26: { M: {}, F: {} },
     atMet: {},
     dnMap: {},
     cMet: {},
     settersData: [],
     atRawBest: {},
     opRawBest: {},
+    season26RawBest: {},
     recentFeed: [],
     courseRunsHistory: {},
 
@@ -90,23 +103,31 @@ export const useDataStore = create<ASRDataState>((set) => {
     teamsAggregated: [],
     playerLB_AT: { M: {}, F: {} },
     playerLB_OP: { M: {}, F: {} },
+    playerLB_2026: { M: {}, F: {} },
 
     courseRecords_M_AT: {},
     courseRecords_F_AT: {},
     courseRecords_M_OP: {},
     courseRecords_F_OP: {},
+    courseRecords_M_2026: {},
+    courseRecords_F_2026: {},
 
     playerList_M_AT: [],
     playerList_F_AT: [],
     playerList_M_OP: [],
     playerList_F_OP: [],
+    playerList_M_2026: [],
+    playerList_F_2026: [],
     courseList_AT: [],
     courseList_OP: [],
+    courseList_2026: [],
     settersList: [],
     teamList_gyms_AT: [],
     teamList_teams_AT: [],
     teamList_gyms_OP: [],
     teamList_teams_OP: [],
+    teamList_gyms_2026: [],
+    teamList_teams_2026: [],
 
     ...initialData,
 

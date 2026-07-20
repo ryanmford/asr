@@ -18,18 +18,23 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
   const location = useLocation();
 
   const queryMode = searchParams.get("mode");
-  const pathMode = location.pathname.includes("/teams") ? "teams" : (location.pathname.includes("/players") ? "players" : null);
+  const pathMode = location.pathname.includes("/teams") ? "teams" : (location.pathname.includes("/gyms") ? "gyms" : (location.pathname.includes("/players") ? "players" : null));
   const initialMode = pathMode || (queryMode === "teams" ? "teams" : "players");
 
   const [mode, setMode] = useState<"players" | "teams">(initialMode);
 
   useEffect(() => {
-    if (queryMode === "teams" || queryMode === "players") {
+    if (queryMode === "teams" || queryMode === "gyms" || queryMode === "players") {
       setMode(queryMode);
     } else if (pathMode) {
       setMode(pathMode);
     }
   }, [queryMode, pathMode]);
+
+  useEffect(() => {
+    if (mode === "gyms") setTeamCategory("gyms");
+    if (mode === "teams") setTeamCategory("teams");
+  }, [mode, setTeamCategory]);
 
   const playerList = usePlayerList();
   const teamList = useTeamList();
@@ -65,15 +70,8 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
     }
   }, [setGen]);
 
-  const handleTeamCategoryChange = React.useCallback((tc: string) => {
-    setTeamCategory(tc as "gyms" | "teams");
-    if (window.scrollY > 150) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [setTeamCategory]);
-
   const handleModeChange = React.useCallback((newMode: string) => {
-    setMode(newMode as "players" | "teams");
+    setMode(newMode as "players" | "gyms" | "teams");
     setSearchParams(
       (prev) => {
         prev.set("mode", newMode);
@@ -87,7 +85,7 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
   }, [setSearchParams]);
 
   const listData = React.useMemo(() => {
-    if (mode === "teams") return teamList;
+    if (mode === "teams" || mode === "gyms") return teamList;
     if (eventType === "open") {
       return playerList.map((p) => {
         // We know 'currentRank' might be typed slightly generically in PlayerProfile,
@@ -108,17 +106,25 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
 
   const listColumns = mode === "players" ? playerColumns : teamColumns;
   const itemClick = mode === "players" ? handlePlayerClick : handleTeamClick;
-  const searchPlaceholder = mode === "players" ? "search players..." : "search gyms & teams...";
-  const middleLabel = mode === "players" ? "PLAYER" : (teamCategory === "gyms" ? "GYM" : "TEAM");
+  const searchPlaceholder = mode === "players" ? "search players..." : (mode === "gyms" ? "search gyms..." : "search teams...");
+  const middleLabel = mode === "players" ? "PLAYER" : (mode === "gyms" ? "GYM" : "TEAM");
 
-  const searchSubtext = (mode === "players" && eventType === "open") ? (
+  const searchSubtext = (mode === "players") ? (
     <div className="flex flex-col gap-1 mt-2 mb-1 w-full">
-      <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
-        * * QUALIFIED FOR USPK NATIONALS & PKE WORLDS
-      </p>
-      <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
-        * QUALIFIED FOR PKE WORLDS
-      </p>
+      {eventType === "open" ? (
+        <>
+          <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+            * * QUALIFIED FOR USPK NATIONALS & PKE WORLDS
+          </p>
+          <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+            * QUALIFIED FOR PKE WORLDS
+          </p>
+        </>
+      ) : (eventType === "2026" || eventType === "all-time") ? (
+        <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500/80 dark:text-zinc-500/80 tracking-widest uppercase">
+          * RUN 6+ COURSES TO GET RANKED
+        </p>
+      ) : null}
     </div>
   ) : undefined;
 
@@ -139,13 +145,14 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
         <ASRNeonToggle
           options={[
             { label: "PLAYERS", value: "players" },
+            { label: "GYMS", value: "gyms" },
             { label: "TEAMS", value: "teams" },
           ]}
           activeOption={mode}
           onChange={handleModeChange}
           layoutId="primary-mode-pill"
           theme={theme}
-          className="w-[200px] mb-3"
+          className="w-[280px] mb-3"
         />
       }
       headerControls={
@@ -161,19 +168,7 @@ export const RankingsView = React.memo(({ theme }: { theme: "light" | "dark" }) 
             theme={theme}
             className="w-[100px] shrink-0"
           />
-        ) : (
-          <ASRNeonToggle
-            options={[
-              { label: "G", value: "gyms" },
-              { label: "T", value: "teams" },
-            ]}
-            activeOption={teamCategory}
-            onChange={handleTeamCategoryChange}
-            layoutId="team-cat-pill"
-            theme={theme}
-            className="w-[100px] shrink-0"
-          />
-        )
+        ) : undefined
       }
     />
   );

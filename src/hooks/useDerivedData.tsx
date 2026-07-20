@@ -23,7 +23,7 @@ export const useURLState = () => {
   const isAllTimeContext = eventType === "all-time";
 
   const setEventType = useCallback(
-    (nextType: "open" | "all-time") => {
+    (nextType: "open" | "all-time" | "2026") => {
       startTransition(() => {
         setSearchParams(
           (prev) => {
@@ -189,10 +189,11 @@ export const useSettersDerived = () => {
 };
 
 export const usePlayerList = () => {
-  const isAllTimeContext = useURLState().isAllTimeContext;
+  const { isAllTimeContext, eventType } = useURLState();
   const gen = useAppStore((s) => s.gen);
   return useDataStore((s) => {
     if (isAllTimeContext) return gen === 'M' ? s.playerList_M_AT : s.playerList_F_AT;
+    if (eventType === "2026") return gen === "M" ? s.playerList_M_2026 : s.playerList_F_2026;
     return gen === 'M' ? s.playerList_M_OP : s.playerList_F_OP;
   }) || [];
 };
@@ -328,20 +329,25 @@ export const useInspectorData = () => {
 
 export const useCourseList = () => {
   const isAllTimeContext = useURLState().isAllTimeContext;
-  return useDataStore((s) => isAllTimeContext ? s.courseList_AT : s.courseList_OP) || [];
+  const eventType = useURLState().eventType;
+  return useDataStore((s) => isAllTimeContext ? s.courseList_AT : (eventType === "2026" ? s.courseList_2026 : s.courseList_OP)) || [];
 };
 
 
 
 export const useTeamList = () => {
   const teamCategory = useAppStore((s) => s.teamCategory);
-  const isAllTimeContext = useURLState().isAllTimeContext;
-  return useDataStore((s: ASRDataContext) => {
+  const { isAllTimeContext, eventType } = useURLState();
+  return useDataStore((s: any) => {
     if (isAllTimeContext) {
       if (teamCategory === 'gyms') return s.teamList_gyms_AT;
       if (teamCategory === 'teams') return s.teamList_teams_AT;
       return null;
     } else {
+      if (eventType === "2026") {
+        if (teamCategory === 'gyms') return s.teamList_gyms_2026;
+        if (teamCategory === 'teams') return s.teamList_teams_2026;
+      }
       if (teamCategory === 'gyms') return s.teamList_gyms_OP;
       if (teamCategory === 'teams') return s.teamList_teams_OP;
       return null;

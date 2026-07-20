@@ -739,10 +739,11 @@ export const robustSort = (a: Record<string, unknown>, b: Record<string, unknown
   return (aStr === bStr ? 0 : aStr < bStr ? -1 : 1) * dir; // Much faster than localeCompare
 };
 
-export const isQualifiedAthlete = (p: { runs?: number, courses?: number, allTimeFireCount?: number, gender?: string, name?: string }, isAllTime = true) => {
+export const isQualifiedAthlete = (p: { runs?: number, courses?: number, allTimeFireCount?: number, gender?: string, name?: string }, mode: string | boolean = true) => {
   if (!p || isPlaceholderPlayer(p.name || "")) return false;
   const courses = p.courses || 0;
-  return isAllTime ? (p.gender === "M" ? courses >= 4 : courses >= 3) : courses >= 3;
+  if (mode === "2026" || mode === true || mode === "all-time") return courses >= 6;
+  return courses >= 3;
 };
 
 export const getNormalizedNameList = (listStr: string) => {
@@ -755,4 +756,29 @@ export const getNormalizedNameList = (listStr: string) => {
 
 export const formatYYYYMMDD = (date: Date): string => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
+export const parseCourseDifficulty = (diff: string): string => {
+  if (!diff) return "-";
+  const d = diff.toLowerCase();
+  
+  if (d.includes("green") || d.includes("🟢")) {
+    if (d.includes("-") || d.includes("minus")) return "1";
+    if (d.includes("+") || d.includes("plus")) return "3";
+    return "2";
+  }
+  
+  if (d.includes("blue") || d.includes("🔵")) {
+    if (d.includes("-") || d.includes("minus")) return "4";
+    if (d.includes("+") || d.includes("plus")) return "6";
+    return "5";
+  }
+  
+  if (d.includes("black") || d.includes("⚫")) {
+    if (d.includes("-") || d.includes("minus")) return "7";
+    if (d.includes("+") || d.includes("plus")) return "9";
+    return "8";
+  }
+  
+  return diff;
 };

@@ -39,7 +39,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const assignRanks = (
     arr: PlayerProfile[],
     gender: string,
-    isAllTime: boolean = true,
+    isAllTime: boolean | string = true,
   ) => {
     const qualified = arr
       .filter((p) => isQualifiedAthlete(p, isAllTime))
@@ -77,9 +77,12 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
 
     arr.forEach((p) => {
       const rankVal = rankMap.has(p.pKey) ? rankMap.get(p.pKey)! : "UR";
-      if (isAllTime) {
+      if (isAllTime === true || isAllTime === "all-time") {
         p.allTimeRank = rankVal;
         initialMetadata[p.pKey].allTimeRank = rankVal;
+      } else if (isAllTime === "2026") {
+        p.season26Rank = rankVal;
+        initialMetadata[p.pKey].season26Rank = rankVal;
       } else {
         p.openRank = rankVal;
         initialMetadata[p.pKey].openRank = rankVal;
@@ -96,6 +99,14 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   );
   assignRanks(openM, "M", false);
   assignRanks(openF, "F", false);
+  const s26M = processed.season26Rankings.filter(
+    (p: PlayerProfile) => p.gender === "M",
+  );
+  const s26F = processed.season26Rankings.filter(
+    (p: PlayerProfile) => p.gender === "F",
+  );
+  assignRanks(s26M, "M", "2026");
+  assignRanks(s26F, "F", "2026");
 
   // Calculate All Time Ranks dynamically
   const atM = processed.allTimeRankings.filter(
@@ -115,16 +126,20 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const nextState = {
     data: processed.allTimeRankings,
     openData: processed.openRankings,
+    season26Data: processed.season26Rankings,
     atPerfs: processed.allTimePerformances,
     opPerfs: processed.openPerformances,
+    season26Perfs: processed.season26Performances,
     lbAT: processed.allTimeLeaderboards,
     lbOpen: processed.openLeaderboards,
+    lbSeason26: processed.season26Leaderboards,
     atMet: processed.athleteMetadata,
     dnMap: processed.athleteDisplayNameMap,
     cMet: processed.courseMetadata,
     settersData: allSetters,
     atRawBest: processed.atRawBest,
     opRawBest: processed.opRawBest,
+    season26RawBest: processed.season26RawBest,
     recentFeed: processed.recentFeed,
     courseRunsHistory: processed.courseRunsHistory,
     hasError: hasTotalError,
@@ -133,10 +148,10 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   const { 
-      cMet, lbAT, lbOpen, atRawBest, opRawBest, dnMap, 
+      cMet, lbAT, lbOpen, lbSeason26, atRawBest, opRawBest, season26RawBest, dnMap, 
       data, 
       settersData, atMet, 
-      openData, atPerfs,
+      openData, season26Data, atPerfs, season26Perfs,
       courseRunsHistory
   } = nextState;
   
@@ -431,17 +446,18 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   });
 
   // TEAM STATS (Gyms and Countries)
-  const computeTeamStats = (teamCategory: string, isAllTime: boolean) => {
+  const computeTeamStats = (teamCategory: string, mode: boolean | string) => {
     const aggregated: Record<string, TeamProfile & { pts: number; players: (PlayerProfile & { contribution: number })[], playersCount: number }> = {};
+    const isAllTime = mode === true || mode === "all-time";
     const sourcePlayers = isAllTime
       ? Object.values(atMet || {})
-      : openData;
+      : (mode === "2026" ? season26Data : openData);
 
     (sourcePlayers || []).forEach((p: PlayerProfile) => {
       const pKey = p.pKey || normalizeName(p.name);
       if (!pKey) return;
 
-      const playerRuns = Object.keys(p).includes("runs") ? p.runs : atPerfs?.[pKey]?.length || 0;
+      const playerRuns = Object.keys(p).includes("runs") ? p.runs : ((mode === "2026" ? season26Perfs?.[pKey] : (isAllTime ? atPerfs?.[pKey] : opPerfs?.[pKey]))?.length || 0);
       if (playerRuns === 0) return;
 
       const itemsToProcess: {
@@ -501,8 +517,11 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
           aggregated[normName].location = item.location;
         }
         let playerPts = p.pts || p.contributionScore || 0;
-        if ((!playerPts || playerPts === 0) && isAllTime && atPerfs?.[pKey]) {
-           playerPts = atPerfs[pKey].reduce((sum: number, perf: { points?: number }) => sum + (perf.points || 0), 0);
+        if ((!playerPts || playerPts === 0)) {
+          const perfs = mode === "2026" ? season26Perfs?.[pKey] : (isAllTime ? atPerfs?.[pKey] : opPerfs?.[pKey]);
+          if (perfs) {
+            playerPts = perfs.reduce((sum: number, perf: { points?: number }) => sum + (perf.points || 0), 0);
+          }
         }
         
         aggregated[normName].pts += playerPts;
@@ -538,21 +557,23 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const teamsAggregated = {
     gyms: {
       open: computeTeamStats('gyms', false),
-      allTime: computeTeamStats('gyms', true)
+      allTime: computeTeamStats('gyms', true),
+      season26: computeTeamStats('gyms', "2026")
     },
     teams: {
       open: computeTeamStats('teams', false),
-      allTime: computeTeamStats('teams', true)
+      allTime: computeTeamStats('teams', true),
+      season26: computeTeamStats('teams', "2026")
     }
   };
 
   // LEADERBOARDS
-  const calculateLeaderboard = (sourceData: PlayerProfile[], isAllTime: boolean) => {
+  const calculateLeaderboard = (sourceData: PlayerProfile[], mode: boolean | string) => {
     const qualifiedM = (sourceData || [])
-      .filter((p: PlayerProfile) => p.gender === "M" && isQualifiedAthlete(p, isAllTime))
+      .filter((p: PlayerProfile) => p.gender === "M" && isQualifiedAthlete(p, mode))
       .sort(sortAthletesWithTiebreakers);
     const qualifiedF = (sourceData || [])
-      .filter((p: PlayerProfile) => p.gender === "F" && isQualifiedAthlete(p, isAllTime))
+      .filter((p: PlayerProfile) => p.gender === "F" && isQualifiedAthlete(p, mode))
       .sort(sortAthletesWithTiebreakers);
       
     const buildRankMap = (qualifiedArr: PlayerProfile[]) => {
@@ -607,10 +628,11 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   const playerLB_AT = calculateLeaderboard(data, true);
+  const playerLB_2026 = calculateLeaderboard(season26Data, "2026");
   const playerLB_OP = calculateLeaderboard(openData, false);
 
-  const computePlayerList = (isAllTime: boolean, gen: string) => {
-    const athletePool = isAllTime ? data : openData;
+  const computePlayerList = (mode: boolean | string, gen: string) => {
+    const athletePool = mode === true || mode === "all-time" ? data : (mode === "2026" ? season26Data : openData);
     const allTimeRankedKeys = new Set((data || []).map((p: PlayerProfile) => p.pKey));
     const filtered = athletePool.filter((p: PlayerProfile) => p && p.gender === gen && !isPlaceholderPlayer(p.name) && (p.runs || 0) > 0);
     
@@ -619,26 +641,26 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const qual: PlayerProfile[] = [];
     const unranked: PlayerProfile[] = [];
     filtered.forEach((p: PlayerProfile) => {
-      if (isQualifiedAthlete(p, isAllTime)) {
+      if (isQualifiedAthlete(p, mode)) {
         qual.push(p);
       } else {
-        if (isAllTime || allTimeRankedKeys.has(p.pKey)) {
+        if (mode === "2026" || mode === true || mode === "all-time" || allTimeRankedKeys.has(p.pKey)) {
           unranked.push(p);
         }
       }
     });
 
     const fQual = qual.map((p, i) => ({ ...p, currentRank: i + 1, isQualified: true, shouldFade: false }));
-    const fUnranked = unranked.map((p, i) => ({ ...p, currentRank: "UR", isQualified: false, shouldFade: isAllTime ? true : (p.runs || 0) === 0 }));
+    const fUnranked = unranked.map((p, i) => ({ ...p, currentRank: "UR", isQualified: false, shouldFade: true }));
     
-    const dividerLabel = isAllTime ? (gen === "M" ? "RUN 4+ COURSES TO GET RANKED" : "RUN 3+ COURSES TO GET RANKED") : "RUN 3+ COURSES TO GET RANKED";
+    const dividerLabel = mode === "2026" || mode === true || mode === "all-time" ? "RUN 6+ COURSES TO GET RANKED" : "RUN 3+ COURSES TO GET RANKED";
     
-    if (!isAllTime && fQual.length === 0) return [{ isDivider: true, label: dividerLabel }, ...fUnranked];
+    if ((mode === false || mode === "open" || mode === "2026") && fQual.length === 0) return [{ isDivider: true, label: dividerLabel }, ...fUnranked];
     return fQual.length && fUnranked.length ? [...fQual, { isDivider: true, label: dividerLabel }, ...fUnranked] : [...fQual, ...fUnranked];
   };
 
-  const computeTeamList = (cat: string, isAllTime: boolean) => {
-    const contextStr = isAllTime ? "allTime" : "open";
+  const computeTeamList = (cat: string, mode: boolean | string) => {
+    const contextStr = mode === "2026" ? "season26" : (mode === true || mode === "all-time" ? "allTime" : "open");
     let arr = ((teamsAggregated as Record<string, Record<string, (TeamProfile & { pts: number })[]>>)?.[cat]?.[contextStr] || []) as (TeamProfile & { pts: number })[];
     arr = [...arr].sort((a: TeamProfile & { pts: number }, b: TeamProfile & { pts: number }) => (b.pts || 0) - (a.pts || 0));
     return arr.map((t: TeamProfile & { pts: number }, i: number) => ({ ...t, currentRank: i + 1, category: cat }));
@@ -646,6 +668,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
 
   const cListAT = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
   const cListOP = masterCourseList.filter((c: CourseData) => c.is2026).sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
+  const cList2026 = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
   const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
 
   const courseRecords_M_AT: Record<string, unknown> = {};
@@ -711,6 +734,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     teamsAggregated,
     playerLB_AT, 
     playerLB_OP,
+    playerLB_2026,
     courseRunsHistory: nextState.courseRunsHistory || {},
 
     // PRECOMPUTED FLAT UI ARRAYS
@@ -718,18 +742,25 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     playerList_F_AT: computePlayerList(true, "F"),
     playerList_M_OP: computePlayerList(false, "M"),
     playerList_F_OP: computePlayerList(false, "F"),
+    playerList_M_2026: computePlayerList("2026", "M"),
+    playerList_F_2026: computePlayerList("2026", "F"),
     courseList_AT: cListAT,
     courseList_OP: cListOP,
+    courseList_2026: cList2026,
     settersList: sList,
     teamList_gyms_AT: computeTeamList("gyms", true),
     teamList_teams_AT: computeTeamList("teams", true),
     teamList_gyms_OP: computeTeamList("gyms", false),
     teamList_teams_OP: computeTeamList("teams", false),
+    teamList_gyms_2026: computeTeamList("gyms", "2026"),
+    teamList_teams_2026: computeTeamList("teams", "2026"),
     
     courseRecords_M_AT,
     courseRecords_F_AT,
     courseRecords_M_OP,
     courseRecords_F_OP,
+    courseRecords_M_2026: courseRecords_M_OP,
+    courseRecords_F_2026: courseRecords_F_OP,
   };
 }
 

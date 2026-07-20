@@ -9,7 +9,7 @@ const EMPTY_LB = { M: {}, F: {} };
 
 export const usePlayerDetailsData = (
   player: PlayerProfile,
-  activeMode: "open" | "all-time",
+  activeMode: "open" | "all-time" | "2026",
   dataContext: ASRDataContext,
 ) => {
   const lbAT = dataContext.lbAT || EMPTY_LB;
@@ -26,7 +26,8 @@ export const usePlayerDetailsData = (
   const meta = atMet[pKey] || player;
 
   const stats = useMemo(() => {
-    const lb = (activeMode === "all-time" ? lbAT : lbOP) || { M: {}, F: {} };
+    const lbSeason26 = dataContext.lbSeason26;
+    const lb = (activeMode === "all-time" ? lbAT : activeMode === "2026" ? lbSeason26 : lbOP) || { M: {}, F: {} };
     const allStats = { ...(lb.M || {}), ...(lb.F || {}) };
     const pData = allStats[pKey] || {};
 
@@ -60,7 +61,7 @@ export const usePlayerDetailsData = (
         pData.allTimeFireCount ??
         0,
     };
-  }, [lbAT, lbOP, activeMode, pKey, meta]);
+  }, [lbAT, lbOP, dataContext.lbSeason26, activeMode, pKey, meta]);
 
   const runs = useMemo(() => {
     const sourceData = pRaw || {};
@@ -334,7 +335,7 @@ export const usePlayerDetailsData = (
 
 export const useTeamDetailsData = (
   team: TeamProfile,
-  mode: "open" | "all-time",
+  mode: "open" | "all-time" | "2026",
   dataContext: ASRDataContext,
 ) => {
   const atMet = dataContext?.atMet || EMPTY_OBJ;
@@ -345,7 +346,7 @@ export const useTeamDetailsData = (
   const teamsAggregated = dataContext?.teamsAggregated || EMPTY_OBJ;
 
   const teamCategory = team?.category || "gyms";
-  const contextStr = mode === "all-time" ? "allTime" : "open";
+  const contextStr = mode === "all-time" ? "allTime" : mode === "2026" ? "season26" : "open";
   const teamsAggregatedMap =
     teamsAggregated?.[teamCategory] || teamsAggregated?.["gyms"];
   const teamsAgg = teamsAggregatedMap?.[contextStr] || [];
@@ -363,7 +364,8 @@ export const useTeamDetailsData = (
         (a: PlayerProfile & { contribution?: number }, b: PlayerProfile & { contribution?: number }) => (b.contribution || 0) - (a.contribution || 0),
       );
     }
-    const source = mode === "all-time" ? Object.values(atMet) : openData;
+    const season26Data = dataContext.season26Data;
+    const source = mode === "all-time" ? Object.values(atMet) : mode === "2026" ? (season26Data || []) : openData;
     return source
       .filter((p: PlayerProfile) => {
         const normalizedTarget = (team?.name || "").toUpperCase();

@@ -52,18 +52,18 @@ export const TeamDetails = React.memo(
     
     const urlMode = searchParams.get("mode");
     const eventTypeMode = searchParams.get("eventType");
-    const validModes = ["open", "all-time"];
+    const validModes = ["open", "all-time", "2026"];
     
-    let initialModeSafe: "open" | "all-time" = "all-time";
+    let initialModeSafe: "open" | "all-time" | "2026" = "all-time";
     if (validModes.includes(urlMode as string)) {
-      initialModeSafe = urlMode as "open" | "all-time";
+      initialModeSafe = urlMode as "open" | "all-time" | "2026";
     } else if (validModes.includes(eventTypeMode as string)) {
-      initialModeSafe = eventTypeMode as "open" | "all-time";
+      initialModeSafe = eventTypeMode as "open" | "all-time" | "2026";
     } else if (initialMode && validModes.includes(initialMode)) {
-      initialModeSafe = initialMode as "open" | "all-time";
+      initialModeSafe = initialMode as "open" | "all-time" | "2026";
     }
-    const [uiMode, setUiMode] = useState<"open" | "all-time">(initialModeSafe);
-    const [contentMode, setContentMode] = useState<"open" | "all-time">(initialModeSafe);
+    const [uiMode, setUiMode] = useState<"open" | "all-time" | "2026">(initialModeSafe);
+    const [contentMode, setContentMode] = useState<"open" | "all-time" | "2026">(initialModeSafe);
 
     const {
       tMeta,
@@ -220,11 +220,12 @@ export const TeamDetails = React.memo(
                 <ASRNeonToggle
                   options={[
                     { label: "ALL-TIME", value: "all-time" },
+                    { label: "2026", value: "2026" },
                     { label: "OPEN", value: "open" },
                   ]}
                   activeOption={uiMode}
                   onChange={(m) => {
-                    const nextMode = m as "open" | "all-time";
+                    const nextMode = m as "open" | "all-time" | "2026";
                     setUiMode(nextMode);
                     React.startTransition(() => {
                       setContentMode(nextMode);

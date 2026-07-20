@@ -230,7 +230,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           <ASRHeader
           theme={theme as "light" | "dark"}
           setTheme={setTheme}
-          eventType={eventType as "open" | "all-time"}
+          eventType={eventType as "open" | "all-time" | "2026"}
           setEventType={setEventType}
           hideTabs={view === "hof" || view === "setters" || view === "home"}
           isTransparent={view === "home"}
@@ -279,6 +279,11 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                   </motion.div>
                 } />
                 <Route path="/teams/:id?" element={
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
+                    <RankingsView theme={theme} />
+                  </motion.div>
+                } />
+                <Route path="/gyms/:id?" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col">
                     <RankingsView theme={theme} />
                   </motion.div>

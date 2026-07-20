@@ -8,6 +8,7 @@ import {
   CONFIG,
   robustSort,
   getNormalizedNameList,
+  parseCourseDifficulty,
 } from "./asr-utils";
 import { normalizeForSearch } from "./utils";
 
@@ -206,7 +207,7 @@ export const processSetListData = (csv: string) => {
         city: (vals.city || "").trim().toUpperCase() || "UNKNOWN",
         stateProv: (vals.state || "").trim().toUpperCase(),
         country: fixed.name.toUpperCase() || "UNKNOWN",
-        difficulty: (vals.rating || "").trim(),
+        difficulty: parseCourseDifficulty((vals.rating || "").trim()),
         length: (vals.length || "").trim(),
         elevation: (vals.elevation || "").trim(),
         type: (vals.type || "").trim(),
@@ -333,7 +334,10 @@ export const processLiveFeedData = (
   const openAthleteBestTimes: Record<string, { [loc: string]: any }> = {};
   const openCourseLeaderboards: { M: Record<string, unknown>; F: Record<string, unknown> } = { M: {}, F: {} };
   const openAthleteTotalSubmissions: Record<string, number> = {};
-  const athleteDisplayNameMap: Record<string, string> = {};
+  const season26AthleteBestTimes: Record<string, Record<string, { label: string; value: string; num: number; videoUrl: string; date: string | null }>> = {};
+  const season26CourseLeaderboards: Record<string, Record<string, Record<string, number>>> = { M: {}, F: {} };
+  const season26AthleteTotalSubmissions: Record<string, number> = {};
+        const athleteDisplayNameMap: Record<string, string> = {};
   const filmerCreditsCount: Record<string, number> = {};
   const courseRunsHistory: Record<string, unknown[]> = {};
 
@@ -461,6 +465,46 @@ export const processLiveFeedData = (
         openCourseLeaderboards[pGender][normC][pKey] = numericValue;
       }
     }
+    const tagString = (vals.tag || "").toUpperCase();
+    let is2026 = false;
+    if (tagString.includes("OPEN") || tagString.includes("2026") || tagString.includes("ASR")) {
+        is2026 = true;
+    } else if (vals.date) {
+        const dateStr = String(vals.date).trim();
+        if (dateStr.includes("2026") || dateStr.includes("/26") || dateStr.match(/^\d{1,2}\/\d{1,2}$/) || dateStr.match(/^\d{1,2}-\d{1,2}$/)) {
+            is2026 = true;
+        } else {
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime()) && d.getFullYear() === 2026) is2026 = true;
+        }
+    }
+
+    if (is2026) {
+      if (!isPlaceholder) {
+        if (!season26AthleteBestTimes[pKey]) season26AthleteBestTimes[pKey] = {};
+        if (
+          !season26AthleteBestTimes[pKey][normC] ||
+          numericValue < season26AthleteBestTimes[pKey][normC].num
+        ) {
+          season26AthleteBestTimes[pKey][normC] = {
+            label: rawCourse,
+            value: vals.result,
+            num: numericValue,
+            videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
+            date: vals.date ? new Date(vals.date).toISOString() : null,
+          };
+        }
+        season26AthleteTotalSubmissions[pKey] = (season26AthleteTotalSubmissions[pKey] || 0) + 1;
+      }
+      if (!season26CourseLeaderboards[pGender][normC])
+        season26CourseLeaderboards[pGender][normC] = {};
+      if (
+        !season26CourseLeaderboards[pGender][normC][pKey] ||
+        numericValue < season26CourseLeaderboards[pGender][normC][pKey]
+      ) {
+        season26CourseLeaderboards[pGender][normC][pKey] = numericValue;
+      }
+    }
   });
 
   const buildPerfs = (source: Record<string, { [loc: string]: { label: string, value: string, num: number, videoUrl: string, date: string | null } }>, isAllTimeBuild = false) => {
@@ -537,10 +581,13 @@ export const processLiveFeedData = (
   };
 
   result.allTimePerformances = buildPerfs(allTimeAthleteBestTimes, true);
-  result.openPerformances = buildPerfs(openAthleteBestTimes, false);
+  result.season26Performances = buildPerfs(season26AthleteBestTimes, false);
+    result.openPerformances = buildPerfs(openAthleteBestTimes, false);
   result.allTimeLeaderboards = allTimeCourseLeaderboards;
   result.openLeaderboards = openCourseLeaderboards;
-  result.athleteDisplayNameMap = athleteDisplayNameMap;
+  result.season26Leaderboards = season26CourseLeaderboards;
+  result.season26RawBest = season26AthleteBestTimes;
+      result.athleteDisplayNameMap = athleteDisplayNameMap;
   result.courseRunsHistory = courseRunsHistory;
   result.atRawBest = allTimeAthleteBestTimes;
   result.opRawBest = openAthleteBestTimes;
@@ -595,6 +642,50 @@ export const processLiveFeedData = (
     };
   });
 
+  
+  result.season26Rankings = Object.keys(athleteMetadata)
+    .filter((k) => {
+      const meta = athleteMetadata[k];
+      const perfs = result.season26Performances[k] || [];
+      return !isPlaceholderPlayer(meta.name) && perfs.length > 0;
+    })
+    .map((pKey) => {
+      const meta = athleteMetadata[pKey];
+      const perfs = result.season26Performances[pKey] || [];
+      const totalPts = perfs.reduce((sum: number, p: { points?: number }) => sum + (p.points || 0), 0);
+      const latestRunDate = perfs.reduce((latest: Date, p: { date?: string | null }) => {
+        if (!p.date) return latest;
+        const runDate = new Date(p.date);
+        if (isNaN(runDate.getTime())) return latest;
+        return runDate > latest ? runDate : latest;
+      }, new Date(0));
+      return {
+        ...meta,
+        id: `season26-${pKey}`,
+        rating: perfs.length > 0 ? totalPts / perfs.length : 0,
+        courses: perfs.length,
+        runs: Math.max(season26AthleteTotalSubmissions[pKey] || 0, perfs.length),
+        latestRunDate,
+        wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
+        pts: totalPts,
+        sets: meta.sets || 0,
+        openFireCount: perfs.reduce(
+          (sum: number, p: { fireCount?: number }) => sum + (p.fireCount || 0),
+          0,
+        ),
+      };
+    })
+    .sort((a: any, b: any) => {
+      if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+      if ((b.runs || 0) !== (a.runs || 0)) {
+        return (b.runs || 0) - (a.runs || 0);
+      }
+      return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
+    });
+
+
   result.openRankings = Object.keys(athleteMetadata)
     .filter((k) => {
       const meta = athleteMetadata[k];
@@ -636,6 +727,7 @@ export const processLiveFeedData = (
       }
       return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
     });
+
 
   result.allTimeRankings = Object.keys(athleteMetadata)
     .filter((k) => {

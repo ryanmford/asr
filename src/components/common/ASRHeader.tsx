@@ -10,8 +10,8 @@ import { useDataStore } from "../../store/useDataStore";
 interface ASRHeaderProps {
   theme: "light" | "dark";
   setTheme: (theme: "light" | "dark") => void;
-  eventType: "open" | "all-time";
-  setEventType: (type: "open" | "all-time") => void;
+  eventType: "open" | "all-time" | "2026";
+  setEventType: (type: "open" | "all-time" | "2026") => void;
   hideTabs?: boolean;
   centerSlot?: React.ReactNode;
   leftSlot?: React.ReactNode;
@@ -63,6 +63,7 @@ export const ASRHeader = React.memo(
               <ASRNeonToggle
                 options={[
                   { label: "ALL-TIME", value: "all-time" },
+                  { label: "2026", value: "2026" },
                   { label: "OPEN", value: "open" },
                 ]}
                 activeOption={eventType}
