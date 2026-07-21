@@ -653,7 +653,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const fQual = qual.map((p, i) => ({ ...p, currentRank: i + 1, isQualified: true, shouldFade: false }));
     const fUnranked = unranked.map((p, i) => ({ ...p, currentRank: "UR", isQualified: false, shouldFade: true }));
     
-    const dividerLabel = "RUN 6+ COURSES TO GET RANKED";
+    const dividerLabel = (mode === "open" || mode === false) ? "RUN 3+ COURSES TO GET RANKED" : "RUN 6+ COURSES TO GET RANKED";
     
     if ((mode === false || mode === "open" || mode === "2026") && fQual.length === 0) return [{ isDivider: true, label: dividerLabel }, ...fUnranked];
     return fQual.length && fUnranked.length ? [...fQual, { isDivider: true, label: dividerLabel }, ...fUnranked] : [...fQual, ...fUnranked];

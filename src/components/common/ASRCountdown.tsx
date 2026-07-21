@@ -10,7 +10,7 @@ interface ASRCountdownProps {
   theme: "light" | "dark";
 }
 
-export const ASRCountdown = React.memo(({ theme }: ASRCountdownProps) => {
+export const ASRCountdown = React.memo(({ theme, eventType }: ASRCountdownProps) => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(() => {
     return sessionStorage.getItem("asr_banner_dismissed") !== "true";
@@ -26,7 +26,7 @@ export const ASRCountdown = React.memo(({ theme }: ASRCountdownProps) => {
 
   return (
     <div
-      onClick={() => navigate("/rankings?eventType=open")}
+      onClick={() => navigate(`/rankings?eventType=${eventType}`)}
       className={cn(
         "relative z-[40] w-full border-b flex items-center justify-center select-none overflow-hidden transition-colors duration-500 cursor-pointer hover:opacity-90 py-1.5 sm:py-2",
         theme === "dark"
@@ -49,12 +49,12 @@ export const ASRCountdown = React.memo(({ theme }: ASRCountdownProps) => {
       </div>
 
       <div className="relative z-20 flex items-center justify-center w-full px-12 sm:px-16 text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] leading-tight gap-3 sm:gap-4">
-        <div className="flex flex-col items-center">
-            <span>2026 ASR OPEN</span>
-            <span>FINAL RESULTS</span>
+        <div className="flex flex-col items-center text-center">
+            <span>{eventType === "all-time" ? "ALL-TIME" : eventType === "2026" ? "2026 SEASON" : "2026 ASR OPEN"}</span>
+            <span>{eventType === "all-time" ? "LEADERBOARDS" : "FINAL RESULTS"}</span>
         </div>
         <div className={cn("w-[1px] h-6 sm:h-8 opacity-30", theme === "dark" ? "bg-white" : "bg-black")} />
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center text-center">
             <span>PRESENTED BY</span>
             <span>STR/KE MVMNT</span>
         </div>

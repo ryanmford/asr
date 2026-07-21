@@ -78,7 +78,11 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
       
       if (player) {
          title = `${player.name.toUpperCase()} | ASR Player Profile`;
-         const rank = isAllTime ? player.allTimeRank : (eventType === "2026" ? player.season26Rank : player.openRank);
+         const leaderboards = isAllTime ? cachedData.playerLB_AT : (eventType === "2026" ? cachedData.playerLB_2026 : cachedData.playerLB_OP);
+         const gender = player.gender || "M";
+         const pKey = player.pKey || normalizeName(player.name || "");
+         const lbRank = (leaderboards as any)?.[gender]?.[pKey]?.rank;
+         const rank = lbRank || 'UR';
          const rating = player.rating ? player.rating.toFixed(2) : '0.00';
          const gym = player.country && player.country !== CONFIG.FALLBACKS.UNKNOWN_LOCATION ? player.country : 'Unknown Location';
          

@@ -211,7 +211,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
             {(view === "home" || view === "rankings") && (
               <ASRCountdown
                 targetDate={CONFIG.DATES.COUNTDOWN_TARGET}
-                eventType={"open"}
+                eventType={eventType as "open" | "all-time" | "2026"}
                 onHelp={() => setShowOnboarding(true)}
                 theme={theme as "light" | "dark"}
               />

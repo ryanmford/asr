@@ -446,7 +446,7 @@ export const CourseDetails = React.memo(
                 />
               </div>
               <div className="px-4 py-6 overflow-visible min-h-[500px]">
-                {contentMode === "open" && !meta.is2026 ? (
+                {contentMode === "open" && !meta.isOpenCourse ? (
                   <div className="text-center text-zinc-500 py-10 px-4 text-sm max-w-sm mx-auto">
                     * Course not included in the 2026 ASR Open.
                   </div>
@@ -512,7 +512,7 @@ export const CourseDetails = React.memo(
                 />
               </div>
               <div className="px-4 py-6 overflow-visible min-h-[500px]">
-                {contentMode === "open" && !meta.is2026 ? (
+                {contentMode === "open" && !meta.isOpenCourse ? (
                   <div className="text-center text-zinc-500 py-10 px-4 text-sm max-w-sm mx-auto">
                     * Course not included in the 2026 ASR Open.
                   </div>

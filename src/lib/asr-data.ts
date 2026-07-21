@@ -195,14 +195,14 @@ export const processSetListData = (csv: string) => {
       const sponsorName = vals.__raw ? (vals.__raw[34] || "").trim() : "";
       const sponsorLink = vals.__raw ? (vals.__raw[35] || "").trim() : "";
 
-      const is2026 =
+      const isOpenCourse =
         valAG === "YES" || valAG === "TRUE" || valAG.includes("OPEN");
       const leadsRaw = (vals.leads || "").trim();
       const assistsRaw = (vals.assists || "").trim();
 
       map[course] = {
         name: course,
-        is2026,
+        isOpenCourse,
         flag: fixed.flag || "🏳️",
         city: (vals.city || "").trim().toUpperCase() || "UNKNOWN",
         stateProv: (vals.state || "").trim().toUpperCase(),
@@ -360,7 +360,7 @@ export const processLiveFeedData = (
       pKey = `${baseKey}-${pGender.toLowerCase()}`;
 
     const normC = rawCourse.toUpperCase();
-    const isCourseOpen = courseSetMap[normC]?.is2026;
+    const isCourseOpen = courseSetMap[normC]?.isOpenCourse;
 
     const isPlaceholder = isPlaceholderPlayer(pName);
 
@@ -467,11 +467,11 @@ export const processLiveFeedData = (
     }
     const tagString = (vals.tag || "").toUpperCase();
     let is2026 = false;
-    if (tagString.includes("OPEN") || tagString.includes("2026")) {
+    if (tagString.includes("2026")) {
         is2026 = true;
     } else if (vals.date) {
         const dateStr = String(vals.date).trim();
-        if (dateStr.includes("2026") || dateStr.includes("/26")) {
+        if (dateStr.includes("2026") || /\/(?:20)?26(?:\s|$)/.test(dateStr) || dateStr.endsWith("/26")) {
             is2026 = true;
         } else {
             const d = new Date(dateStr);
@@ -507,7 +507,7 @@ export const processLiveFeedData = (
     }
   });
 
-  const buildPerfs = (source: Record<string, { [loc: string]: { label: string, value: string, num: number, videoUrl: string, date: string | null } }>, isAllTimeBuild = false) => {
+  const buildPerfs = (source: Record<string, { [loc: string]: { label: string, value: string, num: number, videoUrl: string, date: string | null } }>, mode: "all-time" | "open" | "2026" = "all-time") => {
     const res: Record<string, unknown[]> = {};
     const memoizedBoards: Record<
       string,
@@ -519,13 +519,18 @@ export const processLiveFeedData = (
       let fireTotal = 0;
       res[pKey] = Object.entries(source[pKey]).map(
         ([normL, data]: [string, { label: string, value: string, num: number, videoUrl: string, date: string | null }]) => {
-          const boardKey = `${pGender}-${normL}`;
+          const boardKey = `${pGender}-${normL}-${mode}`;
           if (!memoizedBoards[boardKey]) {
-            const board =
+            const allTimeBoard =
               (allTimeCourseLeaderboards[pGender] || {})[normL] || {};
-            const vals = Object.values(board) as number[];
+            const contextBoard = mode === "2026"
+              ? (season26CourseLeaderboards[pGender] || {})[normL] || {}
+              : mode === "open"
+              ? (openCourseLeaderboards[pGender] || {})[normL] || {}
+              : allTimeBoard;
+            const vals = Object.values(allTimeBoard) as number[];
             const record = vals.length ? Math.min(...vals) : 0;
-            const sorted = Object.entries(board).sort(
+            const sorted = Object.entries(contextBoard).sort(
               (a: [string, unknown], b: [string, unknown]) => (a[1] as number) - (b[1] as number),
             );
             let currentRank = 1;
@@ -564,15 +569,17 @@ export const processLiveFeedData = (
       );
 
       if (athleteMetadata[pKey]) {
-        if (isAllTimeBuild) {
+        if (mode === "all-time") {
           if (
             !athleteMetadata[pKey].allTimeFireCount ||
             fireTotal > athleteMetadata[pKey].allTimeFireCount
           ) {
             athleteMetadata[pKey].allTimeFireCount = fireTotal;
           }
-        } else {
+        } else if (mode === "open") {
           athleteMetadata[pKey].openFireCount = fireTotal;
+        } else if (mode === "2026") {
+          athleteMetadata[pKey].season26FireCount = fireTotal;
         }
         athleteMetadata[pKey].films = filmerCreditsCount[pKey] || 0;
       }
@@ -580,9 +587,9 @@ export const processLiveFeedData = (
     return res;
   };
 
-  result.allTimePerformances = buildPerfs(allTimeAthleteBestTimes, true);
-  result.season26Performances = buildPerfs(season26AthleteBestTimes, false);
-    result.openPerformances = buildPerfs(openAthleteBestTimes, false);
+  result.allTimePerformances = buildPerfs(allTimeAthleteBestTimes, "all-time");
+  result.season26Performances = buildPerfs(season26AthleteBestTimes, "2026");
+    result.openPerformances = buildPerfs(openAthleteBestTimes, "open");
   result.allTimeLeaderboards = allTimeCourseLeaderboards;
   result.openLeaderboards = openCourseLeaderboards;
   result.season26Leaderboards = season26CourseLeaderboards;
@@ -669,7 +676,7 @@ export const processLiveFeedData = (
         wins: perfs.filter((p: { rank?: number }) => p.rank === 1).length,
         pts: totalPts,
         sets: meta.sets || 0,
-        openFireCount: perfs.reduce(
+        season26FireCount: perfs.reduce(
           (sum: number, p: { fireCount?: number }) => sum + (p.fireCount || 0),
           0,
         ),

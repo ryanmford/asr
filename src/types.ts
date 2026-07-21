@@ -42,7 +42,7 @@ export interface CourseData {
   leadSetters?: string | string[];
   assistantSettersNormalized?: string[];
   assistantsetters?: string | string[];
-  is2026?: boolean;
+  isOpenCourse?: boolean;
   dateSet?: string;
 }
 

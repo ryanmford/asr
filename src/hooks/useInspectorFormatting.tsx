@@ -48,6 +48,12 @@ export const usePlayerDetailsData = (
             pData.fires ??
             meta.fires ??
             0)
+          : activeMode === "2026"
+          ? (pData.season26FireCount ??
+            meta.season26FireCount ??
+            pData.fires ??
+            meta.fires ??
+            0)
           : (pData.openFireCount ??
             meta.openFireCount ??
             pData.fires ??
