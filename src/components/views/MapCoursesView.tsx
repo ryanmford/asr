@@ -7,7 +7,7 @@ import { ErrorBoundary } from "../common/ErrorBoundary";
 import { ASRBottomSheet } from "../common/ASRBottomSheet";
 import { CourseData } from "../../types";
 import { useDataStore } from "../../store/useDataStore";
-import { useAppNavigation, useCourseList } from "../../hooks/useDerivedData";
+import { useAppNavigation, useCourseList, useURLState } from "../../hooks/useDerivedData";
 import { useDebounce } from "../../hooks/useDataHooks";
 import { useAppStore } from "../../store/useAppStore";
 import { cn } from "../../lib/asr-utils";
@@ -20,6 +20,7 @@ const ASRMap = React.lazy(() => import("../ASRMap").then((m) => ({ default: m.AS
 export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }) => {
   const isLoading = useDataStore(s => s.isLoading);
   const { navigateToEntity } = useAppNavigation();
+  const { isAllTimeContext, eventType } = useURLState();
   const courseList = useCourseList();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,7 +37,9 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
   const [snap, setSnap] = React.useState<number>(0.2);
   const containerRef = useRef<HTMLDivElement>(null);
   const setActiveCourseId = useAppStore(s => s.setActiveCourseId);
-  const columns = React.useMemo(() => [{ label: "RUNS", key: "totalAllTimeRuns" }], []);
+  
+  const runKey = isAllTimeContext ? "totalAllTimeRuns" : (eventType === "2026" ? "season26Runs" : eventType === "open" ? "openRuns" : "totalAllTimeRuns");
+  const columns = React.useMemo(() => [{ label: "RUNS", key: runKey }], [runKey]);
   
   const setSearch = (val: string) => {
     startTransition(() => {

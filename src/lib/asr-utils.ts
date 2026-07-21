@@ -739,11 +739,10 @@ export const robustSort = (a: Record<string, unknown>, b: Record<string, unknown
   return (aStr === bStr ? 0 : aStr < bStr ? -1 : 1) * dir; // Much faster than localeCompare
 };
 
-export const isQualifiedAthlete = (p: { runs?: number, courses?: number, allTimeFireCount?: number, gender?: string, name?: string }, mode: string | boolean = true) => {
+export const isQualifiedAthlete = (p: { runs?: number, courses?: number, allTimeFireCount?: number, gender?: string, name?: string }, _mode?: string | boolean) => {
   if (!p || isPlaceholderPlayer(p.name || "")) return false;
   const courses = p.courses || 0;
-  if (mode === "2026" || mode === true || mode === "all-time") return courses >= 6;
-  return courses >= 3;
+  return courses >= 6;
 };
 
 export const getNormalizedNameList = (listStr: string) => {

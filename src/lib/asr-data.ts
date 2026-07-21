@@ -467,11 +467,11 @@ export const processLiveFeedData = (
     }
     const tagString = (vals.tag || "").toUpperCase();
     let is2026 = false;
-    if (tagString.includes("OPEN") || tagString.includes("2026") || tagString.includes("ASR")) {
+    if (tagString.includes("OPEN") || tagString.includes("2026")) {
         is2026 = true;
     } else if (vals.date) {
         const dateStr = String(vals.date).trim();
-        if (dateStr.includes("2026") || dateStr.includes("/26") || dateStr.match(/^\d{1,2}\/\d{1,2}$/) || dateStr.match(/^\d{1,2}-\d{1,2}$/)) {
+        if (dateStr.includes("2026") || dateStr.includes("/26")) {
             is2026 = true;
         } else {
             const d = new Date(dateStr);
@@ -787,7 +787,7 @@ export const calculateWofStats = (
   try {
     if (!data || !data.length) return null;
     const qualifiedAthletes = data
-      .filter((p) => !isPlaceholderPlayer(p.name) && (p.courses || 0) >= 10)
+      .filter((p) => !isPlaceholderPlayer(p.name) && (p.courses || 0) >= 6)
       .map((p) => {
         const performances = atPerfs?.[p.pKey] || [];
         const calculatedFires = performances.reduce(

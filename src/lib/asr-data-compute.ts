@@ -653,7 +653,7 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     const fQual = qual.map((p, i) => ({ ...p, currentRank: i + 1, isQualified: true, shouldFade: false }));
     const fUnranked = unranked.map((p, i) => ({ ...p, currentRank: "UR", isQualified: false, shouldFade: true }));
     
-    const dividerLabel = mode === "2026" || mode === true || mode === "all-time" ? "RUN 6+ COURSES TO GET RANKED" : "RUN 3+ COURSES TO GET RANKED";
+    const dividerLabel = "RUN 6+ COURSES TO GET RANKED";
     
     if ((mode === false || mode === "open" || mode === "2026") && fQual.length === 0) return [{ isDivider: true, label: dividerLabel }, ...fUnranked];
     return fQual.length && fUnranked.length ? [...fQual, { isDivider: true, label: dividerLabel }, ...fUnranked] : [...fQual, ...fUnranked];
@@ -667,8 +667,20 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   };
 
   const cListAT = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
-  const cListOP = masterCourseList.filter((c: CourseData) => c.is2026).sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
-  const cList2026 = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
+  const cListOP = masterCourseList.map((c: CourseData) => {
+    const mCount = Object.keys(lbOpen?.M?.[String(c.name).toUpperCase()] || {}).length;
+    const fCount = Object.keys(lbOpen?.F?.[String(c.name).toUpperCase()] || {}).length;
+    return { ...c, openRuns: mCount + fCount };
+  }).filter((c: any) => c.openRuns > 0)
+    .sort((a: any, b: any) => b.openRuns - a.openRuns)
+    .map((c: any, i: number) => ({ ...c, currentRank: i + 1 }));
+  const cList2026 = masterCourseList.map((c: CourseData) => {
+    const mCount = Object.keys(lbSeason26?.M?.[String(c.name).toUpperCase()] || {}).length;
+    const fCount = Object.keys(lbSeason26?.F?.[String(c.name).toUpperCase()] || {}).length;
+    return { ...c, season26Runs: mCount + fCount };
+  }).filter((c: any) => c.season26Runs > 0)
+    .sort((a: any, b: any) => b.season26Runs - a.season26Runs)
+    .map((c: any, i: number) => ({ ...c, currentRank: i + 1 }));
   const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));
 
   const courseRecords_M_AT: Record<string, unknown> = {};

@@ -53,10 +53,10 @@ async function main() {
     const player2026Bests = { M: {}, F: {} };
 
     liveData.forEach(r => {
-        const pName = (r["Player Taylor Carpenter Benati Louvouezo Taylor Carpenter Taylor Carpenter Taylor Carpenter Taylor Carpenter Joey Jepsen Joey Jepsen"] || r["Player"] || r["PLAYER"] || "").trim().toUpperCase();
-        const cName = (r["Course AUCOIN AUCOIN RINO CPRC 1 CHAPU 1 CHAPU 1 AURARIA 1 HARBOURFRONT 1"] || r["Course"] || r["COURSE"] || "").trim().toUpperCase();
-        const timeStr = r["Time (sec) ? ? ? ? ? ? ? ?"] || r["Time (sec)"] || r["TIME"];
-        const div = (r["Division F M F F F F M M"] || r["Division"] || athleteGender[pName] || "M").trim().toUpperCase();
+        const pName = (r["Player"] || r["PLAYER"] || r["Athlete"] || r["Name"] || "").trim().toUpperCase();
+        const cName = (r["Course"] || r["COURSE"] || "").trim().toUpperCase();
+        const timeStr = r["Time (sec)"] || r["TIME"] || r["Result"];
+        const div = (r["Division"] || r["Gender"] || athleteGender[pName] || "M").trim().toUpperCase();
         const d = parseDate(r);
         
         if (!pName || pName.startsWith("UNKNOWN") || pName === "TBD" || !cName || !timeStr || timeStr === "?") return;
@@ -88,7 +88,7 @@ async function main() {
             const courses = player2026Bests[gender][pName];
             const courseNames = Object.keys(courses);
             
-            if (courseNames.length >= 1) {
+            if (courseNames.length >= 6) {
                 let totalLQ = 0;
                 for (const cName of courseNames) {
                     const best = courses[cName];

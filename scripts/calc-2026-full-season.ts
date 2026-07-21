@@ -69,11 +69,11 @@ async function main() {
         // Check if run is in 2026
         let is2026 = false;
         const tag = (vals.tag || "").toUpperCase();
-        if (tag.includes("OPEN") || tag.includes("2026") || tag.includes("ASR")) {
-            is2026 = true; // Assume ASR tag or OPEN tag means current year
+        if (tag.includes("OPEN") || tag.includes("2026")) {
+            is2026 = true; // Assume OPEN tag means current year
         } else if (vals.date) {
             const dateStr = String(vals.date).trim();
-            if (dateStr.includes("2026") || dateStr.includes("/26") || dateStr.match(/^\d{1,2}\/\d{1,2}$/) || dateStr.match(/^\d{1,2}-\d{1,2}$/)) { 
+            if (dateStr.includes("2026") || dateStr.includes("/26")) { 
                 is2026 = true;
             } else {
                 const d = new Date(dateStr);
@@ -97,7 +97,7 @@ async function main() {
             const courses = player2026Bests[gender][pKey];
             const courseNames = Object.keys(courses);
             
-            if (courseNames.length >= 5) {
+            if (courseNames.length >= 6) {
                 let totalLQ = 0;
                 for (const cName of courseNames) {
                     const best = courses[cName];
