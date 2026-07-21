@@ -675,6 +675,8 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
   const courseRecords_F_AT: Record<string, unknown> = {};
   const courseRecords_M_OP: Record<string, unknown> = {};
   const courseRecords_F_OP: Record<string, unknown> = {};
+  const courseRecords_M_2026: Record<string, unknown> = {};
+  const courseRecords_F_2026: Record<string, unknown> = {};
 
   const computeRecords = (sourceSector: Record<string, unknown> | undefined, rawBestSector: Record<string, unknown> | undefined, cName: string, allTimeSourceSector?: Record<string, unknown>) => {
     const source = (sourceSector?.[cName] || {}) as Record<string, unknown>;
@@ -722,6 +724,8 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     courseRecords_F_AT[name] = computeRecords(lbAT?.F, atRawBest, name, lbAT?.F);
     courseRecords_M_OP[name] = computeRecords(lbOpen?.M, opRawBest, name, lbAT?.M);
     courseRecords_F_OP[name] = computeRecords(lbOpen?.F, opRawBest, name, lbAT?.F);
+    courseRecords_M_2026[name] = computeRecords(lbSeason26?.M, season26RawBest, name, lbAT?.M);
+    courseRecords_F_2026[name] = computeRecords(lbSeason26?.F, season26RawBest, name, lbAT?.F);
   });
 
   return {
@@ -759,8 +763,8 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     courseRecords_F_AT,
     courseRecords_M_OP,
     courseRecords_F_OP,
-    courseRecords_M_2026: courseRecords_M_OP,
-    courseRecords_F_2026: courseRecords_F_OP,
+    courseRecords_M_2026,
+    courseRecords_F_2026,
   };
 }
 

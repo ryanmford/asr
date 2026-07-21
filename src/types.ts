@@ -87,4 +87,6 @@ export interface ASRDataContext {
   courseRecords_F_AT?: Record<string, unknown>;
   courseRecords_M_OP?: Record<string, unknown>;
   courseRecords_F_OP?: Record<string, unknown>;
+  courseRecords_M_2026?: Record<string, unknown>;
+  courseRecords_F_2026?: Record<string, unknown>;
 }

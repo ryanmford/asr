@@ -239,10 +239,14 @@ export const CourseDetails = React.memo(
 
     const recordsM = contentMode === "all-time" 
       ? (dataContext.courseRecords_M_AT?.[cName] || [])
+      : contentMode === "2026"
+      ? (dataContext.courseRecords_M_2026?.[cName] || [])
       : (dataContext.courseRecords_M_OP?.[cName] || []);
 
     const recordsF = contentMode === "all-time" 
       ? (dataContext.courseRecords_F_AT?.[cName] || [])
+      : contentMode === "2026"
+      ? (dataContext.courseRecords_F_2026?.[cName] || [])
       : (dataContext.courseRecords_F_OP?.[cName] || []);
 
     const atRecordsM = dataContext.courseRecords_M_AT?.[cName] || [];

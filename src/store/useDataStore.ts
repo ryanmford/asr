@@ -36,6 +36,8 @@ interface ASRDataState {
   courseRecords_F_AT: Record<string, unknown>;
   courseRecords_M_OP: Record<string, unknown>;
   courseRecords_F_OP: Record<string, unknown>;
+  courseRecords_M_2026: Record<string, unknown>;
+  courseRecords_F_2026: Record<string, unknown>;
   playerList_M_AT: PlayerProfile[];
   playerList_F_AT: PlayerProfile[];
   playerList_M_OP: PlayerProfile[];

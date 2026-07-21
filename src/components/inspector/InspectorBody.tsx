@@ -61,6 +61,8 @@ export const InspectorBody = React.memo(
     const courseRecords_F_AT = useDataStore((s) => s.courseRecords_F_AT);
     const courseRecords_M_OP = useDataStore((s) => s.courseRecords_M_OP);
     const courseRecords_F_OP = useDataStore((s) => s.courseRecords_F_OP);
+    const courseRecords_M_2026 = useDataStore((s) => s.courseRecords_M_2026);
+    const courseRecords_F_2026 = useDataStore((s) => s.courseRecords_F_2026);
 
     const { settersWithImpact, setterMet } = useSettersDerived();
     const { pRaw, playerLB_AT, playerLB_OP, playerLB_2026 } = useLeaderboards();
@@ -92,12 +94,14 @@ export const InspectorBody = React.memo(
       courseRecords_F_AT: courseRecords_F_AT,
       courseRecords_M_OP: courseRecords_M_OP,
       courseRecords_F_OP: courseRecords_F_OP,
+      courseRecords_M_2026: courseRecords_M_2026,
+      courseRecords_F_2026: courseRecords_F_2026,
     }), [
       dataCore, atPerfs, opPerfs, atMet, openData, cMet, 
       playerLB_AT, playerLB_OP, playerLB_2026, lbSeason26, season26Data, setterMet, pRaw, 
       settersWithImpact, atRawBest, opRawBest, lbAT, 
       lbOpen, teamsAggregated, courseRunsHistory, masterCourseList,
-      courseRecords_M_AT, courseRecords_F_AT, courseRecords_M_OP, courseRecords_F_OP
+      courseRecords_M_AT, courseRecords_F_AT, courseRecords_M_OP, courseRecords_F_OP, courseRecords_M_2026, courseRecords_F_2026
     ]);
 
     const finalData = data || item;
