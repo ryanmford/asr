@@ -70,6 +70,11 @@ const SET_LIST_MAPPING = {
   state: ["state", "prov", "region"],
   leads: ["lead", "lead setter", "leads", "leadsetters"],
   assists: ["assistant", "assistants", "assistant setter", "assistantsetters"],
+  isOpen: ["open?"],
+  is2026: ["2026?"],
+  isAllTime: ["all-time?"],
+  sponsorName: ["sponsor name", "course sponsor sponsor"],
+  sponsorLink: ["sponsor link"],
 };
 
 const SETTER_MAPPING = {
@@ -184,25 +189,24 @@ export const processSetListData = (csv: string) => {
     const course = (vals.course || "").trim().toUpperCase();
     if (course) {
       const fixed = fixCountryEntity(vals.country, vals.flag);
-      const valAG = vals.__raw
-        ? String(vals.__raw[32] || "")
-            .toUpperCase()
-            .trim()
-        : "";
-      const rulesVideoFromCol = vals.__raw
-        ? String(vals.__raw[31] || "").trim()
-        : "";
-      const sponsorName = vals.__raw ? (vals.__raw[34] || "").trim() : "";
-      const sponsorLink = vals.__raw ? (vals.__raw[35] || "").trim() : "";
+      const isOpenRaw = vals.isOpen ? String(vals.isOpen).toUpperCase().trim() : "";
+      const is2026Raw = vals.is2026 ? String(vals.is2026).toUpperCase().trim() : "";
+      const isAllTimeRaw = vals.isAllTime ? String(vals.isAllTime).toUpperCase().trim() : "";
+      const rulesVideoFromCol = (vals.demo || "").trim();
+      const sponsorName = (vals.sponsorName || "").trim();
+      const sponsorLink = (vals.sponsorLink || "").trim();
 
-      const isOpenCourse =
-        valAG === "YES" || valAG === "TRUE" || valAG.includes("OPEN");
+      const isOpenCourse = isOpenRaw === "YES" || isOpenRaw === "TRUE" || isOpenRaw.includes("OPEN");
+      const is2026Course = is2026Raw === "YES" || is2026Raw === "TRUE" || is2026Raw.includes("2026");
+      const isAllTimeCourse = isAllTimeRaw === "YES" || isAllTimeRaw === "TRUE" || isAllTimeRaw.includes("ALL");
       const leadsRaw = (vals.leads || "").trim();
       const assistsRaw = (vals.assists || "").trim();
 
       map[course] = {
         name: course,
         isOpenCourse,
+        is2026Course,
+        isAllTimeCourse,
         flag: fixed.flag || "🏳️",
         city: (vals.city || "").trim().toUpperCase() || "UNKNOWN",
         stateProv: (vals.state || "").trim().toUpperCase(),

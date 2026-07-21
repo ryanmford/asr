@@ -666,19 +666,28 @@ export function computeAllState(payload: { rM: string; rF: string; rLive: string
     return arr.map((t: TeamProfile & { pts: number }, i: number) => ({ ...t, currentRank: i + 1, category: cat }));
   };
 
-  const cListAT = [...masterCourseList].sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0)).map((c, i) => ({ ...c, currentRank: i + 1 }));
-  const cListOP = masterCourseList.map((c: CourseData) => {
-    const mCount = Object.keys(lbOpen?.M?.[String(c.name).toUpperCase()] || {}).length;
-    const fCount = Object.keys(lbOpen?.F?.[String(c.name).toUpperCase()] || {}).length;
-    return { ...c, openRuns: mCount + fCount };
-  }).filter((c: any) => c.openRuns > 0)
+  const cListAT = [...masterCourseList]
+    .filter((c: CourseData) => c.isAllTimeCourse)
+    .sort((a: CourseData, b: CourseData) => (b.totalAllTimeRuns || 0) - (a.totalAllTimeRuns || 0))
+    .map((c, i) => ({ ...c, currentRank: i + 1 }));
+    
+  const cListOP = masterCourseList
+    .filter((c: CourseData) => c.isOpenCourse)
+    .map((c: CourseData) => {
+      const mCount = Object.keys(lbOpen?.M?.[String(c.name).toUpperCase()] || {}).length;
+      const fCount = Object.keys(lbOpen?.F?.[String(c.name).toUpperCase()] || {}).length;
+      return { ...c, openRuns: mCount + fCount };
+    })
     .sort((a: any, b: any) => b.openRuns - a.openRuns)
     .map((c: any, i: number) => ({ ...c, currentRank: i + 1 }));
-  const cList2026 = masterCourseList.map((c: CourseData) => {
-    const mCount = Object.keys(lbSeason26?.M?.[String(c.name).toUpperCase()] || {}).length;
-    const fCount = Object.keys(lbSeason26?.F?.[String(c.name).toUpperCase()] || {}).length;
-    return { ...c, season26Runs: mCount + fCount };
-  }).filter((c: any) => c.season26Runs > 0)
+    
+  const cList2026 = masterCourseList
+    .filter((c: CourseData) => c.is2026Course)
+    .map((c: CourseData) => {
+      const mCount = Object.keys(lbSeason26?.M?.[String(c.name).toUpperCase()] || {}).length;
+      const fCount = Object.keys(lbSeason26?.F?.[String(c.name).toUpperCase()] || {}).length;
+      return { ...c, season26Runs: mCount + fCount };
+    })
     .sort((a: any, b: any) => b.season26Runs - a.season26Runs)
     .map((c: any, i: number) => ({ ...c, currentRank: i + 1 }));
   const sList = [...settersWithImpact].sort((a: SetterProfile, b: SetterProfile) => (b.impact || 0) - (a.impact || 0)).map((s, i) => ({ ...s, currentRank: i + 1 }));

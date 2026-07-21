@@ -43,6 +43,8 @@ export interface CourseData {
   assistantSettersNormalized?: string[];
   assistantsetters?: string | string[];
   isOpenCourse?: boolean;
+  is2026Course?: boolean;
+  isAllTimeCourse?: boolean;
   dateSet?: string;
 }
 
