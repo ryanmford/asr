@@ -138,14 +138,17 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
      setActiveCourseId(null);
   }, [setActiveCourseId]);
 
-  const renderListContent = (currentSnap: number, scrollRef: React.RefObject<HTMLDivElement>, dRef: React.RefObject<any>) => (
+  const renderListContent = (currentSnap: number, scrollRef: React.RefObject<HTMLDivElement>, dRef: React.RefObject<any>) => {
+    const courseCount = courseList ? courseList.filter((i: any) => !i.isDivider).length : 0;
+    
+    return (
     <div className="flex flex-col h-full bg-transparent">
       <div className="px-4 pb-2 pt-2 shrink-0 pointer-events-auto">
         <ASRSearchInput
           value={search}
           onChange={(e: any) => setSearch(e.target.value)}
           theme={theme}
-          placeholder="search courses..."
+          placeholder={`search ${courseCount} courses...`}
           enableFocusShortcut="slash"
         />
       </div>
@@ -176,7 +179,8 @@ export const MapCoursesView = React.memo(({ theme }: { theme: "light" | "dark" }
         </ErrorBoundary>
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div ref={containerRef} className="relative flex-1 w-full overflow-hidden bg-slate-100 dark:bg-zinc-900">
