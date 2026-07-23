@@ -38,7 +38,7 @@ const MedalHeader = React.memo(
  return (
  <th
  className={cn(
- "py-3 sm:py-5 px-3 sm:px-5 uppercase text-[9px] sm:text-[11px] font-black tracking-widest transition-all select-none group h-full",
+ "py-3 sm:py-5 px-3 sm:px-5 uppercase text-[10px] sm:text-[13px] font-black tracking-widest transition-all select-none group h-full",
  sortable ? "cursor-pointer hover:bg-black/5" : "cursor-default",
  isActive
  ? "text-blue-500 opacity-100"
@@ -193,7 +193,7 @@ export const ASRWallOfFame = React.memo(
  <div className="flex flex-col text-left">
  <span
  className={cn(
- "text-[11px] sm:text-[14px] font-black uppercase truncate pr-2 tracking-tight transition-colors",
+ "text-[14px] sm:text-[18px] lg:text-[22px] font-black uppercase truncate pr-2 leading-tight transition-colors",
  theme === "dark"
  ? "text-zinc-100"
  : "text-zinc-900",
@@ -207,7 +207,7 @@ export const ASRWallOfFame = React.memo(
  <div className="flex items-center justify-end gap-2 shrink-0 text-right z-10 relative">
  <span
  className={cn(
- "text-[14px] sm:text-[18px] font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-blue-500",
+ "text-[16px] sm:text-[24px] lg:text-[28px] font-mono font-black tracking-tighter whitespace-nowrap transition-all tabular-nums text-right group-hover:text-blue-500",
  theme === "dark" ? "text-white" : "text-zinc-900",
  isTop3 ? "scale-110" : "opacity-100",
  i === 0 && ""
@@ -255,7 +255,7 @@ export const ASRWallOfFame = React.memo(
  <tr>
  <th
  className={cn(
- "py-3 sm:py-5 pl-4 sm:pl-10 w-14 sm:w-28 text-left uppercase text-[9px] sm:text-[11px] font-black tracking-widest",
+ "py-3 sm:py-5 pl-4 sm:pl-10 w-14 sm:w-28 text-left uppercase text-[10px] sm:text-[13px] font-black tracking-widest",
  theme === "dark"
  ? "text-white opacity-30"
  : "text-black opacity-40",
@@ -337,12 +337,12 @@ export const ASRWallOfFame = React.memo(
   </td>
   <td className="py-4 sm:py-6 px-2 sm:px-5 text-left max-w-[100px] sm:max-w-xs">
   <div className="flex items-center gap-1.5 sm:gap-3 text-left min-w-0 h-full">
-  <span className="emoji-slot text-[14px] sm:text-2xl shrink-0">
+  <span className="emoji-slot text-[16px] sm:text-[24px] lg:text-[32px] shrink-0">
   {formatFlagsWithSpace(c.flag)}
   </span>
   <span
   className={cn(
-  "text-[10px] sm:text-[16px] font-black uppercase truncate leading-tight group-hover:text-blue-500 transition-colors",
+  "text-[14px] sm:text-[18px] lg:text-[22px] font-black uppercase truncate leading-tight group-hover:text-blue-500 transition-colors",
   theme === "dark"
   ? "text-zinc-100"
   : "text-zinc-800",
@@ -353,24 +353,24 @@ export const ASRWallOfFame = React.memo(
   </div>
   </td>
   <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
-  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-amber-500">
+  <span className="text-[14px] sm:text-[20px] lg:text-[24px] font-mono font-black tabular-nums tracking-tighter text-amber-500">
   {String(c.gold)}
   </span>
   </td>
   <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
-  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-zinc-400">
+  <span className="text-[14px] sm:text-[20px] lg:text-[24px] font-mono font-black tabular-nums tracking-tighter text-zinc-400">
   {String(c.silver)}
   </span>
   </td>
   <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
-  <span className="text-[12px] sm:text-[20px] font-black tabular-nums tracking-tighter text-[#CE8946]">
+  <span className="text-[14px] sm:text-[20px] lg:text-[24px] font-mono font-black tabular-nums tracking-tighter text-[#CE8946]">
   {String(c.bronze)}
   </span>
   </td>
   <td className="py-4 sm:py-6 pr-4 sm:pr-10 pl-1 sm:pl-5 text-right">
   <span
   className={cn(
-  "text-[12px] sm:text-[24px] font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",
+  "text-[16px] sm:text-[24px] lg:text-[32px] font-mono font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",
   theme === "dark" ? "text-white" : "text-zinc-900",
   )}
   >
