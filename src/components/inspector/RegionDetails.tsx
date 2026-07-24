@@ -76,6 +76,18 @@ export const RegionDetails = React.memo(
     const matchRegion = (obj: any): boolean => {
       const locStr = formatLocation(obj);
       if (!locStr || locStr === "UNKNOWN") return false;
+
+      const regionFlags = getCombinedFlags(region.flag, finalFlag).split(" ").filter(Boolean);
+      if (regionFlags.length > 0) {
+        const playerFlags = getCombinedFlags(obj.flag, obj.country, obj.location, obj.region, obj.state, locStr).split(" ").filter(Boolean);
+        
+        for (const flag of regionFlags) {
+          if (flag !== "🏳️" && playerFlags.includes(flag)) {
+            return true;
+          }
+        }
+      }
+
       const strippedLocStr = locStr.replace(/[\uD83C][\uDDE6-\uDDFF]|\p{Extended_Pictographic}/gu, '').trim();
 
       const objTokens = strippedLocStr.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -159,14 +171,12 @@ export const RegionDetails = React.memo(
         .map((p: any) => {
           const pKey = p.pKey || normalizeName(p.name);
           const stats = regionStats[pKey] || { runs: 0, lqSum: 0 };
-          const regionalLQ = stats.runs > 0 ? stats.lqSum / stats.runs : 0;
           return {
             ...p,
             runs: stats.runs,
-            regionalLQ: regionalLQ
           };
         })
-        .sort((a: any, b: any) => b.regionalLQ - a.regionalLQ);
+        .sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
     }, [atMet, region, regionalCourses, allTimeRankedPKeys]);
 
     return (
@@ -234,7 +244,7 @@ export const RegionDetails = React.memo(
                   <ASRRankList
                     athletes={regionalPlayers.map((p: any) => [
                       p.pKey || normalizeName(p.name),
-                      p.regionalLQ || 0,
+                      p.rating || 0,
                     ])}
                     valueLabel="LQ"
                     dataContext={dataContext}

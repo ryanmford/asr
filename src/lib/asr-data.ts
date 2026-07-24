@@ -832,22 +832,24 @@ export const calculateWofStats = (
           const flags = String(athlete.region || "").match(
             /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g,
           ) || [athlete.region || "🏳️"];
-          names.forEach((name, i) => {
-            const fixed = fixCountryEntity(name, flags[i] || flags[0]);
-            if (!medalsBase[fixed.name])
-              medalsBase[fixed.name] = {
-                name: fixed.name,
-                flag: fixed.flag,
-                gold: 0,
-                silver: 0,
-                bronze: 0,
-                total: 0,
-              };
-            if (rankIdx === 0) medalsBase[fixed.name].gold++;
-            else if (rankIdx === 1) medalsBase[fixed.name].silver++;
-            else medalsBase[fixed.name].bronze++;
-            medalsBase[fixed.name].total++;
-          });
+          
+          const primaryName = names[0];
+          const primaryFlag = flags[0] || "🏳️";
+          
+          const fixed = fixCountryEntity(primaryName, primaryFlag);
+          if (!medalsBase[fixed.name])
+            medalsBase[fixed.name] = {
+              name: fixed.name,
+              flag: fixed.flag,
+              gold: 0,
+              silver: 0,
+              bronze: 0,
+              total: 0,
+            };
+          if (rankIdx === 0) medalsBase[fixed.name].gold++;
+          else if (rankIdx === 1) medalsBase[fixed.name].silver++;
+          else medalsBase[fixed.name].bronze++;
+          medalsBase[fixed.name].total++;
         });
       });
     };

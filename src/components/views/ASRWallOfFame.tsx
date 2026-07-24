@@ -353,7 +353,7 @@ export const ASRWallOfFame = React.memo(
   </div>
   </td>
   <td className="py-4 sm:py-6 px-1 sm:px-5 text-right">
-  <span className="text-[14px] sm:text-[20px] lg:text-[24px] font-mono font-black tabular-nums tracking-tighter text-amber-500">
+  <span className="text-[16px] sm:text-[24px] lg:text-[32px] font-mono font-black tabular-nums tracking-tighter text-amber-500 group-hover:text-amber-400 transition-colors">
   {String(c.gold)}
   </span>
   </td>
@@ -370,7 +370,7 @@ export const ASRWallOfFame = React.memo(
   <td className="py-4 sm:py-6 pr-4 sm:pr-10 pl-1 sm:pl-5 text-right">
   <span
   className={cn(
-  "text-[16px] sm:text-[24px] lg:text-[32px] font-mono font-black tracking-tighter tabular-nums group-hover:text-blue-500 transition-all",
+  "text-[14px] sm:text-[20px] lg:text-[24px] font-mono font-black tabular-nums tracking-tighter",
   theme === "dark" ? "text-white" : "text-zinc-900",
   )}
   >
