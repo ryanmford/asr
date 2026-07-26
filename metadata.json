@@ -1,6 +1,6 @@
 {
   "name": "Apex Speed Run",
-  "description": "ASR Leaderboard and Course Directory",
+  "description": "Finding the fastest humans IRL 🌎 🌍 🌏",
   "requestFramePermissions": [
     "geolocation"
   ],
