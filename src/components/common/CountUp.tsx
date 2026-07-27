@@ -1,4 +1,3 @@
- 
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "../../lib/asr-utils";
 
@@ -20,7 +19,7 @@ export const CountUp = React.memo(
             setHasTriggered(true);
           }
         },
-        { threshold: 0.1 }
+        { threshold: 0.1 },
       );
 
       if (nodeRef.current) {
@@ -45,14 +44,21 @@ export const CountUp = React.memo(
         // Ease out quadratic
         const p = Math.min((timestamp - startTimestamp) / duration, 1);
         const progress = p * (2 - p);
-        
+
         const currentCount = progress * end;
 
         if (nodeRef.current) {
           if (decimals > 0) {
-            nodeRef.current.textContent = currentCount.toFixed(decimals);
+            nodeRef.current.textContent = currentCount.toLocaleString(
+              undefined,
+              {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals,
+              },
+            );
           } else {
-            nodeRef.current.textContent = Math.floor(currentCount).toLocaleString();
+            nodeRef.current.textContent =
+              Math.floor(currentCount).toLocaleString();
           }
         }
 
@@ -61,7 +67,10 @@ export const CountUp = React.memo(
         } else if (nodeRef.current) {
           // Guarantee final value
           if (decimals > 0) {
-            nodeRef.current.textContent = end.toFixed(decimals);
+            nodeRef.current.textContent = end.toLocaleString(undefined, {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals,
+            });
           } else {
             nodeRef.current.textContent = end.toLocaleString();
           }

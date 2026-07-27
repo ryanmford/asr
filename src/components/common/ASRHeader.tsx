@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 import React from "react";
 import { Moon, Sun, CloudOff, RefreshCw } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
@@ -36,7 +36,7 @@ export const ASRHeader = React.memo(
     return (
       <header
         className={cn(
-          "z-[60] w-full px-4 py-3 sm:py-4 flex items-center border-b backdrop-blur-xl pointer-events-auto transition-all duration-500 gap-2 select-none",
+          "z-[60] w-full px-4 pb-3 sm:pb-4 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pt-[max(1rem,env(safe-area-inset-top))] flex items-center border-b backdrop-blur-xl pointer-events-auto transition-all duration-500 gap-2 select-none",
           isTransparent
             ? "bg-transparent border-transparent shadow-none"
             : theme === "dark"
@@ -52,9 +52,7 @@ export const ASRHeader = React.memo(
               </div>
             )}
             {leftSlot && (
-              <div className="w-full flex items-center">
-                {leftSlot}
-              </div>
+              <div className="w-full flex items-center">{leftSlot}</div>
             )}
           </div>
 
@@ -79,7 +77,12 @@ export const ASRHeader = React.memo(
             </div>
           ) : null}
 
-          <div className={cn("flex items-center justify-end gap-2 shrink-0", (!hideTabs || centerSlot) ? "flex-1" : "flex-none")}>
+          <div
+            className={cn(
+              "flex items-center justify-end gap-2 shrink-0",
+              !hideTabs || centerSlot ? "flex-1" : "flex-none",
+            )}
+          >
             {hasError ? (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-black tracking-widest uppercase">
                 <CloudOff size={10} /> OFFLINE
@@ -101,7 +104,11 @@ export const ASRHeader = React.memo(
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10 transition-transform duration-500 group-hover/theme:rotate-12 group-active/theme:-rotate-12">
-                {theme === "dark" ? <Sun size={18} strokeWidth={2} /> : <Moon size={18} strokeWidth={2.5} />}
+                {theme === "dark" ? (
+                  <Sun size={18} strokeWidth={2} />
+                ) : (
+                  <Moon size={18} strokeWidth={2.5} />
+                )}
               </div>
             </button>
           </div>

@@ -45,7 +45,7 @@ export function ASRSubmitModal() {
             </h2>
             <button
               onClick={() => setIsOpen(false)}
-              className={`rounded-full p-2 outline-none transition-colors ${
+              className={`rounded-full p-2 relative after:absolute after:-inset-3 after:content-['] outline-none transition-colors ${
                 theme === "dark"
                   ? "hover:bg-white/10 focus-visible:bg-white/10"
                   : "hover:bg-black/5 focus-visible:bg-black/5"
@@ -62,7 +62,8 @@ export function ASRSubmitModal() {
                 theme === "dark" ? "text-zinc-400" : "text-zinc-600"
               }`}
             >
-              Follow our community protocol to get your run verified and added to the leaderboards.
+              Follow our community protocol to get your run verified and added
+              to the leaderboards.
             </p>
 
             <div className="space-y-6">
@@ -86,7 +87,8 @@ export function ASRSubmitModal() {
                       theme === "dark" ? "text-zinc-400" : "text-zinc-600"
                     }`}
                   >
-                    Make sure your start/stop touches are visible and that you cleared all checkpoints.
+                    Make sure your start/stop touches are visible and that you
+                    cleared all checkpoints.
                   </p>
                 </div>
               </div>
@@ -115,11 +117,12 @@ export function ASRSubmitModal() {
                     <a
                       href="https://drive.google.com/drive/folders/1EPR8ZK09w8PtZ9XrC7N7lW7P8nPJ-anN?usp=sharing"
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="text-blue-500 hover:underline focus-visible:underline outline-none"
                     >
                       ASR Google Drive
-                    </a>.
+                    </a>
+                    .
                   </p>
                 </div>
               </div>
@@ -148,7 +151,7 @@ export function ASRSubmitModal() {
                     <a
                       href="https://www.skool.com/apexmovement/share-verify-asr-clips-here"
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="font-semibold text-blue-500 hover:text-blue-400 hover:underline"
                     >
                       Parkour Skool app
@@ -163,7 +166,7 @@ export function ASRSubmitModal() {
               <a
                 href="https://www.skool.com/apexmovement/share-verify-asr-clips-here"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="block outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md"
               >
                 <div className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-md bg-white px-4 py-3 font-mono text-sm font-semibold text-black transition-transform hover:scale-[1.02] active:scale-95">

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Share, CornerUpLeft, CornerUpRight, X } from "lucide-react";
+import { Share, CornerUpLeft, CornerUpRight, X, Check } from "lucide-react";
 import { cn } from "../../lib/asr-utils";
 
 interface ASRBaseModalProps {
@@ -21,7 +21,9 @@ interface ASRBaseModalProps {
 
 import { motion, AnimatePresence } from "motion/react";
 
-export const ModalScrollContext = React.createContext<React.RefObject<HTMLDivElement | null>>({ current: null });
+export const ModalScrollContext = React.createContext<
+  React.RefObject<HTMLDivElement | null>
+>({ current: null });
 
 export const ASRBaseModal = React.memo(
   ({
@@ -70,20 +72,20 @@ export const ASRBaseModal = React.memo(
       if (scrollContainerRef.current) {
         const savedPos = historyScrollPositions.current[historyIndex];
         const targetY = savedPos !== undefined ? savedPos : 0;
-        
+
         const attemptScroll = () => {
-           if (scrollContainerRef.current) {
-             scrollContainerRef.current.scrollTo({
-                top: targetY,
-                behavior: "instant",
-             });
-           }
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({
+              top: targetY,
+              behavior: "instant",
+            });
+          }
         };
 
         attemptScroll();
         requestAnimationFrame(() => {
-           attemptScroll();
-           setTimeout(attemptScroll, 100);
+          attemptScroll();
+          setTimeout(attemptScroll, 100);
         });
       }
 
@@ -94,10 +96,16 @@ export const ASRBaseModal = React.memo(
       const url = window.location.href;
       if (navigator.share) {
         navigator.share({ title: "Apex Speed Run", url }).catch(() => {
-          navigator.clipboard.writeText(url).then(() => setCopied(true)).catch((e) => console.warn("Clipboard copy failed", e));
+          navigator.clipboard
+            .writeText(url)
+            .then(() => setCopied(true))
+            .catch((e) => console.warn("Clipboard copy failed", e));
         });
       } else {
-        navigator.clipboard.writeText(url).then(() => setCopied(true)).catch((e) => console.warn("Clipboard copy failed", e));
+        navigator.clipboard
+          .writeText(url)
+          .then(() => setCopied(true))
+          .catch((e) => console.warn("Clipboard copy failed", e));
       }
     };
 
@@ -184,7 +192,7 @@ export const ASRBaseModal = React.memo(
                       "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
-                        : "text-slate-400 hover:text-black hover:bg-slate-100"
+                        : "text-slate-400 hover:text-black hover:bg-slate-100",
                     )}
                     title="Back"
                   >
@@ -197,7 +205,7 @@ export const ASRBaseModal = React.memo(
                         "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                         theme === "dark"
                           ? "text-zinc-400 hover:text-white hover:bg-zinc-800/20"
-                          : "text-slate-400 hover:text-black hover:bg-slate-100"
+                          : "text-slate-400 hover:text-black hover:bg-slate-100",
                       )}
                       title="Forward"
                     >
@@ -263,11 +271,19 @@ export const ASRBaseModal = React.memo(
                       "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
-                        : "text-zinc-500 hover:text-black hover:bg-slate-100"
+                        : "text-zinc-500 hover:text-black hover:bg-slate-100",
                     )}
                     title="Share"
                   >
-                    <Share size={20} strokeWidth={2.5} />
+                    {copied ? (
+                      <Check
+                        size={20}
+                        strokeWidth={2.5}
+                        className="text-green-500"
+                      />
+                    ) : (
+                      <Share size={20} strokeWidth={2.5} />
+                    )}
                   </button>
                   <button
                     onClick={onClose}
@@ -275,9 +291,10 @@ export const ASRBaseModal = React.memo(
                       "p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                       theme === "dark"
                         ? "text-zinc-500 hover:text-white hover:bg-zinc-800/20"
-                        : "text-zinc-500 hover:text-black hover:bg-slate-100"
+                        : "text-zinc-500 hover:text-black hover:bg-slate-100",
                     )}
                     title="Close"
+                    aria-label="Close modal"
                   >
                     <X size={20} strokeWidth={2.5} />
                   </button>

@@ -13,32 +13,37 @@ interface ASRNavDockProps {
 
 export const ASRNavDock = React.memo(
   ({ currentView, setView, theme }: ASRNavDockProps) => {
-    const isCompact = useAppStore(s => s.isNavCompact);
-    const setIsCompact = useAppStore(s => s.setIsNavCompact);
-    const isKeyboardOpen = useAppStore(s => s.isKeyboardOpen);
-    const setIsKeyboardOpen = useAppStore(s => s.setIsKeyboardOpen);
+    const isCompact = useAppStore((s) => s.isNavCompact);
+    const setIsCompact = useAppStore((s) => s.setIsNavCompact);
+    const isKeyboardOpen = useAppStore((s) => s.isKeyboardOpen);
+    const setIsKeyboardOpen = useAppStore((s) => s.setIsKeyboardOpen);
     const triggerRefresh = useDataStore((s) => s.triggerRefresh);
-    const setIsSubmitModalOpen = useAppStore(s => s.setIsSubmitModalOpen);
+    const setIsSubmitModalOpen = useAppStore((s) => s.setIsSubmitModalOpen);
 
     useEffect(() => {
       const handleFocusIn = (e: Event) => {
         const target = e.target as HTMLElement;
-        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+        if (
+          target &&
+          (target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.tagName === "SELECT")
+        ) {
           setIsKeyboardOpen(true);
         }
       };
-      
+
       const handleFocusOut = () => {
         setIsKeyboardOpen(false);
       };
-      
-      window.addEventListener('focusin', handleFocusIn);
-      window.addEventListener('focusout', handleFocusOut);
-      
+
+      window.addEventListener("focusin", handleFocusIn);
+      window.addEventListener("focusout", handleFocusOut);
+
       return () => {
-        window.removeEventListener('focusin', handleFocusIn);
-        window.removeEventListener('focusout', handleFocusOut);
-      }
+        window.removeEventListener("focusin", handleFocusIn);
+        window.removeEventListener("focusout", handleFocusOut);
+      };
     }, []);
 
     useEffect(() => {
@@ -51,9 +56,12 @@ export const ASRNavDock = React.memo(
             // Scroll down threshold to shrink
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
               setIsCompact(true);
-            } 
+            }
             // Scroll up to expand
-            else if (currentScrollY < lastScrollY - 10 || currentScrollY < 150) {
+            else if (
+              currentScrollY < lastScrollY - 10 ||
+              currentScrollY < 150
+            ) {
               setIsCompact(false);
             }
             lastScrollY = currentScrollY;
@@ -66,13 +74,15 @@ export const ASRNavDock = React.memo(
       const handleScroll = () => performScrollCheck(window.scrollY);
       const handleCustomScroll = (e: Event) => {
         const ce = e as CustomEvent<{ scrollTop: number }>;
-        if (ce.detail && typeof ce.detail.scrollTop === 'number') {
-           performScrollCheck(ce.detail.scrollTop);
+        if (ce.detail && typeof ce.detail.scrollTop === "number") {
+          performScrollCheck(ce.detail.scrollTop);
         }
       };
 
       window.addEventListener("scroll", handleScroll, { passive: true });
-      window.addEventListener("asr-scroll", handleCustomScroll, { passive: true });
+      window.addEventListener("asr-scroll", handleCustomScroll, {
+        passive: true,
+      });
       return () => {
         window.removeEventListener("scroll", handleScroll);
         window.removeEventListener("asr-scroll", handleCustomScroll);
@@ -84,19 +94,21 @@ export const ASRNavDock = React.memo(
       { id: "courses", icon: MapPin, label: "COURSES" },
       { id: "submit", icon: Plus, label: "SUBMIT" },
       { id: "rankings", icon: Users, label: "RANKINGS" },
-      { id: "hof", icon: Trophy, label: "HOF" }
+      { id: "hof", icon: Trophy, label: "HOF" },
     ];
 
     return (
-      <div 
+      <div
         className={cn(
           "fixed left-1/2 -translate-x-1/2 z-[100] px-4 w-full pointer-events-none transition-all duration-500 ease-out flex justify-center items-center",
           isCompact ? "max-w-[320px]" : "max-w-[400px]",
-          isKeyboardOpen ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
+          isKeyboardOpen
+            ? "translate-y-24 opacity-0 pointer-events-none"
+            : "translate-y-0 opacity-100",
         )}
-        style={{ 
+        style={{
           bottom: `calc(24px + env(safe-area-inset-bottom, 0px))`,
-          height: '64px'
+          height: "64px",
         }}
       >
         <div className="relative group pointer-events-auto w-full">
@@ -120,6 +132,18 @@ export const ASRNavDock = React.memo(
                 <motion.button
                   key={item.id}
                   aria-label={`View ${item.label}`}
+                  onMouseEnter={() => {
+                    if (item.id === "map") import("../views/MapCoursesView");
+                    if (item.id === "rankings") import("../views/RankingsView");
+                    if (item.id === "wall-of-fame")
+                      import("../views/ASRWallOfFame");
+                  }}
+                  onTouchStart={() => {
+                    if (item.id === "map") import("../views/MapCoursesView");
+                    if (item.id === "rankings") import("../views/RankingsView");
+                    if (item.id === "wall-of-fame")
+                      import("../views/ASRWallOfFame");
+                  }}
                   onClick={() => {
                     if (item.id === "submit") {
                       setIsSubmitModalOpen(true);
@@ -137,7 +161,7 @@ export const ASRNavDock = React.memo(
                   className={cn(
                     "relative flex flex-col items-center justify-center flex-1 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 cursor-pointer overflow-visible",
                     isCompact ? "h-11" : "h-12",
-                    isActive ? "z-20" : "z-10"
+                    isActive ? "z-20" : "z-10",
                   )}
                 >
                   {/* Subtle active background pill */}
@@ -148,9 +172,14 @@ export const ASRNavDock = React.memo(
                         "absolute inset-0 rounded-full",
                         theme === "dark"
                           ? "bg-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_0_10px_rgba(255,255,255,0.03)]"
-                          : "bg-black/[0.04] shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                          : "bg-black/[0.04] shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]",
                       )}
-                      transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 35,
+                        mass: 0.8,
+                      }}
                     />
                   )}
 
@@ -160,17 +189,40 @@ export const ASRNavDock = React.memo(
                       animate={{
                         y: isActive ? -1.5 : 0,
                         color: isActive
-                            ? "#3b82f6" // text-blue-500
-                            : theme === "dark" ? "#a1a1aa" : "#71717a", // text-zinc-400 / text-zinc-500
+                          ? "#3b82f6" // text-blue-500
+                          : theme === "dark"
+                            ? "#a1a1aa"
+                            : "#71717a", // text-zinc-400 / text-zinc-500
                       }}
-                      transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.8 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 35,
+                        mass: 0.8,
+                      }}
                     >
                       <Icon
-                        size={item.id === "submit" ? (isCompact ? 22 : 26) : (isCompact ? 18 : 22)}
-                        strokeWidth={item.id === "submit" && !isActive ? 2.5 : (isActive ? 2.5 : 2)}
+                        size={
+                          item.id === "submit"
+                            ? isCompact
+                              ? 22
+                              : 26
+                            : isCompact
+                              ? 18
+                              : 22
+                        }
+                        strokeWidth={
+                          item.id === "submit" && !isActive
+                            ? 2.5
+                            : isActive
+                              ? 2.5
+                              : 2
+                        }
                         className={cn(
                           "transition-shadow duration-300",
-                          isActive && theme === "dark" ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" : ""
+                          isActive && theme === "dark"
+                            ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]"
+                            : "",
                         )}
                       />
                     </motion.div>

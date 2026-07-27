@@ -210,7 +210,7 @@ export const ASRListItem = React.memo(
  >
  <span
  className={cn(
- THEME.VALUE,
+ THEME.VALUE, "tabular-nums",
  "text-right transition-colors",
  idx === 0
  ? cn(
@@ -403,7 +403,7 @@ export const ASRListItem = React.memo(
  <span
  key={idx}
  className={cn(
- THEME.VALUE,
+ THEME.VALUE, "tabular-nums",
  "text-right transition-colors",
  idx === 0
  ? cn(

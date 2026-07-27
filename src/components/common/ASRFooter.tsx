@@ -74,9 +74,9 @@ export const ASRFooter = React.memo(() => {
           </div>
 
           <div className="flex items-center justify-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-bold tracking-widest uppercase transition-colors shrink-0 whitespace-nowrap">
-            <button onClick={() => setActiveModal("about")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">About</button>
-            <button onClick={() => setActiveModal("privacy")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Privacy Policy</button>
-            <button onClick={() => setActiveModal("terms")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Terms of Service</button>
+            <button type="button" onClick={() => setActiveModal("about")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">About</button>
+            <button type="button" onClick={() => setActiveModal("privacy")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Privacy Policy</button>
+            <button type="button" onClick={() => setActiveModal("terms")} className="hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-widest flex-shrink-0">Terms of Service</button>
           </div>
         </div>
 

@@ -341,7 +341,7 @@ export const CourseDetails = React.memo(
           <ASRStandardButton
             href={mapsUrl || undefined}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             variant="premium"
             color="blue"
             theme={theme}
@@ -357,7 +357,7 @@ export const CourseDetails = React.memo(
           <ASRStandardButton
             href={rulesUrl || undefined}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             variant="premium"
             color="red"
             theme={theme}

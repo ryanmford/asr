@@ -50,8 +50,9 @@ const generateAvatarSvg = (name: string, initials: string) => {
   const [c1, c2] = GRADIENTS[hash % GRADIENTS.length];
   // Create an offset color
   const c3 = GRADIENTS[(hash + 1) % GRADIENTS.length][1];
-  const scale = initials.length === 3 ? 0.75 : initials.length === 1 ? 1.1 : 0.9;
-  
+  const scale =
+    initials.length === 3 ? 0.75 : initials.length === 1 ? 1.1 : 0.9;
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <defs>
       <linearGradient id="g${hash}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -87,13 +88,20 @@ export const FallbackAvatar = React.memo(
     style,
   }: FallbackAvatarProps) => {
     const initials = getInitials(name, initialsOverride);
-    const src = useMemo(() => generateAvatarSvg(name, initials), [name, initials]);
+    const src = useMemo(
+      () => generateAvatarSvg(name, initials),
+      [name, initials],
+    );
 
     return (
       <img
         src={src}
         alt={name || "Avatar"}
-        className={cn("rounded-full object-cover ring-1 ring-inset ring-black/10 dark:ring-white/10", sizeCls, className)}
+        className={cn(
+          "rounded-full object-cover ios-gpu-fix ring-1 ring-inset ring-black/10 dark:ring-white/10",
+          sizeCls,
+          className,
+        )}
         style={style}
         loading="lazy"
         decoding="async"
@@ -101,6 +109,10 @@ export const FallbackAvatar = React.memo(
     );
   },
   (prev, next) => {
-    return prev.name === next.name && prev.initialsOverride === next.initialsOverride && prev.className === next.className;
-  }
+    return (
+      prev.name === next.name &&
+      prev.initialsOverride === next.initialsOverride &&
+      prev.className === next.className
+    );
+  },
 );

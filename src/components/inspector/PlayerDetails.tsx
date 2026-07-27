@@ -382,7 +382,7 @@ export const PlayerDetails = React.memo(
                     { label: "FILMS", value: meta.films || 0 },
                     {
                       label: "AVG LEN",
-                      value: `${calculatedAvgLength.toFixed(0)}m`,
+                      value: `${calculatedAvgLength.toFixed(2)}m`,
                     },
                     {
                       label: "🪙",
