@@ -198,25 +198,20 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
         onClose={() => setShowOnboarding(false)}
       />
 
-      <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 pt-[env(safe-area-inset-top,0px)] relative z-[80]">
-        {!isLoading && (
-          <div className="flex flex-col">
-            {view === "home" && (
-              <ASRLiveTicker
-                theme={theme}
-                onEntityClick={navigateToEntity}
-              />
-            )}
-          </div>
-        )}
-      </div>
+      {view === "home" && !isLoading && (
+        <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 relative z-[80] pt-[env(safe-area-inset-top,0px)]">
+          <ASRLiveTicker
+            theme={theme}
+            onEntityClick={navigateToEntity}
+          />
+        </div>
+      )}
 
       <div 
         className={cn(
           "w-full flex flex-col pointer-events-auto transition-all duration-300",
-          "sticky z-[70]"
+          "sticky top-0 z-[70]"
         )}
-        style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
           <ASRHeader
           theme={theme as "light" | "dark"}
@@ -233,15 +228,6 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
           ) : undefined}
         />
       </div>
-
-      <div 
-        className={cn(
-          "fixed top-0 left-0 right-0 z-[100] h-[env(safe-area-inset-top)] backdrop-blur-xl border-b transition-colors duration-500",
-          view === "home" 
-            ? "bg-transparent border-transparent" 
-            : theme === "dark" ? "bg-zinc-950/80 border-white/5" : "bg-white/80 border-black/5"
-        )}
-      />
 
       <main
         className={cn(

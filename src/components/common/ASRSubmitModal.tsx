@@ -118,7 +118,7 @@ export function ASRSubmitModal() {
                       href="https://drive.google.com/drive/folders/1EPR8ZK09w8PtZ9XrC7N7lW7P8nPJ-anN?usp=sharing"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline focus-visible:underline outline-none"
+                      className="font-semibold text-blue-500 hover:text-blue-400 hover:underline focus-visible:underline outline-none"
                     >
                       ASR Google Drive
                     </a>
@@ -152,7 +152,7 @@ export function ASRSubmitModal() {
                       href="https://www.skool.com/apexmovement/share-verify-asr-clips-here"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-blue-500 hover:text-blue-400 hover:underline"
+                      className="font-semibold text-blue-500 hover:text-blue-400 hover:underline focus-visible:underline outline-none"
                     >
                       Parkour Skool app
                     </a>
