@@ -21,7 +21,7 @@ export const ASRLiveTicker = React.memo(
       return (
         <div
           className={cn(
-            "relative z-[40] w-full h-8 sm:h-10 border-b flex items-center justify-center select-none overflow-hidden transition-colors duration-500",
+            "relative z-[40] w-full h-[calc(2.5rem+env(safe-area-inset-top))] sm:h-[calc(3rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] border-b flex items-center justify-center select-none overflow-hidden transition-colors duration-500",
             theme === "dark"
               ? "bg-zinc-950/80 border-white/5 text-zinc-100 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
               : "bg-white/90 border-zinc-200/50 text-slate-800 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",
@@ -57,7 +57,7 @@ export const ASRLiveTicker = React.memo(
     return (
       <div
         className={cn(
-          "relative z-[40] w-full overflow-hidden border-b h-10 sm:h-12 flex items-center select-none transition-colors duration-500 backdrop-blur-md",
+          "relative z-[40] w-full overflow-hidden border-b h-[calc(2.5rem+env(safe-area-inset-top))] sm:h-[calc(3rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] flex items-center select-none transition-colors duration-500 backdrop-blur-md",
           theme === "dark"
             ? "bg-zinc-950/80 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             : "bg-white/90 border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]",

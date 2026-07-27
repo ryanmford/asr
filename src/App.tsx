@@ -198,22 +198,19 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
         onClose={() => setShowOnboarding(false)}
       />
 
-      {view === "home" && !isLoading && (
-        <div className="w-full flex flex-col pointer-events-auto transition-all duration-300 relative z-[80] pt-[env(safe-area-inset-top,0px)]">
-          <ASRLiveTicker
-            theme={theme}
-            onEntityClick={navigateToEntity}
-          />
-        </div>
-      )}
-
       <div 
         className={cn(
           "w-full flex flex-col pointer-events-auto transition-all duration-300",
           "sticky top-0 z-[70]"
         )}
       >
-          <ASRHeader
+        {view === "home" && !isLoading && (
+          <ASRLiveTicker
+            theme={theme}
+            onEntityClick={navigateToEntity}
+          />
+        )}
+        <ASRHeader
           theme={theme as "light" | "dark"}
           setTheme={setTheme}
           eventType={eventType as "open" | "all-time" | "2026"}
