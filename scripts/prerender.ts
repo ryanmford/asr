@@ -70,12 +70,14 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                 type: 'img',
                 props: {
                   src: t.dataUri,
+                  width: 256,
+                  height: 256,
                   style: {
                     position: 'absolute',
                     left: t.x,
                     top: t.y,
-                    width: 1024,
-                    height: 1024,
+                    width: 256,
+                    height: 256,
                   }
                 }
               }))
@@ -197,25 +199,30 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                       props: {
                         style: {
                           display: 'flex',
-                          flexDirection: 'row',
+                          flexDirection: (stats.length > 2) ? 'row' : 'column',
+                          flexWrap: (stats.length > 2) ? 'wrap' : 'nowrap',
                           alignItems: 'flex-end',
-                          gap: '60px',
+                          justifyContent: 'flex-end',
+                          gap: (stats.length > 2) ? '0px' : '40px',
+                          width: (stats.length > 2) ? '400px' : 'auto',
                         },
-                        children: stats.map(stat => ({
+                        children: stats.map((stat, i) => ({
                            type: 'div',
                            props: {
                              style: {
                                display: 'flex',
                                flexDirection: 'column',
-                               alignItems: 'flex-end',
-                               textAlign: 'right',
+                               alignItems: (stats.length > 2) ? 'flex-start' : 'flex-end',
+                               textAlign: (stats.length > 2) ? 'left' : 'right',
+                               width: (stats.length > 2) ? '50%' : 'auto',
+                               marginBottom: (stats.length > 2 && i < 2) ? '32px' : '0px',
                              },
                              children: [
                                {
                                  type: 'div',
                                  props: {
                                    style: {
-                                     fontSize: 100,
+                                     fontSize: (stats.length > 2) ? 64 : 100,
                                      fontWeight: 700,
                                      color: '#ffffff',
                                      lineHeight: 1,
@@ -228,12 +235,12 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                                  type: 'div',
                                  props: {
                                    style: {
-                                     fontSize: 24,
+                                     fontSize: (stats.length > 2) ? 20 : 24,
                                      fontWeight: 700,
                                      color: '#a1a1aa',
                                      textTransform: 'uppercase',
                                      letterSpacing: '0.05em',
-                                     marginTop: '16px',
+                                     marginTop: (stats.length > 2) ? '8px' : '16px',
                                    },
                                    children: stat.label,
                                  }
@@ -345,7 +352,7 @@ async function getMapTiles(coords: [number, number] | null) {
   const centerTx = (lon + 180) / 360 * Math.pow(2, Z);
   const centerTy = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, Z);
   
-  const TILE_SIZE = 1024;
+  const TILE_SIZE = 256;
   const svgX = centerTx * TILE_SIZE - 600;
   const svgY = centerTy * TILE_SIZE - 315;
   

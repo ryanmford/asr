@@ -94,7 +94,7 @@ async function getMapTiles(coords: [number, number] | null) {
   const centerTx = (lon + 180) / 360 * Math.pow(2, Z);
   const centerTy = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, Z);
   
-  const TILE_SIZE = 1024;
+  const TILE_SIZE = 256;
   const svgX = centerTx * TILE_SIZE - 600;
   const svgY = centerTy * TILE_SIZE - 315;
   
