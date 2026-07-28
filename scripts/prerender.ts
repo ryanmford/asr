@@ -63,7 +63,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
               width: '100%',
               height: '100%',
               display: 'flex',
-              opacity: 0.35,
+              opacity: 0.7,
             },
             children: mapTiles.map(t => ({
               type: 'img',
@@ -429,12 +429,12 @@ async function run() {
     if (firesCount > 0) desc += ` | 🔥 ${firesCount}`;
     
     // Gen OG Image
-    const ogTitle = `${player.name.toUpperCase()}`;
+    const ogTitle = `${titlePrefix}${player.name.toUpperCase()}`;
     const ogFileName = `player-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     
     let highlightValue = rating;
-    let highlightLabel = 'LQ RATING';
+    let highlightLabel = 'LQ';
     if (rank && rank !== 'UR' && parseInt(String(rank)) <= 10) {
       highlightValue = `#${rank}`;
       highlightLabel = 'WORLD RANK';
@@ -494,12 +494,12 @@ async function run() {
     const desc = `World Record: ${wrStr} | Runs: ${totalRunsCount} | 📍 ${locStr}`;
     
     // Gen OG Image
-    const ogTitle = `${courseStr.toUpperCase()} SPEED RUN`;
+    const ogTitle = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
     const ogFileName = `course-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     
-    const highlightValue = best !== Infinity ? `${best.toFixed(2)}s` : '';
-    const highlightLabel = best !== Infinity ? 'WORLD RECORD' : '';
+    const highlightValue = best !== Infinity ? `${best.toFixed(2)}` : '';
+    const highlightLabel = best !== Infinity ? 'WR' : '';
     
     const mapTiles = await getMapTiles(courseInfo.parsedCoords || null);
     
