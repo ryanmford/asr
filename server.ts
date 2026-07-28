@@ -157,12 +157,14 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                 type: 'img',
                 props: {
                   src: t.dataUri,
+                  width: 256,
+                  height: 256,
                   style: {
                     position: 'absolute',
                     left: t.x,
                     top: t.y,
-                    width: 1024,
-                    height: 1024,
+                    width: 256,
+                    height: 256,
                   }
                 }
               }))
@@ -283,26 +285,30 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                       props: {
                         style: {
                           display: 'flex',
-                          flexDirection: 'column',
+                          flexDirection: (stats.length > 2) ? 'row' : 'column',
+                          flexWrap: (stats.length > 2) ? 'wrap' : 'nowrap',
                           alignItems: 'flex-end',
-                          justifyContent: 'center',
-                          gap: (stats.length > 2) ? '16px' : '40px',
+                          justifyContent: 'flex-end',
+                          gap: (stats.length > 2) ? '0px' : '40px',
+                          width: (stats.length > 2) ? '400px' : 'auto',
                         },
-                        children: stats.map(stat => ({
+                        children: stats.map((stat, i) => ({
                            type: 'div',
                            props: {
                              style: {
                                display: 'flex',
                                flexDirection: 'column',
-                               alignItems: 'flex-end',
-                               textAlign: 'right',
+                               alignItems: (stats.length > 2) ? 'flex-start' : 'flex-end',
+                               textAlign: (stats.length > 2) ? 'left' : 'right',
+                               width: (stats.length > 2) ? '50%' : 'auto',
+                               marginBottom: (stats.length > 2 && i < 2) ? '32px' : '0px',
                              },
                              children: [
                                {
                                  type: 'div',
                                  props: {
                                    style: {
-                                     fontSize: (stats.length > 2) ? 72 : 100,
+                                     fontSize: (stats.length > 2) ? 64 : 100,
                                      fontWeight: 700,
                                      color: '#ffffff',
                                      lineHeight: 1,
