@@ -447,6 +447,13 @@ export const getCombinedFlags = (...objects: (string | FlaggedObject | null | un
   return Array.from(flags).join(" ");
 };
 
+export const toTitleCase = (str: string): string => {
+  if (!str) return "";
+  return str.split(" ").map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(" ");
+};
+
 export const getFireCountForRun = (time: number, gender: string) => {
   if (time === null || time === undefined) return 0;
   if (gender === "M") {

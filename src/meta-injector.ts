@@ -1,5 +1,4 @@
-import { CONFIG } from "./lib/asr-utils.ts";
-import { normalizeName } from "./lib/asr-utils.ts";
+import { normalizeName, CONFIG, getCombinedFlags, toTitleCase } from "./lib/asr-utils.ts";
 import { computeAllState } from "./lib/asr-data-compute.ts";
 import type { ASRDataContext, PlayerProfile } from "./types.ts";
 
@@ -58,7 +57,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
   }
 
   const baseTitle = "Apex Speed Run";
-  const baseDesc = "Global Parkour Leaderboards and Course Directory";
+  const baseDesc = "Finding the fastest humans IRL 🌎 🌍 🌏";
 
   if (!cachedData) return { title: baseTitle, description: baseDesc };
 
@@ -77,7 +76,9 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
       const player = rankData.find((p: PlayerProfile) => normalizeName(p.name || "") === slug);
       
       if (player) {
-         title = `${player.name.toUpperCase()} | ASR Player Profile`;
+         const flags = getCombinedFlags(player).trim();
+         const titlePrefix = flags ? `${flags} ` : '';
+         title = `${titlePrefix}${player.name.toUpperCase()}`;
          const leaderboards = isAllTime ? cachedData.playerLB_AT : (eventType === "2026" ? cachedData.playerLB_2026 : cachedData.playerLB_OP);
          const gender = player.gender || "M";
          const pKey = player.pKey || normalizeName(player.name || "");
@@ -99,7 +100,9 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
       const courseStr = Object.keys(cachedData.cMet || {}).find(c => normalizeName(c) === slug);
       if (courseStr) {
          const courseInfo = cachedData.cMet[courseStr] || {};
-         title = `${courseStr.toUpperCase()} | ASR Map`;
+         const flags = getCombinedFlags(courseInfo).trim();
+         const titlePrefix = flags ? `${flags} ` : '';
+         title = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
          
          const isAllTime = eventType === "all-time";
          const leaderboards = isAllTime ? cachedData.lbAT : (eventType === "2026" ? cachedData.lbSeason26 : cachedData.lbOpen);
@@ -122,9 +125,10 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          
          const best = Math.min(mBest, fBest);
          const wrStr = best !== Infinity ? `${best.toFixed(2)}s` : 'N/A';
-         const locStr = courseInfo.city ? `${courseInfo.city.toUpperCase()}` : courseInfo.country ? `${courseInfo.country.toUpperCase()}` : 'UNKNOWN LOCATION';
+         const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
-         description = `Fastest Time: ${wrStr} | Total Clears: ${totalClears} | Location: ${locStr}`;
+         const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
+         description = `World Record: ${wrStr} | Runs: ${totalRunsCount} | Location: ${locStr}`;
       }
     }
   } catch(e) {

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { getPageMeta } from '../src/meta-injector.ts';
-import { normalizeName, createSlug, CONFIG } from '../src/lib/asr-utils.ts';
+import { normalizeName, createSlug, CONFIG, getCombinedFlags, toTitleCase } from '../src/lib/asr-utils.ts';
 import { computeAllState } from '../src/lib/asr-data-compute.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -35,7 +35,7 @@ async function fetchSheets() {
   });
 }
 
-function getOgImageSvg(title: string, desc: string) {
+function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', highlightValue?: string, highlightLabel?: string, mapTiles?: any[]) {
   return {
     type: 'div',
     props: {
@@ -45,44 +45,42 @@ function getOgImageSvg(title: string, desc: string) {
         width: '100%',
         flexDirection: 'column',
         backgroundColor: '#09090b',
-        color: 'white',
+        color: '#ffffff',
         fontFamily: 'Inter',
-        padding: '80px',
-        backgroundImage: 'linear-gradient(135deg, #09090b 0%, #171720 100%)',
+        padding: '60px 80px',
+        border: '12px solid #27272a',
+        position: 'relative',
+        overflow: 'hidden',
       },
       children: [
-        {
+        ...(mapTiles && mapTiles.length > 0 ? [{
           type: 'div',
           props: {
             style: {
               position: 'absolute',
-              top: '-150px',
-              right: '-150px',
-              width: '600px',
-              height: '600px',
-              backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              borderRadius: '50%',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              zIndex: 0,
               opacity: 0.15,
-              filter: 'blur(80px)',
             },
-          },
-        },
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              bottom: '-150px',
-              left: '-150px',
-              width: '500px',
-              height: '500px',
-              backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
-              borderRadius: '50%',
-              opacity: 0.1,
-              filter: 'blur(80px)',
-            },
-          },
-        },
+            children: mapTiles.map(t => ({
+              type: 'img',
+              props: {
+                src: t.dataUri,
+                style: {
+                  position: 'absolute',
+                  left: t.x,
+                  top: t.y,
+                  width: 1024,
+                  height: 1024,
+                }
+              }
+            }))
+          }
+        }] : []),
         {
           type: 'div',
           props: {
@@ -91,7 +89,6 @@ function getOgImageSvg(title: string, desc: string) {
               flexDirection: 'column',
               justifyContent: 'space-between',
               height: '100%',
-              zIndex: 10,
             },
             children: [
               {
@@ -100,7 +97,6 @@ function getOgImageSvg(title: string, desc: string) {
                   style: {
                     display: 'flex',
                     alignItems: 'center',
-                    marginTop: '20px',
                   },
                   children: [
                     {
@@ -110,20 +106,20 @@ function getOgImageSvg(title: string, desc: string) {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          width: '60px',
-                          height: '60px',
-                          backgroundColor: '#2563eb', // Brand color
-                          borderRadius: '12px',
-                          marginRight: '24px',
+                          width: '50px',
+                          height: '50px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '8px',
+                          marginRight: '20px',
                         },
                         children: [
                           {
                             type: 'div',
                             props: {
                               style: {
-                                width: '30px',
-                                height: '30px',
-                                border: '4px solid white',
+                                width: '24px',
+                                height: '24px',
+                                border: '3px solid #000000',
                                 borderRadius: '50%',
                                 borderTopColor: 'transparent',
                                 transform: 'rotate(45deg)',
@@ -137,10 +133,11 @@ function getOgImageSvg(title: string, desc: string) {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: 48,
+                          fontSize: 36,
                           fontWeight: 700,
-                          color: '#e4e4e7',
-                          letterSpacing: '-0.02em',
+                          color: '#ffffff',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase',
                         },
                         children: 'APEX SPEED RUN',
                       },
@@ -153,38 +150,115 @@ function getOgImageSvg(title: string, desc: string) {
                 props: {
                   style: {
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    width: '100%',
                   },
                   children: [
                     {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: 88,
-                          fontWeight: 700,
-                          marginBottom: '24px',
-                          lineHeight: 1.05,
-                          color: '#ffffff',
-                          letterSpacing: '-0.03em',
-                          maxWidth: '1000px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          maxWidth: highlightValue ? '650px' : '1050px',
                         },
-                        children: title,
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: highlightValue ? 72 : 96,
+                                fontWeight: 700,
+                                marginBottom: '32px',
+                                lineHeight: 1.1,
+                                color: '#ffffff',
+                                letterSpacing: '-0.04em',
+                                textTransform: 'uppercase',
+                              },
+                              children: title,
+                            },
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                display: 'flex',
+                                alignItems: 'center',
+                              },
+                              children: [
+                                {
+                                  type: 'div',
+                                  props: {
+                                    style: {
+                                      width: '6px',
+                                      height: '48px',
+                                      backgroundColor: '#dc2626',
+                                      marginRight: '24px',
+                                    },
+                                  },
+                                },
+                                {
+                                  type: 'div',
+                                  props: {
+                                    style: {
+                                      fontSize: highlightValue ? 32 : 40,
+                                      color: '#a1a1aa',
+                                      lineHeight: 1.2,
+                                      letterSpacing: '-0.02em',
+                                      fontWeight: 700,
+                                    },
+                                    children: desc,
+                                  },
+                                }
+                              ]
+                            }
+                          },
+                        ],
                       },
                     },
-                    {
+                    highlightValue ? {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: 42,
-                          color: '#a1a1aa',
-                          maxWidth: '850px',
-                          lineHeight: 1.3,
-                          letterSpacing: '-0.01em',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-end',
+                          textAlign: 'right',
                         },
-                        children: desc,
-                      },
-                    },
-                  ],
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: 140,
+                                fontWeight: 700,
+                                color: '#ffffff',
+                                lineHeight: 1,
+                                letterSpacing: '-0.05em',
+                              },
+                              children: highlightValue,
+                            }
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: 32,
+                                fontWeight: 700,
+                                color: '#a1a1aa',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                marginTop: '16px',
+                              },
+                              children: highlightLabel,
+                            }
+                          }
+                        ]
+                      }
+                    } : null
+                  ].filter(Boolean),
                 },
               },
             ],
@@ -195,8 +269,8 @@ function getOgImageSvg(title: string, desc: string) {
   } as any;
 }
 
-async function generateOgImage(title: string, desc: string, outputPath: string, fontData: Buffer) {
-  const svg = await satori(getOgImageSvg(title, desc), {
+async function generateOgImage(title: string, desc: string, outputPath: string, fontData: Buffer, type?: 'player' | 'course', highlightValue?: string, highlightLabel?: string, mapTiles?: any[]) {
+  const svg = await satori(getOgImageSvg(title, desc, type, highlightValue, highlightLabel, mapTiles), {
     width: 1200,
     height: 630,
     fonts: [
@@ -229,6 +303,58 @@ function injectMeta(html: string, title: string, desc: string, ogImageUrl: strin
     .replace(/<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${ogImageUrl}">`);
 }
 
+const tileCache = new Map<string, string>();
+
+async function fetchTile(url: string) {
+  if (tileCache.has(url)) return tileCache.get(url);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const dataUri = `data:image/png;base64,${buffer.toString('base64')}`;
+    tileCache.set(url, dataUri);
+    return dataUri;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function getMapTiles(coords: [number, number] | null) {
+  if (!coords) return [];
+  const [lat, lon] = coords;
+  const Z = 13;
+  const centerTx = (lon + 180) / 360 * Math.pow(2, Z);
+  const centerTy = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, Z);
+  
+  const TILE_SIZE = 1024;
+  const svgX = centerTx * TILE_SIZE - 600;
+  const svgY = centerTy * TILE_SIZE - 315;
+  
+  const startTx = Math.floor(svgX / TILE_SIZE);
+  const endTx = Math.floor((svgX + 1200) / TILE_SIZE);
+  
+  const startTy = Math.floor(svgY / TILE_SIZE);
+  const endTy = Math.floor((svgY + 630) / TILE_SIZE);
+  
+  const tiles = [];
+  for (let tx = startTx; tx <= endTx; tx++) {
+    for (let ty = startTy; ty <= endTy; ty++) {
+      tiles.push({
+        url: `https://a.basemaps.cartocdn.com/dark_all/${Z}/${tx}/${ty}.png`,
+        x: tx * TILE_SIZE - svgX,
+        y: ty * TILE_SIZE - svgY
+      });
+    }
+  }
+  
+  for (const t of tiles) {
+    (t as any).dataUri = await fetchTile(t.url);
+  }
+  
+  return tiles.filter((t: any) => !!t.dataUri);
+}
+
 async function run() {
   console.log('Starting prerender...');
   
@@ -246,7 +372,7 @@ async function run() {
 
   const BASE_URL = 'https://apexspeedrun.com';
   
-  const players = [...(data.data || []), ...(data.openData || [])];
+  const players = [...(data.openData || []), ...(data.data || [])];
   const uniquePlayers = new Map();
   players.forEach(p => {
     if (p.name) uniquePlayers.set(createSlug(p.name), p);
@@ -255,16 +381,37 @@ async function run() {
   console.log(`Pre-rendering ${uniquePlayers.size} players...`);
   
   for (const [slug, player] of uniquePlayers.entries()) {
-    const title = `${player.name.toUpperCase()} | ASR Player Profile`;
+    const flags = getCombinedFlags(player).trim();
+    const titlePrefix = flags ? `${flags} ` : '';
+    const title = `${titlePrefix}${player.name.toUpperCase()}`;
     const rating = player.rating ? player.rating.toFixed(2) : '0.00';
-    const gym = player.country && player.country !== "UNKNOWN LOCATION" ? player.country : 'Unknown Location';
-    const rank = player.openRank || player.allTimeRank || 'UR';
-    const desc = `Open Season Stats: ${rating} Rating | Open Rank: ${rank} | Gym: ${gym}`;
+    const gym = player.country && player.country !== "UNKNOWN LOCATION" ? player.country : 'Secret Location';
+    const rank = player.allTimeRank || player.openRank || 'UR';
+    const desc = `All-Time Stats: ${rating} Rating | Overall Rank: ${rank} | Gym: ${gym}`;
     
     // Gen OG Image
+    const ogTitle = `${titlePrefix}${player.name.toUpperCase()}`;
     const ogFileName = `player-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
-    await generateOgImage(title, desc, ogFilePath, fontData);
+    
+    let highlightValue = rating;
+    let highlightLabel = 'LQ RATING';
+    if (rank && rank !== 'UR' && parseInt(String(rank)) <= 10) {
+      highlightValue = `#${rank}`;
+      highlightLabel = 'WORLD RANK';
+    }
+    
+    const completedCourses = [];
+    const allCourses = Object.keys(data.cMet || {});
+    for (const c of allCourses) {
+      if (data.lbAT?.M?.[c]?.[player.name] || data.lbAT?.F?.[c]?.[player.name] || data.lbSeason26?.M?.[c]?.[player.name] || data.lbSeason26?.F?.[c]?.[player.name]) {
+        completedCourses.push(c);
+      }
+    }
+    const randCourse = completedCourses.length > 0 ? completedCourses[Math.floor(Math.random() * completedCourses.length)] : null;
+    const mapTiles = await getMapTiles(randCourse && data.cMet[randCourse] ? data.cMet[randCourse].parsedCoords : null);
+    
+    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'player', highlightValue, highlightLabel, mapTiles);
     
     const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
@@ -282,7 +429,9 @@ async function run() {
   for (const courseStr of Object.keys(data.cMet || {})) {
     const slug = createSlug(courseStr);
     const courseInfo = data.cMet[courseStr] || {};
-    const title = `${courseStr.toUpperCase()} | ASR Map`;
+    const flags = getCombinedFlags(courseInfo).trim();
+    const titlePrefix = flags ? `${flags} ` : '';
+    const title = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
     
     let totalClears = 0;
     let mBest = Infinity;
@@ -300,14 +449,22 @@ async function run() {
     
     const best = Math.min(mBest, fBest);
     const wrStr = best !== Infinity ? `${best.toFixed(2)}s` : 'N/A';
-    const locStr = courseInfo.city ? `${courseInfo.city.toUpperCase()}` : courseInfo.country ? `${courseInfo.country.toUpperCase()}` : 'UNKNOWN LOCATION';
+    const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
     
-    const desc = `Fastest Time: ${wrStr} | Total Clears: ${totalClears} | Location: ${locStr}`;
+    const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
+    const desc = `World Record: ${wrStr} | Runs: ${totalRunsCount} | Location: ${locStr}`;
     
     // Gen OG Image
+    const ogTitle = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
     const ogFileName = `course-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
-    await generateOgImage(title, desc, ogFilePath, fontData);
+    
+    const highlightValue = best !== Infinity ? `${best.toFixed(2)}s` : '';
+    const highlightLabel = best !== Infinity ? 'WORLD RECORD' : '';
+    
+    const mapTiles = await getMapTiles(courseInfo.parsedCoords || null);
+    
+    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'course', highlightValue, highlightLabel, mapTiles);
     
     const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
