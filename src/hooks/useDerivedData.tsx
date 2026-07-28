@@ -13,6 +13,7 @@ import {
   isQualifiedAthlete,
   isPlaceholderPlayer,
   normalizeName,
+  createSlug,
 } from "../lib/asr-utils";
 import { CourseData, SetterProfile, TeamProfile } from "../types";
 
@@ -88,7 +89,7 @@ export const useAppNavigation = () => {
           (entityData as { label?: string })?.label ||
           (typeof entityData === "string" ? entityData : "");
         if (entityName && typeof entityName === "string") {
-          const slug = encodeURIComponent(entityName.trim().toLowerCase());
+          const slug = encodeURIComponent(createSlug(entityName));
           let prefix = "players";
           if (type === "course") prefix = "courses";
           if (type === "setter") prefix = "setters";
@@ -214,14 +215,16 @@ const getInspectorDataForPath = (
 
   if (!entitySlug) return null;
 
+  const searchKey = entitySlug.toLowerCase().replace(/-/g, " ");
+  const normalizedKey = entitySlug.toLowerCase().replace(/[^a-z0-9]/g, "");
+
   if (viewPrefix === "players") {
-    const pKey = entitySlug.toLowerCase();
     // Fast O(1) lookup
-    let found = atMet?.[pKey];
+    let found = atMet?.[normalizedKey];
     if (!found) {
       for (const k in atMet) {
         const a = atMet[k];
-        if (a.name?.toLowerCase() === pKey || a.pKey === pKey) {
+        if (a.name?.toLowerCase() === searchKey || a.pKey === normalizedKey) {
           found = a;
           break;
         }
@@ -229,35 +232,37 @@ const getInspectorDataForPath = (
     }
     return {
       type: "player",
-      data: found || { name: entitySlug, pKey },
+      data: found || { name: searchKey, pKey: normalizedKey },
       isNotFound: !found,
       requestedId: entitySlug,
     };
   }
   if (viewPrefix === "courses") {
-    const cKey = entitySlug.toUpperCase();
+    const searchKeyUpper = searchKey.toUpperCase();
+    const normalizedKeyUpper = normalizedKey.toUpperCase();
     let found = undefined;
     for (let i = 0; i < masterCourseList.length; i++) {
       const c = masterCourseList[i];
-      if (c.pKey === cKey || c.name?.toUpperCase() === cKey) {
+      const cNameUpper = c.name?.toUpperCase();
+      const cNameNormalized = cNameUpper?.replace(/[^A-Z0-9]/g, "");
+      if (c.pKey === normalizedKeyUpper || cNameUpper === searchKeyUpper || cNameNormalized === normalizedKeyUpper) {
         found = c;
         break;
       }
     }
     return {
       type: "course",
-      data: found || { name: entitySlug },
+      data: found || { name: searchKey },
       isNotFound: !found,
       requestedId: entitySlug,
     };
   }
   if (viewPrefix === "setters") {
-    const sKey = entitySlug.toLowerCase();
-    let found = setterMet?.[sKey];
+    let found = setterMet?.[normalizedKey];
     if (!found) {
       for (let i = 0; i < settersWithImpact.length; i++) {
         const s = settersWithImpact[i];
-        if (s.name?.toLowerCase() === sKey || s.pKey === sKey) {
+        if (s.name?.toLowerCase() === searchKey || s.pKey === normalizedKey) {
           found = s;
           break;
         }
@@ -265,16 +270,16 @@ const getInspectorDataForPath = (
     }
     return {
       type: "setter",
-      data: found || { name: entitySlug },
+      data: found || { name: searchKey },
       isNotFound: !found,
       requestedId: entitySlug,
     };
   }
   if (viewPrefix === "teams") {
-    return { type: "team", data: { name: entitySlug } };
+    return { type: "team", data: { name: searchKey } };
   }
   if (viewPrefix === "regions") {
-    return { type: "region", data: { name: entitySlug } };
+    return { type: "region", data: { name: searchKey } };
   }
 
   return null;

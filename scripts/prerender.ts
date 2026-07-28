@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { getPageMeta } from '../src/meta-injector.ts';
-import { normalizeName, CONFIG } from '../src/lib/asr-utils.ts';
+import { normalizeName, createSlug, CONFIG } from '../src/lib/asr-utils.ts';
 import { computeAllState } from '../src/lib/asr-data-compute.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -249,7 +249,7 @@ async function run() {
   const players = [...(data.data || []), ...(data.openData || [])];
   const uniquePlayers = new Map();
   players.forEach(p => {
-    if (p.name) uniquePlayers.set(normalizeName(p.name), p);
+    if (p.name) uniquePlayers.set(createSlug(p.name), p);
   });
   
   console.log(`Pre-rendering ${uniquePlayers.size} players...`);
@@ -278,7 +278,7 @@ async function run() {
   console.log(`Pre-rendering ${Object.keys(data.cMet || {}).length} courses...`);
   
   for (const courseStr of Object.keys(data.cMet || {})) {
-    const slug = normalizeName(courseStr);
+    const slug = createSlug(courseStr);
     const courseInfo = data.cMet[courseStr] || {};
     const title = `${courseStr.toUpperCase()} | ASR Map`;
     

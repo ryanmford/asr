@@ -85,6 +85,17 @@ const ALIAS_MAP: Record<string, string> = {
   "muhammadsteedbaloch": "muhammadbaloch",
 };
 
+export const createSlug = (n: string) => {
+  if (!n) return "";
+  return String(n)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "") // remove anything that's not a letter, number, space, or hyphen
+    .trim()
+    .replace(/[\s-]+/g, "-"); // replace spaces and consecutive hyphens with a single hyphen
+};
+
 export const normalizeName = (n: string) => {
   if (!n) return "";
   const raw = String(n)
