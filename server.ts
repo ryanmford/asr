@@ -283,9 +283,10 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                       props: {
                         style: {
                           display: 'flex',
-                          flexDirection: 'row',
+                          flexDirection: 'column',
                           alignItems: 'flex-end',
-                          gap: '60px',
+                          justifyContent: 'center',
+                          gap: (stats.length > 2) ? '16px' : '40px',
                         },
                         children: stats.map(stat => ({
                            type: 'div',
@@ -301,7 +302,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                                  type: 'div',
                                  props: {
                                    style: {
-                                     fontSize: 100,
+                                     fontSize: (stats.length > 2) ? 72 : 100,
                                      fontWeight: 700,
                                      color: '#ffffff',
                                      lineHeight: 1,
@@ -314,12 +315,12 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                                  type: 'div',
                                  props: {
                                    style: {
-                                     fontSize: 24,
+                                     fontSize: (stats.length > 2) ? 20 : 24,
                                      fontWeight: 700,
                                      color: '#a1a1aa',
                                      textTransform: 'uppercase',
                                      letterSpacing: '0.05em',
-                                     marginTop: '16px',
+                                     marginTop: (stats.length > 2) ? '8px' : '16px',
                                    },
                                    children: stat.label,
                                  }
@@ -498,16 +499,17 @@ async function startServer() {
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
         const ogImageUrl = `${baseUrl}/api/og.png?path=${encodeURIComponent(req.path)}&query=${encodeURIComponent(searchParams.toString())}`;
+        const escapedOgImageUrl = ogImageUrl.replace(/&/g, '&amp;');
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
           .replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${meta.title}">`)
           .replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${meta.description}">`)
           .replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${currentUrl}">`)
-          .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${ogImageUrl}">`)
+          .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${escapedOgImageUrl}">`)
           .replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${meta.title}">`)
           .replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${meta.description}">`)
-          .replace(/<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${ogImageUrl}">`);
+          .replace(/<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${escapedOgImageUrl}">`);
           
         if (meta.initialData) {
           template = template.replace('</head>', `
@@ -541,16 +543,17 @@ async function startServer() {
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
         const ogImageUrl = `${baseUrl}/api/og.png?path=${encodeURIComponent(req.path)}&query=${encodeURIComponent(searchParams.toString())}`;
+        const escapedOgImageUrl = ogImageUrl.replace(/&/g, '&amp;');
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
           .replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${meta.title}">`)
           .replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${meta.description}">`)
           .replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${currentUrl}">`)
-          .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${ogImageUrl}">`)
+          .replace(/<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${escapedOgImageUrl}">`)
           .replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${meta.title}">`)
           .replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${meta.description}">`)
-          .replace(/<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${ogImageUrl}">`);
+          .replace(/<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${escapedOgImageUrl}">`);
           
         if (meta.initialData) {
           template = template.replace('</head>', `

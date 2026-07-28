@@ -98,22 +98,34 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const winsCount = player.wins || 0;
          const firesCount = player.allTimeFireCount || 0;
          
-         let newDesc = `LQ: ${rating} | Courses: ${coursesCount} | Runs: ${runsCount}`;
-         if (winsCount > 0) newDesc += ` | Wins: ${winsCount}`;
+         let newDesc = `LQ: ${rating} | COURSES: ${coursesCount} | RUNS: ${runsCount}`;
+         if (winsCount > 0) newDesc += ` | WINS: ${winsCount}`;
          if (firesCount > 0) newDesc += ` | 🔥 ${firesCount}`;
 
          if (isAllTime) {
              description = newDesc;
          } else if (eventType === "2026") {
-             description = `2026 Season Stats: ${rating} Rating | 2026 Rank: ${rank || 'UR'} | Gym: ${gym}`;
+             description = `2026 SEASON STATS: ${rating} RATING | 2026 RANK: ${rank || 'UR'} | GYM: ${gym}`;
          } else {
-             description = `Open Season Stats: ${rating} Rating | Open Rank: ${rank || 'UR'} | Gym: ${gym}`;
+             description = `OPEN SEASON STATS: ${rating} RATING | OPEN RANK: ${rank || 'UR'} | GYM: ${gym}`;
          }
+         
+         const setterData = (cachedData.settersWithImpact as any[])?.find(s => normalizeName(s.name) === slug);
+         const setsCount = setterData?.sets || 0;
+         const impactCount = setterData?.impact || 0;
+
          ogType = 'player';
          ogStats = [
              { value: rating, label: 'LQ' },
              { value: rank === 'UR' ? 'UR' : `#${rank}`, label: 'RANK' }
          ];
+         
+         if (setsCount > 0) {
+             ogStats.push({ value: setsCount.toString(), label: 'SETS' });
+         }
+         if (impactCount > 0) {
+             ogStats.push({ value: impactCount.toString(), label: 'IMPACT' });
+         }
          
          const completedCourses = [];
          const allCourses = Object.keys(cachedData.cMet || {});
@@ -158,7 +170,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
          const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-         description = `Runs: ${totalRunsCount} | 📍 ${locStr}`;
+         description = `RUNS: ${totalRunsCount} | 📍 ${locStr}`;
          ogType = 'course';
          ogStats = [
              { value: mBest !== Infinity ? mBest.toFixed(2) : '--', label: "MEN'S WR" },
