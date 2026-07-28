@@ -262,12 +262,14 @@ async function run() {
     const desc = `Open Season Stats: ${rating} Rating | Open Rank: ${rank} | Gym: ${gym}`;
     
     // Gen OG Image
-    // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
-    // We'll fall back to the main logo.
-    const fallbackOgImage = `${BASE_URL}/apexspeedrun.png`;
+    const ogFileName = `player-${slug}.png`;
+    const ogFilePath = path.join(ogDir, ogFileName);
+    await generateOgImage(title, desc, ogFilePath, fontData);
+    
+    const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
     // Inj HTML
-    const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
+    const pageHtml = injectMeta(baseHtml, title, desc, ogImageUrl);
     
     // Write HTML
     const playerDir = path.join(ROOT, 'dist', 'players', slug);
@@ -303,12 +305,14 @@ async function run() {
     const desc = `Fastest Time: ${wrStr} | Total Clears: ${totalClears} | Location: ${locStr}`;
     
     // Gen OG Image
-    // Note: Temporarily skipping dynamic OG generation until real thumbnails are ready.
-    // We'll fall back to the main logo.
-    const fallbackOgImage = `${BASE_URL}/apexspeedrun.png`;
+    const ogFileName = `course-${slug}.png`;
+    const ogFilePath = path.join(ogDir, ogFileName);
+    await generateOgImage(title, desc, ogFilePath, fontData);
+    
+    const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
     // Inj HTML
-    const pageHtml = injectMeta(baseHtml, title, desc, fallbackOgImage);
+    const pageHtml = injectMeta(baseHtml, title, desc, ogImageUrl);
     
     // Write HTML
     const courseDir = path.join(ROOT, 'dist', 'courses', slug);
