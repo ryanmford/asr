@@ -63,8 +63,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
               width: '100%',
               height: '100%',
               display: 'flex',
-              zIndex: 0,
-              opacity: 0.15,
+              opacity: 0.35,
             },
             children: mapTiles.map(t => ({
               type: 'img',
@@ -269,6 +268,23 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
   } as any;
 }
 
+function toCodePoint(unicodeSurrogates: string) {
+  const r = [];
+  let c = 0, p = 0, i = 0;
+  while (i < unicodeSurrogates.length) {
+    c = unicodeSurrogates.charCodeAt(i++);
+    if (p) {
+      r.push((65536 + ((p - 55296) << 10) + (c - 56320)).toString(16));
+      p = 0;
+    } else if (55296 <= c && c <= 56319) {
+      p = c;
+    } else {
+      r.push(c.toString(16));
+    }
+  }
+  return r.filter(cp => cp !== 'fe0f').join('-');
+}
+
 async function generateOgImage(title: string, desc: string, outputPath: string, fontData: Buffer, type?: 'player' | 'course', highlightValue?: string, highlightLabel?: string, mapTiles?: any[]) {
   const svg = await satori(getOgImageSvg(title, desc, type, highlightValue, highlightLabel, mapTiles), {
     width: 1200,
@@ -281,6 +297,22 @@ async function generateOgImage(title: string, desc: string, outputPath: string, 
         style: 'normal',
       },
     ],
+    loadAdditionalAsset: async (code, segment) => {
+      if (code === 'emoji') {
+        const cp = toCodePoint(segment);
+        const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${cp}.svg`;
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            return `data:image/svg+xml;base64,${Buffer.from(text).toString('base64')}`;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+      return '';
+    }
   });
 
   const resvg = new Resvg(svg, {
@@ -385,12 +417,19 @@ async function run() {
     const titlePrefix = flags ? `${flags} ` : '';
     const title = `${titlePrefix}${player.name.toUpperCase()}`;
     const rating = player.rating ? player.rating.toFixed(2) : '0.00';
-    const gym = player.country && player.country !== "UNKNOWN LOCATION" ? player.country : 'Secret Location';
     const rank = player.allTimeRank || player.openRank || 'UR';
-    const desc = `All-Time Stats: ${rating} Rating | Overall Rank: ${rank} | Gym: ${gym}`;
+    
+    const coursesCount = player.courses || 0;
+    const runsCount = player.runs || 0;
+    const winsCount = player.wins || 0;
+    const firesCount = player.allTimeFireCount || 0;
+    
+    let desc = `LQ: ${rating} | Courses: ${coursesCount} | Runs: ${runsCount}`;
+    if (winsCount > 0) desc += ` | Wins: ${winsCount}`;
+    if (firesCount > 0) desc += ` | 🔥 ${firesCount}`;
     
     // Gen OG Image
-    const ogTitle = `${titlePrefix}${player.name.toUpperCase()}`;
+    const ogTitle = `${player.name.toUpperCase()}`;
     const ogFileName = `player-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     
@@ -452,10 +491,10 @@ async function run() {
     const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
     
     const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-    const desc = `World Record: ${wrStr} | Runs: ${totalRunsCount} | Location: ${locStr}`;
+    const desc = `World Record: ${wrStr} | Runs: ${totalRunsCount} | 📍 ${locStr}`;
     
     // Gen OG Image
-    const ogTitle = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
+    const ogTitle = `${courseStr.toUpperCase()} SPEED RUN`;
     const ogFileName = `course-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     

@@ -87,8 +87,17 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const rating = player.rating ? player.rating.toFixed(2) : '0.00';
          const gym = player.country && player.country !== CONFIG.FALLBACKS.UNKNOWN_LOCATION ? player.country : 'Unknown Location';
          
+         const coursesCount = player.courses || 0;
+         const runsCount = player.runs || 0;
+         const winsCount = player.wins || 0;
+         const firesCount = player.allTimeFireCount || 0;
+         
+         let newDesc = `LQ: ${rating} | Courses: ${coursesCount} | Runs: ${runsCount}`;
+         if (winsCount > 0) newDesc += ` | Wins: ${winsCount}`;
+         if (firesCount > 0) newDesc += ` | 🔥 ${firesCount}`;
+
          if (isAllTime) {
-             description = `All-Time Stats: ${rating} Rating | Overall Rank: ${rank || 'UR'} | Gym: ${gym}`;
+             description = newDesc;
          } else if (eventType === "2026") {
              description = `2026 Season Stats: ${rating} Rating | 2026 Rank: ${rank || 'UR'} | Gym: ${gym}`;
          } else {
@@ -128,7 +137,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
          const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-         description = `World Record: ${wrStr} | Runs: ${totalRunsCount} | Location: ${locStr}`;
+         description = `World Record: ${wrStr} | Runs: ${totalRunsCount} | 📍 ${locStr}`;
       }
     }
   } catch(e) {
