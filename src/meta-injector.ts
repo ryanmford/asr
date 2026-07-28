@@ -59,8 +59,8 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
     }
   }
 
-  const baseTitle = "Apex Speed Run";
-  const baseDesc = "Finding the fastest humans IRL 🌎 🌍 🌏";
+  const baseTitle = "APEX SPEED RUN";
+  const baseDesc = "FINDING THE FASTEST HUMANS IRL 🌎 🌍 🌏";
 
   if (!cachedData) return { title: baseTitle, description: baseDesc };
 
@@ -98,16 +98,16 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const winsCount = player.wins || 0;
          const firesCount = player.allTimeFireCount || 0;
          
-         let newDesc = `LQ: ${rating} | COURSES: ${coursesCount} | RUNS: ${runsCount}`;
+         let newDesc = `COURSES: ${coursesCount} | RUNS: ${runsCount}`;
          if (winsCount > 0) newDesc += ` | WINS: ${winsCount}`;
          if (firesCount > 0) newDesc += ` | 🔥 ${firesCount}`;
 
          if (isAllTime) {
-             description = newDesc;
+             description = newDesc.toUpperCase();
          } else if (eventType === "2026") {
-             description = `2026 SEASON STATS: ${rating} RATING | 2026 RANK: ${rank || 'UR'} | GYM: ${gym}`;
+             description = `2026 SEASON STATS: ${rating} RATING | 2026 RANK: ${rank || 'UR'} | GYM: ${gym}`.toUpperCase();
          } else {
-             description = `OPEN SEASON STATS: ${rating} RATING | OPEN RANK: ${rank || 'UR'} | GYM: ${gym}`;
+             description = `OPEN SEASON STATS: ${rating} RATING | OPEN RANK: ${rank || 'UR'} | GYM: ${gym}`.toUpperCase();
          }
          
          const setterData = (cachedData.settersWithImpact as any[])?.find(s => normalizeName(s.name) === slug);
@@ -117,7 +117,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          ogType = 'player';
          ogStats = [
              { value: rating, label: 'LQ' },
-             { value: rank === 'UR' ? 'UR' : `#${rank}`, label: 'RANK' }
+             { value: rank === 'UR' ? 'UR' : `${rank}`, label: 'RANK' }
          ];
          
          if (setsCount > 0) {
@@ -170,11 +170,11 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
          const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-         description = `RUNS: ${totalRunsCount} | 📍 ${locStr}`;
+         description = `RUNS: ${totalRunsCount} | 📍 ${locStr}`.toUpperCase();
          ogType = 'course';
          ogStats = [
-             { value: mBest !== Infinity ? mBest.toFixed(2) : '--', label: "MEN'S WR" },
-             { value: fBest !== Infinity ? fBest.toFixed(2) : '--', label: "WOMEN'S WR" }
+             { value: mBest !== Infinity ? mBest.toFixed(2) : '--', label: "WR (M)" },
+             { value: fBest !== Infinity ? fBest.toFixed(2) : '--', label: "WR (W)" }
          ];
          ogMapCoords = courseInfo.parsedCoords || null;
       }

@@ -270,6 +270,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                                       lineHeight: 1.2,
                                       letterSpacing: '-0.02em',
                                       fontWeight: 700,
+                                      textTransform: 'uppercase',
                                     },
                                     children: desc,
                                   },
@@ -412,10 +413,10 @@ async function startServer() {
       if (reqPath) {
         const searchParams = new URLSearchParams(reqQuery || "");
         const meta = await getPageMeta(reqPath, searchParams);
-        title = meta.title;
-        desc = meta.description;
+        title = meta.title?.toUpperCase();
+        desc = meta.description?.toUpperCase();
         type = meta.ogType;
-        stats = meta.ogStats;
+        stats = meta.ogStats?.map(s => ({ value: s.value?.toUpperCase(), label: s.label?.toUpperCase() }));
         if (meta.ogMapCoords) {
            mapTiles = await getMapTiles(meta.ogMapCoords);
         }
