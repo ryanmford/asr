@@ -6,6 +6,9 @@ export interface MetaData {
   title: string;
   description: string;
   initialData?: ASRDataContext;
+  ogType?: 'player' | 'course';
+  ogStats?: { value: string; label: string }[];
+  ogMapCoords?: [number, number] | null;
 }
 
 let cachedData: ASRDataContext | null = null;
@@ -63,6 +66,9 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
 
   let title = baseTitle;
   let description = baseDesc;
+  let ogType: 'player' | 'course' | undefined;
+  let ogStats: { value: string; label: string }[] | undefined;
+  let ogMapCoords: [number, number] | null = null;
 
   try {
     const parts = urlPath.replace(/^\//, "").split("/");
@@ -103,6 +109,21 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          } else {
              description = `Open Season Stats: ${rating} Rating | Open Rank: ${rank || 'UR'} | Gym: ${gym}`;
          }
+         ogType = 'player';
+         ogStats = [
+             { value: rating, label: 'LQ' },
+             { value: rank === 'UR' ? 'UR' : `#${rank}`, label: 'RANK' }
+         ];
+         
+         const completedCourses = [];
+         const allCourses = Object.keys(cachedData.cMet || {});
+         for (const c of allCourses) {
+           if (cachedData.lbAT?.M?.[c]?.[player.name] || cachedData.lbAT?.F?.[c]?.[player.name] || cachedData.lbSeason26?.M?.[c]?.[player.name] || cachedData.lbSeason26?.F?.[c]?.[player.name]) {
+             completedCourses.push(c);
+           }
+         }
+         const randCourse = completedCourses.length > 0 ? completedCourses[Math.floor(Math.random() * completedCourses.length)] : null;
+         ogMapCoords = randCourse && cachedData.cMet[randCourse] ? cachedData.cMet[randCourse].parsedCoords || null : null;
       }
     } else if (parts[0] === "courses" && parts[1]) {
       const slug = normalizeName(decodeURIComponent(parts[1]));
@@ -137,12 +158,18 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
          const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-         description = `World Record: ${wrStr} | Runs: ${totalRunsCount} | 📍 ${locStr}`;
+         description = `Runs: ${totalRunsCount} | 📍 ${locStr}`;
+         ogType = 'course';
+         ogStats = [
+             { value: mBest !== Infinity ? mBest.toFixed(2) : '--', label: "MEN'S WR" },
+             { value: fBest !== Infinity ? fBest.toFixed(2) : '--', label: "WOMEN'S WR" }
+         ];
+         ogMapCoords = courseInfo.parsedCoords || null;
       }
     }
   } catch(e) {
     console.error("Meta evaluation error", e);
   }
 
-  return { title, description, initialData: cachedData };
+  return { title, description, initialData: cachedData, ogType, ogStats, ogMapCoords };
 }

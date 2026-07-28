@@ -53,6 +53,293 @@ const __dirname = path.dirname(__filename);
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID || '1DcLZyAO2QZij_176vsC7_rWWTVbxwt8X9Jw7YWM_7j4';
 
+
+function toCodePoint(unicodeSurrogates: string) {
+  const r = [];
+  let c = 0, p = 0, i = 0;
+  while (i < unicodeSurrogates.length) {
+    c = unicodeSurrogates.charCodeAt(i++);
+    if (p) {
+      r.push((65536 + ((p - 55296) << 10) + (c - 56320)).toString(16));
+      p = 0;
+    } else if (55296 <= c && c <= 56319) {
+      p = c;
+    } else {
+      r.push(c.toString(16));
+    }
+  }
+  return r.filter(cp => cp !== 'fe0f').join('-');
+}
+
+const tileCache = new Map<string, string>();
+async function fetchTile(url: string) {
+  if (tileCache.has(url)) return tileCache.get(url);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const dataUri = `data:image/png;base64,${buffer.toString('base64')}`;
+    tileCache.set(url, dataUri);
+    return dataUri;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function getMapTiles(coords: [number, number] | null) {
+  if (!coords) return [];
+  const [lat, lon] = coords;
+  const Z = 13;
+  const centerTx = (lon + 180) / 360 * Math.pow(2, Z);
+  const centerTy = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, Z);
+  
+  const TILE_SIZE = 1024;
+  const svgX = centerTx * TILE_SIZE - 600;
+  const svgY = centerTy * TILE_SIZE - 315;
+  
+  const startTx = Math.floor(svgX / TILE_SIZE);
+  const endTx = Math.floor((svgX + 1200) / TILE_SIZE);
+  
+  const startTy = Math.floor(svgY / TILE_SIZE);
+  const endTy = Math.floor((svgY + 630) / TILE_SIZE);
+  
+  const tiles = [];
+  for (let tx = startTx; tx <= endTx; tx++) {
+    for (let ty = startTy; ty <= endTy; ty++) {
+      tiles.push({
+        url: `https://a.basemaps.cartocdn.com/dark_nolabels/${Z}/${tx}/${ty}.png`,
+        x: tx * TILE_SIZE - svgX,
+        y: ty * TILE_SIZE - svgY
+      });
+    }
+  }
+  
+  for (const t of tiles) {
+    (t as any).dataUri = await fetchTile(t.url);
+  }
+  
+  return tiles.filter((t: any) => !!t.dataUri);
+}
+
+function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', stats?: {value: string, label: string}[], mapTiles?: any[]) {
+  return {
+    type: 'div',
+    props: {
+      style: {
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        flexDirection: 'column',
+        backgroundColor: '#09090b',
+        color: '#ffffff',
+        fontFamily: 'Inter',
+        padding: '60px 80px',
+        border: '12px solid #27272a',
+        position: 'relative',
+        overflow: 'hidden',
+      },
+      children: [
+        ...(mapTiles && mapTiles.length > 0 ? [
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                opacity: 0.9,
+              },
+              children: mapTiles.map(t => ({
+                type: 'img',
+                props: {
+                  src: t.dataUri,
+                  style: {
+                    position: 'absolute',
+                    left: t.x,
+                    top: t.y,
+                    width: 1024,
+                    height: 1024,
+                  }
+                }
+              }))
+            }
+          },
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: 'linear-gradient(to right, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.7) 40%, rgba(9, 9, 11, 0.1) 100%)',
+              }
+            }
+          }
+        ] : []),
+        {
+          type: 'div',
+          props: {
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            },
+            children: [
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                  children: [
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          fontSize: 36,
+                          fontWeight: 700,
+                          color: '#ffffff',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase',
+                        },
+                        children: 'APEX SPEED RUN',
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    width: '100%',
+                  },
+                  children: [
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'column',
+                          maxWidth: (stats && stats.length > 0) ? '650px' : '1050px',
+                        },
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: (stats && stats.length > 0) ? 72 : 96,
+                                fontWeight: 700,
+                                marginBottom: '32px',
+                                lineHeight: 1.1,
+                                color: '#ffffff',
+                                letterSpacing: '-0.04em',
+                                textTransform: 'uppercase',
+                              },
+                              children: title,
+                            },
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                display: 'flex',
+                                alignItems: 'center',
+                              },
+                              children: [
+                                {
+                                  type: 'div',
+                                  props: {
+                                    style: {
+                                      fontSize: (stats && stats.length > 0) ? 32 : 40,
+                                      color: '#a1a1aa',
+                                      lineHeight: 1.2,
+                                      letterSpacing: '-0.02em',
+                                      fontWeight: 700,
+                                    },
+                                    children: desc,
+                                  },
+                                }
+                              ]
+                            }
+                          },
+                        ],
+                      },
+                    },
+                    (stats && stats.length > 0) ? {
+                      type: 'div',
+                      props: {
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                          gap: '60px',
+                        },
+                        children: stats.map(stat => ({
+                           type: 'div',
+                           props: {
+                             style: {
+                               display: 'flex',
+                               flexDirection: 'column',
+                               alignItems: 'flex-end',
+                               textAlign: 'right',
+                             },
+                             children: [
+                               {
+                                 type: 'div',
+                                 props: {
+                                   style: {
+                                     fontSize: 100,
+                                     fontWeight: 700,
+                                     color: '#ffffff',
+                                     lineHeight: 1,
+                                     letterSpacing: '-0.05em',
+                                   },
+                                   children: stat.value,
+                                 }
+                               },
+                               {
+                                 type: 'div',
+                                 props: {
+                                   style: {
+                                     fontSize: 24,
+                                     fontWeight: 700,
+                                     color: '#a1a1aa',
+                                     textTransform: 'uppercase',
+                                     letterSpacing: '0.05em',
+                                     marginTop: '16px',
+                                   },
+                                   children: stat.label,
+                                 }
+                               }
+                             ]
+                           }
+                        }))
+                      }
+                    } : null
+                  ].filter(Boolean),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  } as any;
+}
+
 async function startServer() {
   const app = express();
   app.set('trust proxy', true);
@@ -105,13 +392,32 @@ async function startServer() {
   // Generate Dynamic OG Images
   app.get('/api/og.png', async (req, res) => {
     try {
-      const title = (req.query.title as string) || 'Apex Speed Run';
-      const desc = (req.query.desc as string) || 'Global Parkour Leaderboards and Course Directory';
+      let title = (req.query.title as string) || 'Apex Speed Run';
+      let desc = (req.query.desc as string) || 'Global Parkour Leaderboards and Course Directory';
+      
+      const reqPath = req.query.path as string;
+      const reqQuery = req.query.query as string;
+      
+      let type: 'player' | 'course' | undefined;
+      let stats: {value: string, label: string}[] | undefined;
+      let mapTiles: any[] = [];
+      
+      if (reqPath) {
+        const searchParams = new URLSearchParams(reqQuery || "");
+        const meta = await getPageMeta(reqPath, searchParams);
+        title = meta.title;
+        desc = meta.description;
+        type = meta.ogType;
+        stats = meta.ogStats;
+        if (meta.ogMapCoords) {
+           mapTiles = await getMapTiles(meta.ogMapCoords);
+        }
+      }
 
-      const cachedBuffer = ogCache.get(title, desc);
+      const cachedBuffer = ogCache.get(title, desc + JSON.stringify(stats));
       if (cachedBuffer) {
         res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+        res.setHeader('Cache-Control', 'public, max-age=86400');
         return res.send(cachedBuffer);
       }
 
@@ -120,163 +426,7 @@ async function startServer() {
       );
 
       const svg = await satori(
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              height: '100%',
-              width: '100%',
-              flexDirection: 'column',
-              backgroundColor: '#09090b',
-              color: 'white',
-              fontFamily: 'Inter',
-              padding: '80px',
-              backgroundImage: 'linear-gradient(135deg, #09090b 0%, #171720 100%)',
-            },
-            children: [
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    top: '-150px',
-                    right: '-150px',
-                    width: '600px',
-                    height: '600px',
-                    backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                    borderRadius: '50%',
-                    opacity: 0.15,
-                    filter: 'blur(80px)',
-                  },
-                },
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    bottom: '-150px',
-                    left: '-150px',
-                    width: '500px',
-                    height: '500px',
-                    backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
-                    borderRadius: '50%',
-                    opacity: 0.1,
-                    filter: 'blur(80px)',
-                  },
-                },
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    zIndex: 10,
-                  },
-                  children: [
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginTop: '20px',
-                        },
-                        children: [
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '60px',
-                                height: '60px',
-                                backgroundColor: '#2563eb', // Brand color
-                                borderRadius: '12px',
-                                marginRight: '24px',
-                              },
-                              children: [
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      width: '30px',
-                                      height: '30px',
-                                      border: '4px solid white',
-                                      borderRadius: '50%',
-                                      borderTopColor: 'transparent',
-                                      transform: 'rotate(45deg)',
-                                    },
-                                  },
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                fontSize: 48,
-                                fontWeight: 700,
-                                color: '#e4e4e7',
-                                letterSpacing: '-0.02em',
-                              },
-                              children: 'APEX SPEED RUN',
-                            },
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          display: 'flex',
-                          flexDirection: 'column',
-                        },
-                        children: [
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                fontSize: 88,
-                                fontWeight: 700,
-                                marginBottom: '24px',
-                                lineHeight: 1.05,
-                                color: '#ffffff',
-                                letterSpacing: '-0.03em',
-                                maxWidth: '1000px',
-                              },
-                              children: title,
-                            },
-                          },
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                fontSize: 42,
-                                color: '#a1a1aa', // Zinc-400
-                                maxWidth: '850px',
-                                lineHeight: 1.3,
-                                letterSpacing: '-0.01em',
-                              },
-                              children: desc,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        } as any,
+        getOgImageSvg(title, desc, type, stats, mapTiles),
         {
           width: 1200,
           height: 630,
@@ -288,6 +438,22 @@ async function startServer() {
               style: 'normal',
             },
           ],
+          loadAdditionalAsset: async (code, segment) => {
+            if (code === 'emoji') {
+              const cp = toCodePoint(segment);
+              const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${cp}.svg`;
+              try {
+                const res = await fetch(url);
+                if (res.ok) {
+                  const text = await res.text();
+                  return `data:image/svg+xml;base64,${Buffer.from(text).toString('base64')}`;
+                }
+              } catch (e) {
+                // ignore
+              }
+            }
+            return '';
+          }
         }
       );
 
@@ -295,16 +461,16 @@ async function startServer() {
         background: '#09090b',
         fitTo: { mode: 'width', value: 1200 },
       });
-      const pngBuffer = resvg.render().asPng();
 
-      ogCache.set(title, desc, pngBuffer);
+      const pngBuffer = resvg.render().asPng();
+      ogCache.set(title, desc + JSON.stringify(stats), pngBuffer);
 
       res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+      res.setHeader('Cache-Control', 'public, max-age=86400');
       res.send(pngBuffer);
     } catch (error) {
       console.error('OG Image Error:', error);
-      res.status(500).send('Failed to generate image');
+      res.status(500).send(error.stack || error.toString());
     }
   });
 
@@ -331,7 +497,7 @@ async function startServer() {
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
-        const ogImageUrl = `${baseUrl}/api/og.png?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
+        const ogImageUrl = `${baseUrl}/api/og.png?path=${encodeURIComponent(req.path)}&query=${encodeURIComponent(searchParams.toString())}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)
@@ -374,7 +540,7 @@ async function startServer() {
         
         const baseUrl = req.headers.host && req.headers.host.includes('localhost') ? 'http://localhost:3000' : 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'apexspeedrun.com');
         const currentUrl = `${baseUrl}${req.originalUrl}`;
-        const ogImageUrl = `${baseUrl}/api/og.png?title=${encodeURIComponent(meta.title)}&desc=${encodeURIComponent(meta.description)}`;
+        const ogImageUrl = `${baseUrl}/api/og.png?path=${encodeURIComponent(req.path)}&query=${encodeURIComponent(searchParams.toString())}`;
         template = template
           .replace(/<title>.*?<\/title>/s, `<title>${meta.title}</title>`)
           .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${meta.description}">`)

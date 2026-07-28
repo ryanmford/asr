@@ -35,7 +35,7 @@ async function fetchSheets() {
   });
 }
 
-function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', highlightValue?: string, highlightLabel?: string, mapTiles?: any[]) {
+function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', stats?: {value: string, label: string}[], mapTiles?: any[]) {
   return {
     type: 'div',
     props: {
@@ -53,33 +53,48 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
         overflow: 'hidden',
       },
       children: [
-        ...(mapTiles && mapTiles.length > 0 ? [{
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              opacity: 0.7,
-            },
-            children: mapTiles.map(t => ({
-              type: 'img',
-              props: {
-                src: t.dataUri,
-                style: {
-                  position: 'absolute',
-                  left: t.x,
-                  top: t.y,
-                  width: 1024,
-                  height: 1024,
+        ...(mapTiles && mapTiles.length > 0 ? [
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                opacity: 0.9, // Increased opacity to make map more visible
+              },
+              children: mapTiles.map(t => ({
+                type: 'img',
+                props: {
+                  src: t.dataUri,
+                  style: {
+                    position: 'absolute',
+                    left: t.x,
+                    top: t.y,
+                    width: 1024,
+                    height: 1024,
+                  }
                 }
+              }))
+            }
+          },
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: 'linear-gradient(to right, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.7) 40%, rgba(9, 9, 11, 0.1) 100%)',
               }
-            }))
+            }
           }
-        }] : []),
+        ] : []),
         {
           type: 'div',
           props: {
@@ -88,6 +103,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
               flexDirection: 'column',
               justifyContent: 'space-between',
               height: '100%',
+              zIndex: 10,
             },
             children: [
               {
@@ -98,36 +114,6 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                     alignItems: 'center',
                   },
                   children: [
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '50px',
-                          height: '50px',
-                          backgroundColor: '#ffffff',
-                          borderRadius: '8px',
-                          marginRight: '20px',
-                        },
-                        children: [
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                width: '24px',
-                                height: '24px',
-                                border: '3px solid #000000',
-                                borderRadius: '50%',
-                                borderTopColor: 'transparent',
-                                transform: 'rotate(45deg)',
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
                     {
                       type: 'div',
                       props: {
@@ -161,14 +147,14 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                         style: {
                           display: 'flex',
                           flexDirection: 'column',
-                          maxWidth: highlightValue ? '650px' : '1050px',
+                          maxWidth: (stats && stats.length > 0) ? '650px' : '1050px',
                         },
                         children: [
                           {
                             type: 'div',
                             props: {
                               style: {
-                                fontSize: highlightValue ? 72 : 96,
+                                fontSize: (stats && stats.length > 0) ? 72 : 96,
                                 fontWeight: 700,
                                 marginBottom: '32px',
                                 lineHeight: 1.1,
@@ -191,18 +177,7 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                                   type: 'div',
                                   props: {
                                     style: {
-                                      width: '6px',
-                                      height: '48px',
-                                      backgroundColor: '#dc2626',
-                                      marginRight: '24px',
-                                    },
-                                  },
-                                },
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      fontSize: highlightValue ? 32 : 40,
+                                      fontSize: (stats && stats.length > 0) ? 32 : 40,
                                       color: '#a1a1aa',
                                       lineHeight: 1.2,
                                       letterSpacing: '-0.02em',
@@ -217,44 +192,55 @@ function getOgImageSvg(title: string, desc: string, type?: 'player' | 'course', 
                         ],
                       },
                     },
-                    highlightValue ? {
+                    (stats && stats.length > 0) ? {
                       type: 'div',
                       props: {
                         style: {
                           display: 'flex',
-                          flexDirection: 'column',
+                          flexDirection: 'row',
                           alignItems: 'flex-end',
-                          textAlign: 'right',
+                          gap: '60px',
                         },
-                        children: [
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                fontSize: 140,
-                                fontWeight: 700,
-                                color: '#ffffff',
-                                lineHeight: 1,
-                                letterSpacing: '-0.05em',
-                              },
-                              children: highlightValue,
-                            }
-                          },
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                fontSize: 32,
-                                fontWeight: 700,
-                                color: '#a1a1aa',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                                marginTop: '16px',
-                              },
-                              children: highlightLabel,
-                            }
-                          }
-                        ]
+                        children: stats.map(stat => ({
+                           type: 'div',
+                           props: {
+                             style: {
+                               display: 'flex',
+                               flexDirection: 'column',
+                               alignItems: 'flex-end',
+                               textAlign: 'right',
+                             },
+                             children: [
+                               {
+                                 type: 'div',
+                                 props: {
+                                   style: {
+                                     fontSize: 100,
+                                     fontWeight: 700,
+                                     color: '#ffffff',
+                                     lineHeight: 1,
+                                     letterSpacing: '-0.05em',
+                                   },
+                                   children: stat.value,
+                                 }
+                               },
+                               {
+                                 type: 'div',
+                                 props: {
+                                   style: {
+                                     fontSize: 24,
+                                     fontWeight: 700,
+                                     color: '#a1a1aa',
+                                     textTransform: 'uppercase',
+                                     letterSpacing: '0.05em',
+                                     marginTop: '16px',
+                                   },
+                                   children: stat.label,
+                                 }
+                               }
+                             ]
+                           }
+                        }))
                       }
                     } : null
                   ].filter(Boolean),
@@ -285,8 +271,8 @@ function toCodePoint(unicodeSurrogates: string) {
   return r.filter(cp => cp !== 'fe0f').join('-');
 }
 
-async function generateOgImage(title: string, desc: string, outputPath: string, fontData: Buffer, type?: 'player' | 'course', highlightValue?: string, highlightLabel?: string, mapTiles?: any[]) {
-  const svg = await satori(getOgImageSvg(title, desc, type, highlightValue, highlightLabel, mapTiles), {
+async function generateOgImage(title: string, desc: string, outputPath: string, fontData: Buffer, type?: 'player' | 'course', stats?: {value: string, label: string}[], mapTiles?: any[]) {
+  const svg = await satori(getOgImageSvg(title, desc, type, stats, mapTiles), {
     width: 1200,
     height: 630,
     fonts: [
@@ -321,7 +307,7 @@ async function generateOgImage(title: string, desc: string, outputPath: string, 
   });
   
   const pngBuffer = resvg.render().asPng();
-  await fs.writeFile(outputPath, pngBuffer);
+  await fs.mkdir(path.dirname(outputPath), { recursive: true }); await fs.writeFile(outputPath, pngBuffer);
 }
 
 function injectMeta(html: string, title: string, desc: string, ogImageUrl: string) {
@@ -373,7 +359,7 @@ async function getMapTiles(coords: [number, number] | null) {
   for (let tx = startTx; tx <= endTx; tx++) {
     for (let ty = startTy; ty <= endTy; ty++) {
       tiles.push({
-        url: `https://a.basemaps.cartocdn.com/dark_all/${Z}/${tx}/${ty}.png`,
+        url: `https://a.basemaps.cartocdn.com/dark_nolabels/${Z}/${tx}/${ty}.png`,
         x: tx * TILE_SIZE - svgX,
         y: ty * TILE_SIZE - svgY
       });
@@ -424,21 +410,17 @@ async function run() {
     const winsCount = player.wins || 0;
     const firesCount = player.allTimeFireCount || 0;
     
-    let desc = `LQ: ${rating} | Courses: ${coursesCount} | Runs: ${runsCount}`;
+    let desc = `Courses: ${coursesCount} | Runs: ${runsCount}`;
     if (winsCount > 0) desc += ` | Wins: ${winsCount}`;
     if (firesCount > 0) desc += ` | 🔥 ${firesCount}`;
     
-    // Gen OG Image
     const ogTitle = `${titlePrefix}${player.name.toUpperCase()}`;
     const ogFileName = `player-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     
-    let highlightValue = rating;
-    let highlightLabel = 'LQ';
-    if (rank && rank !== 'UR' && parseInt(String(rank)) <= 10) {
-      highlightValue = `#${rank}`;
-      highlightLabel = 'WORLD RANK';
-    }
+    const stats = [];
+    stats.push({ value: rating, label: 'LQ' });
+    stats.push({ value: rank === 'UR' ? 'UR' : `#${rank}`, label: 'RANK' });
     
     const completedCourses = [];
     const allCourses = Object.keys(data.cMet || {});
@@ -450,14 +432,12 @@ async function run() {
     const randCourse = completedCourses.length > 0 ? completedCourses[Math.floor(Math.random() * completedCourses.length)] : null;
     const mapTiles = await getMapTiles(randCourse && data.cMet[randCourse] ? data.cMet[randCourse].parsedCoords : null);
     
-    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'player', highlightValue, highlightLabel, mapTiles);
+    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'player', stats, mapTiles);
     
     const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
-    // Inj HTML
     const pageHtml = injectMeta(baseHtml, title, desc, ogImageUrl);
     
-    // Write HTML
     const playerDir = path.join(ROOT, 'dist', 'players', slug);
     await fs.mkdir(playerDir, { recursive: true });
     await fs.writeFile(path.join(playerDir, 'index.html'), pageHtml);
@@ -486,31 +466,26 @@ async function run() {
       if (fTimes.length) fBest = Math.min(...fTimes);
     }
     
-    const best = Math.min(mBest, fBest);
-    const wrStr = best !== Infinity ? `${best.toFixed(2)}s` : 'N/A';
     const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
-    
     const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
-    const desc = `World Record: ${wrStr} | Runs: ${totalRunsCount} | 📍 ${locStr}`;
+    const desc = `Runs: ${totalRunsCount} | 📍 ${locStr}`;
     
-    // Gen OG Image
     const ogTitle = `${titlePrefix}${courseStr.toUpperCase()} SPEED RUN`;
     const ogFileName = `course-${slug}.png`;
     const ogFilePath = path.join(ogDir, ogFileName);
     
-    const highlightValue = best !== Infinity ? `${best.toFixed(2)}` : '';
-    const highlightLabel = best !== Infinity ? 'WR' : '';
+    const stats = [];
+    stats.push({ value: mBest !== Infinity ? mBest.toFixed(2) : '--', label: "MEN'S WR" });
+    stats.push({ value: fBest !== Infinity ? fBest.toFixed(2) : '--', label: "WOMEN'S WR" });
     
     const mapTiles = await getMapTiles(courseInfo.parsedCoords || null);
     
-    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'course', highlightValue, highlightLabel, mapTiles);
+    await generateOgImage(ogTitle, desc, ogFilePath, fontData, 'course', stats, mapTiles);
     
     const ogImageUrl = `${BASE_URL}/og/${ogFileName}`;
     
-    // Inj HTML
     const pageHtml = injectMeta(baseHtml, title, desc, ogImageUrl);
     
-    // Write HTML
     const courseDir = path.join(ROOT, 'dist', 'courses', slug);
     await fs.mkdir(courseDir, { recursive: true });
     await fs.writeFile(path.join(courseDir, 'index.html'), pageHtml);
