@@ -1,7 +1,6 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import { getPageMeta } from './src/meta-injector.ts';
 import satori from 'satori';
@@ -48,15 +47,12 @@ class OgImageCache {
 
 const ogCache = new OgImageCache();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID || '1DcLZyAO2QZij_176vsC7_rWWTVbxwt8X9Jw7YWM_7j4';
 
 
 function toCodePoint(unicodeSurrogates: string) {
   const r = [];
-  let c = 0, p = 0, i = 0;
+  let c, p = 0, i = 0;
   while (i < unicodeSurrogates.length) {
     c = unicodeSurrogates.charCodeAt(i++);
     if (p) {
@@ -82,7 +78,7 @@ async function fetchTile(url: string) {
     const dataUri = `data:image/png;base64,${buffer.toString('base64')}`;
     tileCache.set(url, dataUri);
     return dataUri;
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 }
@@ -456,7 +452,7 @@ async function startServer() {
                   const text = await res.text();
                   return `data:image/svg+xml;base64,${Buffer.from(text).toString('base64')}`;
                 }
-              } catch (e) {
+              } catch (_e) {
                 // ignore
               }
             }

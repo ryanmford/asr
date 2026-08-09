@@ -216,7 +216,7 @@ const getInspectorDataForPath = (
   if (!entitySlug) return null;
 
   const searchKey = entitySlug.toLowerCase().replace(/-/g, " ");
-  const normalizedKey = entitySlug.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normalizedKey = normalizeName(entitySlug);
 
   if (viewPrefix === "players") {
     // Fast O(1) lookup
@@ -224,7 +224,7 @@ const getInspectorDataForPath = (
     if (!found) {
       for (const k in atMet) {
         const a = atMet[k];
-        if (a.name?.toLowerCase() === searchKey || a.pKey === normalizedKey) {
+        if (a.name?.toLowerCase() === searchKey || a.pKey === normalizedKey || normalizeName(a.name || "") === normalizedKey) {
           found = a;
           break;
         }
@@ -244,7 +244,7 @@ const getInspectorDataForPath = (
     for (let i = 0; i < masterCourseList.length; i++) {
       const c = masterCourseList[i];
       const cNameUpper = c.name?.toUpperCase();
-      const cNameNormalized = cNameUpper?.replace(/[^A-Z0-9]/g, "");
+      const cNameNormalized = normalizeName(c.name || "").toUpperCase();
       if (c.pKey === normalizedKeyUpper || cNameUpper === searchKeyUpper || cNameNormalized === normalizedKeyUpper) {
         found = c;
         break;
@@ -262,7 +262,7 @@ const getInspectorDataForPath = (
     if (!found) {
       for (let i = 0; i < settersWithImpact.length; i++) {
         const s = settersWithImpact[i];
-        if (s.name?.toLowerCase() === searchKey || s.pKey === normalizedKey) {
+        if (s.name?.toLowerCase() === searchKey || s.pKey === normalizedKey || normalizeName(s.name || "") === normalizedKey) {
           found = s;
           break;
         }

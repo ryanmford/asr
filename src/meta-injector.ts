@@ -165,8 +165,6 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
             if (fTimes.length) fBest = Math.min(...fTimes);
          }
          
-         const best = Math.min(mBest, fBest);
-         const wrStr = best !== Infinity ? `${best.toFixed(2)}s` : 'N/A';
          const locStr = courseInfo.city ? toTitleCase(courseInfo.city) : courseInfo.country ? toTitleCase(courseInfo.country) : 'Secret Location';
          
          const totalRunsCount = courseInfo.totalAllTimeRuns || courseInfo.totalRuns || totalClears;
