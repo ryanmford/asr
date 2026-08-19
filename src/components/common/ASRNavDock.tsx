@@ -136,13 +136,13 @@ export const ASRNavDock = React.memo(
                     if (item.id === "map") import("../views/MapCoursesView");
                     if (item.id === "rankings") import("../views/RankingsView");
                     if (item.id === "wall-of-fame")
-                      import("../views/ASRWallOfFame");
+                      import("../views/ASRHOF");
                   }}
                   onTouchStart={() => {
                     if (item.id === "map") import("../views/MapCoursesView");
                     if (item.id === "rankings") import("../views/RankingsView");
                     if (item.id === "wall-of-fame")
-                      import("../views/ASRWallOfFame");
+                      import("../views/ASRHOF");
                   }}
                   onClick={() => {
                     if (item.id === "submit") {

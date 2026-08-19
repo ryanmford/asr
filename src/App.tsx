@@ -27,7 +27,7 @@ import { ASRSubmitModal } from "./components/common/ASRSubmitModal";
 const RankingsView = React.lazy(() => import("./components/views/RankingsView").then(m => ({ default: m.RankingsView })));
 const HomeView = React.lazy(() => import("./components/views/HomeView").then(m => ({ default: m.HomeView })));
 const MapCoursesView = React.lazy(() => import("./components/views/MapCoursesView").then(m => ({ default: m.MapCoursesView })));
-const ASRWallOfFame = React.lazy(() => import("./components/views/ASRWallOfFame").then(m => ({ default: m.ASRWallOfFame })));
+const ASRHOF = React.lazy(() => import("./components/views/ASRHOF").then(m => ({ default: m.ASRHOF })));
 const ASRVideoAnnotator = React.lazy(() => import("./components/views/ASRVideoAnnotator").then(m => ({ default: m.ASRVideoAnnotator })));
 const InspectorBody = React.lazy(() => import("./components/inspector/InspectorBody").then(m => ({ default: m.InspectorBody })));
 
@@ -285,7 +285,7 @@ function MainAppContent({ theme, setTheme }: { theme: "light" | "dark", setTheme
                 } />
                 <Route path="/hof" element={
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex flex-col">
-                    <ASRWallOfFame
+                    <ASRHOF
                       theme={theme}
                       onEntityClick={navigateToEntity}
                       medalSort={medalSort}

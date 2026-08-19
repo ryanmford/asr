@@ -879,6 +879,9 @@ export const calculateWofStats = (
             return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
           })
           .slice(0, 10),
+        courses: [...qualifiedAthletes]
+          .sort((a, b) => (b.courses || 0) - (a.courses || 0) || b.runs - a.runs)
+          .slice(0, 10),
         runs: [...qualifiedAthletes]
           .sort((a, b) => b.runs - a.runs)
           .slice(0, 10),

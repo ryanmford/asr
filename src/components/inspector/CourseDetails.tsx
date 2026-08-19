@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import {
   Zap,
   Compass,
@@ -11,6 +11,8 @@ import {
   MapPin,
   Play,
   Eye,
+  ArrowDown,
+  Check,
 } from "lucide-react";
 import {
   cn,
@@ -37,6 +39,7 @@ import { ASRNeonToggle } from "../common/ASRNeonToggle";
 import { ModalScrollContext } from "../common/ASRBaseModal";
 
 import { CourseData, ASRDataContext } from "../../types";
+import { ASRBottomSheet } from "../common/ASRBottomSheet";
 
 interface CourseDetailsProps {
   course: CourseData;
@@ -178,6 +181,10 @@ export const CourseDetails = React.memo(
           country:
             atMet[r.pKey]?.countryName || atMet[r.pKey]?.country || r.country,
           flag: atMet[r.pKey]?.region || atMet[r.pKey]?.flag || r.flag,
+          _sortDate: new Date(r.date || 0).getTime(),
+          _sortName: String(atMet[r.pKey]?.name || r.athlete || r.pKey || "").toUpperCase(),
+          _sortTime: Number(r.num ?? r.time ?? Infinity),
+          _sortPts: Number(r.pts ?? r.points ?? 0),
         }));
       } else {
         const allTimePlayers = pRaw["all-time"] || {};
@@ -195,6 +202,10 @@ export const CourseDetails = React.memo(
                   gender: atMet[pKey]?.gender || "M",
                   country: atMet[pKey]?.countryName || atMet[pKey]?.country,
                   flag: atMet[pKey]?.region || atMet[pKey]?.flag,
+                  _sortDate: new Date(r.date || 0).getTime(),
+                  _sortName: String(atMet[pKey]?.name || pKey || "").toUpperCase(),
+                  _sortTime: Number(r.num ?? r.time ?? Infinity),
+                  _sortPts: Number(r.pts ?? r.points ?? 0),
                 });
               });
             }
@@ -204,17 +215,30 @@ export const CourseDetails = React.memo(
       
       const mInterims = (dataContext.courseRecords_M_AT?.[cName] || []).filter((r: any) => r.isInterim);
       mInterims.forEach((r: any) => {
-        runList.push({ ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "M", num: r.time, isInterim: true });
+        runList.push({ 
+          ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "M", num: r.time, isInterim: true,
+          _sortDate: new Date("2026-03-01T00:00:00Z").getTime(),
+          _sortName: "INTERIM TOP TIME",
+          _sortTime: Number(r.time ?? Infinity),
+          _sortPts: 0,
+        });
       });
       const fInterims = (dataContext.courseRecords_F_AT?.[cName] || []).filter((r: any) => r.isInterim);
       fInterims.forEach((r: any) => {
-        runList.push({ ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "F", num: r.time, isInterim: true });
+        runList.push({ 
+          ...r, athlete: "INTERIM TOP TIME", date: "2026-03-01T00:00:00Z", gender: "F", num: r.time, isInterim: true,
+          _sortDate: new Date("2026-03-01T00:00:00Z").getTime(),
+          _sortName: "INTERIM TOP TIME",
+          _sortTime: Number(r.time ?? Infinity),
+          _sortPts: 0,
+        });
       });
 
       return runList;
     }, [pRaw, cName, atMet, courseRunsHistory, dataContext.courseRecords_M_AT, dataContext.courseRecords_F_AT]);
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
     const urlTab = searchParams.get("tab");
     const validTabs = ["stats", "men", "women"];
     
@@ -237,6 +261,23 @@ export const CourseDetails = React.memo(
     const [uiMode, setUiMode] = useState<"open" | "all-time" | "2026">(initialModeSafe);
     const [contentMode, setContentMode] = useState<"open" | "all-time" | "2026">(initialModeSafe);
 
+    const urlSort = searchParams.get("sort");
+    const urlDir = searchParams.get("dir");
+    const validSorts = ["points", "date", "time", "player"];
+    const validDirs = ["desc", "asc"];
+    const sortCategory = validSorts.includes(urlSort as string) ? (urlSort as "points" | "date" | "time" | "player") : "points";
+    const sortDirection = validDirs.includes(urlDir as string) ? (urlDir as "desc" | "asc") : "desc";
+
+    const setSortState = (cat: string, dir: string) => {
+      setSearchParams(prev => {
+        prev.set("sort", cat);
+        prev.set("dir", dir);
+        return prev;
+      }, { replace: true, state: location.state, preventScrollReset: true });
+    };
+
+    const [isSortOpen, setIsSortOpen] = useState(false);
+
     const recordsM = contentMode === "all-time" 
       ? (dataContext.courseRecords_M_AT?.[cName] || [])
       : contentMode === "2026"
@@ -248,6 +289,45 @@ export const CourseDetails = React.memo(
       : contentMode === "2026"
       ? (dataContext.courseRecords_F_2026?.[cName] || [])
       : (dataContext.courseRecords_F_OP?.[cName] || []);
+
+    const sortRecords = (records: any[]) => {
+      const sorted = [...records];
+      sorted.sort((a, b) => {
+        if (a.isInterim && !b.isInterim) return -1;
+        if (!a.isInterim && b.isInterim) return 1;
+
+        const aDate = new Date(a.date || 0).getTime();
+        const bDate = new Date(b.date || 0).getTime();
+        const aName = String(a.pKey || a.athlete || "").toUpperCase();
+        const bName = String(b.pKey || b.athlete || "").toUpperCase();
+        const aTime = Number(a.num ?? a.time ?? Infinity);
+        const bTime = Number(b.num ?? b.time ?? Infinity);
+        const aPts = Number(a.pts ?? a.points ?? 0);
+        const bPts = Number(b.pts ?? b.points ?? 0);
+
+        if (sortCategory === "date") {
+          const primary = aDate - bDate;
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return aTime - bTime;
+        } else if (sortCategory === "player") {
+          const primary = aName.localeCompare(bName);
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return aTime - bTime;
+        } else if (sortCategory === "time") {
+          const primary = aTime - bTime;
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return aDate - bDate;
+        } else {
+          const primary = aPts - bPts;
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return aTime - bTime;
+        }
+      });
+      return sorted;
+    };
+
+    const sortedRecordsM = useMemo(() => sortRecords(recordsM), [recordsM, sortCategory, sortDirection]);
+    const sortedRecordsF = useMemo(() => sortRecords(recordsF), [recordsF, sortCategory, sortDirection]);
 
     const atRecordsM = dataContext.courseRecords_M_AT?.[cName] || [];
     const atRecordsF = dataContext.courseRecords_F_AT?.[cName] || [];
@@ -460,14 +540,39 @@ export const CourseDetails = React.memo(
                       dataContext={dataContext}
                       cName={cName}
                     />
-                    <ASRRankList
-                      athletes={recordsM}
-                      dataContext={dataContext}
-                      onEntityClick={onEntityClick}
-                      entityType="player"
-                      showDateSubtitle={true}
-                      padTo={3}
-                    />
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center justify-between">
+                        <SectionTitle noPadding>VERIFIED RUNS</SectionTitle>
+                        <div 
+                          className={cn(
+                            "flex items-center rounded-full border text-[10px] font-black uppercase tracking-widest",
+                            theme === "dark" ? "border-white/10 bg-zinc-900/50" : "border-black/10 bg-zinc-100/50"
+                          )}
+                        >
+                          <button
+                            onClick={() => setIsSortOpen(true)}
+                            className="px-3 py-1.5 hover:opacity-70 transition-opacity uppercase"
+                          >
+                            {sortCategory}
+                          </button>
+                          <div className={cn("w-px h-3", theme === "dark" ? "bg-white/20" : "bg-black/20")} />
+                          <button
+                            onClick={() => setSortState(sortCategory, sortDirection === "desc" ? "asc" : "desc")}
+                            className="px-2 py-1.5 hover:opacity-70 transition-opacity flex items-center justify-center"
+                          >
+                            <ArrowDown size={14} className={cn("transition-transform duration-200", sortDirection === "asc" ? "rotate-180" : "")} />
+                          </button>
+                        </div>
+                      </div>
+                      <ASRRankList
+                        athletes={sortedRecordsM}
+                        dataContext={dataContext}
+                        onEntityClick={onEntityClick}
+                        entityType="player"
+                        showDateSubtitle={true}
+                        padTo={3}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -526,14 +631,39 @@ export const CourseDetails = React.memo(
                       dataContext={dataContext}
                       cName={cName}
                     />
-                    <ASRRankList
-                      athletes={recordsF}
-                      dataContext={dataContext}
-                      onEntityClick={onEntityClick}
-                      entityType="player"
-                      showDateSubtitle={true}
-                      padTo={3}
-                    />
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center justify-between">
+                        <SectionTitle noPadding>VERIFIED RUNS</SectionTitle>
+                        <div 
+                          className={cn(
+                            "flex items-center rounded-full border text-[10px] font-black uppercase tracking-widest",
+                            theme === "dark" ? "border-white/10 bg-zinc-900/50" : "border-black/10 bg-zinc-100/50"
+                          )}
+                        >
+                          <button
+                            onClick={() => setIsSortOpen(true)}
+                            className="px-3 py-1.5 hover:opacity-70 transition-opacity uppercase"
+                          >
+                            {sortCategory}
+                          </button>
+                          <div className={cn("w-px h-3", theme === "dark" ? "bg-white/20" : "bg-black/20")} />
+                          <button
+                            onClick={() => setSortState(sortCategory, sortDirection === "desc" ? "asc" : "desc")}
+                            className="px-2 py-1.5 hover:opacity-70 transition-opacity flex items-center justify-center"
+                          >
+                            <ArrowDown size={14} className={cn("transition-transform duration-200", sortDirection === "asc" ? "rotate-180" : "")} />
+                          </button>
+                        </div>
+                      </div>
+                      <ASRRankList
+                        athletes={sortedRecordsF}
+                        dataContext={dataContext}
+                        onEntityClick={onEntityClick}
+                        entityType="player"
+                        showDateSubtitle={true}
+                        padTo={3}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -646,6 +776,55 @@ export const CourseDetails = React.memo(
             </InspectorTabContainer>
           )}
         </div>
+
+        {isSortOpen && (
+          <ASRBottomSheet
+            snapPoints={[0, 0.55]}
+            activeSnap={isSortOpen ? 0.55 : 0}
+            onSnapChange={(snap) => {
+              if (snap === 0) setIsSortOpen(false);
+            }}
+          >
+            <div className="flex flex-col px-6 py-4 pb-12 gap-1.5">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3 pl-1">
+                SORT RUNS
+              </h3>
+              {[
+                { id: "points", label: "POINTS" },
+                { id: "date", label: "DATE" },
+                { id: "time", label: "TIME" },
+                { id: "player", label: "PLAYER" },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => {
+                    const nextDir = (opt.id === "time" || opt.id === "player") ? "asc" : "desc";
+                    setSortState(opt.id, nextDir);
+                    setIsSortOpen(false);
+                  }}
+                  className={cn(
+                    "flex items-center justify-between w-full p-4 rounded-xl transition-all outline-none focus-visible:ring-2",
+                    sortCategory === opt.id
+                      ? (theme === "dark" ? "bg-white/10" : "bg-black/5")
+                      : "hover:bg-zinc-500/10"
+                  )}
+                >
+                  <span className={cn(
+                    "text-sm font-black uppercase tracking-widest",
+                    sortCategory === opt.id
+                      ? (theme === "dark" ? "text-white" : "text-black")
+                      : "text-zinc-500"
+                  )}>
+                    {opt.label}
+                  </span>
+                  {sortCategory === opt.id && (
+                    <Check size={18} className={theme === "dark" ? "text-white" : "text-black"} />
+                  )}
+                </button>
+              ))}
+            </div>
+          </ASRBottomSheet>
+        )}
       </div>
     );
   },

@@ -191,9 +191,13 @@ export const usePlayerDetailsData = (
   }, [meta]);
 
   const rankListRuns = useMemo(() => {
-    return runs.map((r: { label?: string; num?: number; date?: string }) => ({
+    return runs.map((r: any) => ({
       ...r,
       pKey: r.pKey || r.label,
+      _sortDate: new Date(r.date || 0).getTime(),
+      _sortName: String(r.pKey || r.label || "").toUpperCase(),
+      _sortTime: Number(r.num ?? r.time ?? Infinity),
+      _sortPts: Number(r.pts ?? r.points ?? 0),
     }));
   }, [runs]);
 

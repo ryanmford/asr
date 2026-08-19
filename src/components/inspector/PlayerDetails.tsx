@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ASRWeeklyActivityChart } from "./ASRWeeklyActivityChart";
 import {
@@ -10,6 +10,8 @@ import {
   Users,
   X,
   MapPin,
+  ArrowDown,
+  Check,
 } from "lucide-react";
 import {
   cn,
@@ -39,6 +41,7 @@ import { ASRRankList } from "../list/ASRRankList";
 
 import { ASREmptyState } from "../common/ASREmptyState";
 import { ModalScrollContext } from "../common/ASRBaseModal";
+import { ASRBottomSheet } from "../common/ASRBottomSheet";
 
 import { PlayerProfile, ASRDataContext } from "../../types";
 import { usePlayerDetailsData } from "../../hooks/useInspectorFormatting";
@@ -59,7 +62,8 @@ export const PlayerDetails = React.memo(
     theme,
     initialTab = "runs",
   }: PlayerDetailsProps) => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
 
     const urlTab = searchParams.get("tab");
     const validTabs = ["runs", "sets", "vault", "bio"];
@@ -83,6 +87,23 @@ export const PlayerDetails = React.memo(
     const [contentMode, setContentMode] = useState<"open" | "all-time" | "2026">(initialModeSafe);
 
     const [selectedItem, setSelectedItem] = useState<{ type: string; item: unknown } | null>(null);
+
+    const urlSort = searchParams.get("sort");
+    const urlDir = searchParams.get("dir");
+    const validSorts = ["points", "date", "time", "name"];
+    const validDirs = ["desc", "asc"];
+    const sortCategory = validSorts.includes(urlSort as string) ? (urlSort as "points" | "date" | "time" | "name") : "points";
+    const sortDirection = validDirs.includes(urlDir as string) ? (urlDir as "desc" | "asc") : "desc";
+
+    const setSortState = (cat: string, dir: string) => {
+      setSearchParams(prev => {
+        prev.set("sort", cat);
+        prev.set("dir", dir);
+        return prev;
+      }, { replace: true, state: location.state, preventScrollReset: true });
+    };
+
+    const [isSortOpen, setIsSortOpen] = useState(false);
 
     const randomRunsPromo = useMemo(() => {
       const types: PromoType[] = ["skool"];
@@ -112,6 +133,32 @@ export const PlayerDetails = React.memo(
       rankListRuns,
       vaultItems,
     } = usePlayerDetailsData(player, contentMode, dataContext);
+
+    const sortedRankListRuns = useMemo(() => {
+      const result = [...rankListRuns];
+      result.sort((a, b) => {
+        if (sortCategory === "date") {
+          const primary = (a._sortDate || 0) - (b._sortDate || 0);
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return (a._sortTime || 0) - (b._sortTime || 0);
+        } else if (sortCategory === "name") {
+          const aName = a._sortName || "";
+          const bName = b._sortName || "";
+          const primary = aName.localeCompare(bName);
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return (a._sortTime || 0) - (b._sortTime || 0);
+        } else if (sortCategory === "time") {
+          const primary = (a._sortTime || 0) - (b._sortTime || 0);
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return (a._sortDate || 0) - (b._sortDate || 0);
+        } else {
+          const primary = (a._sortPts || 0) - (b._sortPts || 0);
+          if (primary !== 0) return sortDirection === "desc" ? -primary : primary;
+          return (a._sortTime || 0) - (b._sortTime || 0);
+        }
+      });
+      return result;
+    }, [rankListRuns, sortCategory, sortDirection]);
 
     const assignedShoe = useMemo(() => {
       const rawShoe = vitals.shoe;
@@ -314,10 +361,32 @@ export const PlayerDetails = React.memo(
               )}
 
               <div className="p-6 flex flex-col gap-6 pt-6 relative min-h-[300px]">
-                <SectionTitle>VERIFIED RUNS</SectionTitle>
-                {rankListRuns.length > 0 ? (
+                <div className="flex items-center justify-between">
+                  <SectionTitle noPadding>VERIFIED RUNS</SectionTitle>
+                  <div 
+                    className={cn(
+                      "flex items-center rounded-full border text-[10px] font-black uppercase tracking-widest",
+                      theme === "dark" ? "border-white/10 bg-zinc-900/50" : "border-black/10 bg-zinc-100/50"
+                    )}
+                  >
+                    <button
+                      onClick={() => setIsSortOpen(true)}
+                      className="px-3 py-1.5 hover:opacity-70 transition-opacity uppercase"
+                    >
+                      {sortCategory}
+                    </button>
+                    <div className={cn("w-px h-3", theme === "dark" ? "bg-white/20" : "bg-black/20")} />
+                    <button
+                      onClick={() => setSortState(sortCategory, sortDirection === "desc" ? "asc" : "desc")}
+                      className="px-2 py-1.5 hover:opacity-70 transition-opacity flex items-center justify-center"
+                    >
+                      <ArrowDown size={14} className={cn("transition-transform duration-200", sortDirection === "asc" ? "rotate-180" : "")} />
+                    </button>
+                  </div>
+                </div>
+                {sortedRankListRuns.length > 0 ? (
                   <ASRRankList
-                    athletes={rankListRuns}
+                    athletes={sortedRankListRuns}
                     valueLabel="LQ"
                     onEntityClick={onEntityClick}
                     dataContext={dataContext}
@@ -666,6 +735,55 @@ export const PlayerDetails = React.memo(
             </motion.div>
           )}
         </AnimatePresence>
+        
+        {isSortOpen && (
+          <ASRBottomSheet
+            snapPoints={[0, 0.55]}
+            activeSnap={isSortOpen ? 0.55 : 0}
+            onSnapChange={(snap) => {
+              if (snap === 0) setIsSortOpen(false);
+            }}
+          >
+            <div className="flex flex-col px-6 py-4 pb-12 gap-1.5">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3 pl-1">
+                SORT RUNS
+              </h3>
+              {[
+                { id: "points", label: "POINTS" },
+                { id: "date", label: "DATE" },
+                { id: "time", label: "TIME" },
+                { id: "name", label: "COURSE" },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => {
+                    const nextDir = (opt.id === "time" || opt.id === "name") ? "asc" : "desc";
+                    setSortState(opt.id, nextDir);
+                    setIsSortOpen(false);
+                  }}
+                  className={cn(
+                    "flex items-center justify-between w-full p-4 rounded-xl transition-all outline-none focus-visible:ring-2",
+                    sortCategory === opt.id
+                      ? (theme === "dark" ? "bg-white/10" : "bg-black/5")
+                      : "hover:bg-zinc-500/10"
+                  )}
+                >
+                  <span className={cn(
+                    "text-sm font-black uppercase tracking-widest",
+                    sortCategory === opt.id
+                      ? (theme === "dark" ? "text-white" : "text-black")
+                      : "text-zinc-500"
+                  )}>
+                    {opt.label}
+                  </span>
+                  {sortCategory === opt.id && (
+                    <Check size={18} className={theme === "dark" ? "text-white" : "text-black"} />
+                  )}
+                </button>
+              ))}
+            </div>
+          </ASRBottomSheet>
+        )}
       </div>
     );
   },

@@ -16,7 +16,7 @@ import { ASRSectionHeading } from "../common/ASRSectionHeading";
 import { ASRRankBadge } from "../ASRListItems";
 import { ASRPromotionBanner } from "../common/ASRPromotionBanner";
 
-interface ASRWallOfFameProps {
+interface ASRHOFProps {
  onEntityClick: (type: string, data: any, options?: any) => void;
  medalSort: { key: string; direction: "ascending" | "descending" };
  onMedalSort: (key: string) => void;
@@ -81,8 +81,8 @@ const MedalHeader = React.memo(
  },
 );
 
-export const ASRWallOfFame = React.memo(
- ({ onEntityClick, medalSort, onMedalSort, theme }: ASRWallOfFameProps) => {
+export const ASRHOF = React.memo(
+ ({ onEntityClick, medalSort, onMedalSort, theme }: ASRHOFProps) => {
  const data = useDataStore((s) => s.data);
  const atPerfs = useDataStore((s) => s.atPerfs);
  const lbAT = useDataStore((s) => s.lbAT);
@@ -122,9 +122,10 @@ export const ASRWallOfFame = React.memo(
 
  const sections = [
  { l: "TOP LQ", k: "rating" },
+ { l: "MOST WORLD RECORDS", k: "wins" },
+ { l: "MOST COURSES", k: "courses" },
  { l: "MOST RUNS", k: "runs" },
  { l: "HIGHEST WIN %", k: "winPercentage" },
- { l: "MOST RECORDS", k: "wins" },
  { l: "MOST 🪙", k: "contributionScore" },
  { l: "MOST 🔥", k: "totalFireCount" },
  { l: "MOST IMPACT", k: "impact" },
