@@ -145,21 +145,18 @@ export const ASRMap = forwardRef(({
       keyboard: true,
     }).setView(defaultCenter, defaultZoom);
 
-    const lightTile = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-    const darkTile = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    const osmTile = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
-    const lightLayer = L.tileLayer(lightTile, {
-      subdomains: "abcd",
+    const lightLayer = L.tileLayer(osmTile, {
       maxZoom: 20,
       noWrap: true,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
-    const darkLayer = L.tileLayer(darkTile, {
-      subdomains: "abcd",
+    const darkLayer = L.tileLayer(osmTile, {
       maxZoom: 20,
       noWrap: true,
-      className: "transition-opacity duration-[1000ms] ease-in-out",
+      className: "map-tiles-dark transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
     lightLayer.setOpacity(isDarkRef.current ? 0 : 1);

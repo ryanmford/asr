@@ -12,6 +12,16 @@ import {
 } from "./asr-utils";
 import { normalizeForSearch } from "./utils";
 
+const parseSafeDate = (dStr: string | null | undefined): Date | null => {
+  if (!dStr) return null;
+  const s = String(dStr).trim();
+  if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) {
+    return new Date(s.replace(/-/g, '/'));
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 const isFootwearTeam = (name: string, shoeField?: string): boolean => {
   if (!name) return false;
   const nLow = name.toLowerCase().trim();
@@ -378,7 +388,7 @@ export const processLiveFeedData = (
         num: numericValue,
         time: numericValue,
         videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-        date: vals.date ? new Date(vals.date).toISOString() : null,
+        date: vals.date ? parseSafeDate(vals.date)?.toISOString() || null : null,
       });
 
       if (!athleteDisplayNameMap[pKey]) athleteDisplayNameMap[pKey] = pName;
@@ -422,7 +432,7 @@ export const processLiveFeedData = (
           value: vals.result,
           num: numericValue,
           videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-          date: vals.date ? new Date(vals.date).toISOString() : null,
+          date: vals.date ? parseSafeDate(vals.date)?.toISOString() || null : null,
         };
       }
     }
@@ -434,7 +444,7 @@ export const processLiveFeedData = (
     ) {
       allTimeCourseLeaderboards[pGender][normC][pKey] = numericValue;
     }
-    const runDate = vals.date ? new Date(vals.date) : null;
+    const runDate = vals.date ? parseSafeDate(vals.date) : null;
     const isASROpenTag = (vals.tag || "").toUpperCase().includes("OPEN");
     const isInOpenWindow =
       runDate &&
@@ -454,7 +464,7 @@ export const processLiveFeedData = (
             value: vals.result,
             num: numericValue,
             videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-            date: vals.date ? new Date(vals.date).toISOString() : null,
+            date: vals.date ? parseSafeDate(vals.date)?.toISOString() || null : null,
           };
         }
         openAthleteTotalSubmissions[pKey] =
@@ -478,8 +488,8 @@ export const processLiveFeedData = (
         if (dateStr.includes("2026") || /\/(?:20)?26(?:\s|$)/.test(dateStr) || dateStr.endsWith("/26")) {
             is2026 = true;
         } else {
-            const d = new Date(dateStr);
-            if (!isNaN(d.getTime()) && d.getFullYear() === 2026) is2026 = true;
+            const d = parseSafeDate(dateStr);
+            if (d && d.getFullYear() === 2026) is2026 = true;
         }
     }
 
@@ -495,7 +505,7 @@ export const processLiveFeedData = (
             value: vals.result,
             num: numericValue,
             videoUrl: vals.proof || (vals.__raw && vals.__raw[7]) || "",
-            date: vals.date ? new Date(vals.date).toISOString() : null,
+            date: vals.date ? parseSafeDate(vals.date)?.toISOString() || null : null,
           };
         }
         season26AthleteTotalSubmissions[pKey] = (season26AthleteTotalSubmissions[pKey] || 0) + 1;
