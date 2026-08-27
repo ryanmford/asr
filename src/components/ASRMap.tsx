@@ -10,6 +10,20 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { trackEvent, cn } from "../lib/asr-utils";
 import { ThemeContext } from "../theme-context";
 import { useAppStore } from "../store/useAppStore";
+import { CourseData } from "../types";
+
+export interface ASRMapProps {
+  courses?: CourseData[];
+  totalCourses?: number;
+  searchQuery?: string;
+  onCourseClick?: (course: CourseData) => void;
+  onPinClick?: (course: CourseData) => void;
+  onBoundsChange?: (bounds: { north: number; south: number; east: number; west: number }) => void;
+  onMapClick?: () => void;
+  theme?: string | null;
+  className?: string;
+  hideControls?: boolean;
+}
 
 export const ASRMap = forwardRef(({
   courses = [],
@@ -22,7 +36,7 @@ export const ASRMap = forwardRef(({
   theme: propTheme,
   className,
   hideControls = false,
-}: any, ref: any) => {
+}: ASRMapProps, ref: any) => {
   const contextTheme = useContext(ThemeContext);
   const theme = propTheme || contextTheme;
   const isDark = theme === "dark";
@@ -47,7 +61,7 @@ export const ASRMap = forwardRef(({
     let validCoordsCount = 0;
     let lastValidCoord = null;
 
-    courses.forEach((c: any) => {
+    courses.forEach((c: CourseData & { parsedCoords?: [number, number], isDivider?: boolean }) => {
       if (c.parsedCoords && !c.isDivider) {
         bounds.extend(c.parsedCoords);
         validCoordsCount++;
@@ -360,7 +374,7 @@ export const ASRMap = forwardRef(({
   useEffect(() => {
     if (!mapReady || !clusterGroupRef.current) return;
     
-    const currentCourseIds = new Set(courses.map((c: any) => c.name));
+    const currentCourseIds = new Set(courses.map((c: CourseData) => c.name));
     
     // Remove markers that are no longer in `courses`
     const markersToRemove: L.Marker[] = [];
@@ -378,7 +392,7 @@ export const ASRMap = forwardRef(({
     // Add or update markers Let's add new markers without blowing up the whole cluster.
     const newMarkers: L.Marker[] = [];
 
-    courses.forEach((c: any) => {
+    courses.forEach((c: CourseData & { parsedCoords?: [number, number] }) => {
       const id = c.name;
       if (!c.parsedCoords) return;
 
@@ -464,7 +478,7 @@ export const ASRMap = forwardRef(({
   useEffect(() => {
     if (!mapReady || !mapRef.current || !courses) return;
 
-    const activeCoursesCount = courses.filter((c: any) => c && !c.isDivider).length;
+    const activeCoursesCount = courses.filter((c: CourseData & { isDivider?: boolean }) => c && !c.isDivider).length;
     const isFiltered = activeCoursesCount < totalCourses * 0.95 && activeCoursesCount > 0;
     
     // If we're showing all courses (or near all), we don't force recenter.
