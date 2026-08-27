@@ -279,7 +279,7 @@ export const usePlayerDetailsData = (
         id: "c2",
         title: "The finisher",
         metric: golds,
-        metricLabel: "TOTAL WINS",
+        metricLabel: "TOTAL WORLD RECORDS",
         tier: golds >= 20 ? 3 : golds >= 10 ? 2 : golds >= 1 ? 1 : 0,
         maxTier: 3,
         progress: golds,

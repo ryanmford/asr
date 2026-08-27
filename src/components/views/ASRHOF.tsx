@@ -121,15 +121,15 @@ export const ASRHOF = React.memo(
  }
 
  const sections = [
- { l: "TOP LQ", k: "rating" },
- { l: "MOST WORLD RECORDS", k: "wins" },
- { l: "MOST COURSES", k: "courses" },
- { l: "MOST RUNS", k: "runs" },
- { l: "HIGHEST WIN %", k: "winPercentage" },
- { l: "MOST 🪙", k: "contributionScore" },
- { l: "MOST 🔥", k: "totalFireCount" },
- { l: "MOST IMPACT", k: "impact" },
- { l: "MOST SETS", k: "sets" },
+ { l: "TOP LQ", subtitle: "LOCOMOTIVE QUOTIENT = POINTS / RUNS", k: "rating" },
+ { l: "MOST WR", subtitle: "TOTAL WORLD RECORDS", k: "wins" },
+ { l: "MOST COURSES", subtitle: "TOTAL RUNS VERIFIED", k: "courses" },
+ { l: "MOST RUNS", subtitle: "TOTAL RUNS SUBMITTED", k: "runs" },
+ { l: "HIGHEST WR %", subtitle: "TOTAL WORLD RECORDS / TOTAL COURSES", k: "winPercentage" },
+ { l: "MOST 🪙", subtitle: "COINS EARNED FROM RUNS, WORLD RECORDS, & SETS", k: "contributionScore" },
+ { l: "MOST 🔥", subtitle: <><span className="block whitespace-nowrap">M: &lt;9 🔥, &lt;8 🔥🔥, &lt;7 🔥🔥🔥</span><span className="block mt-0.5 whitespace-nowrap">W: &lt;11 🔥, &lt;10 🔥🔥, &lt;9 🔥🔥🔥</span></>, k: "totalFireCount" },
+ { l: "MOST IMPACT", subtitle: "OVERALL SETTER IMPACT SCORE", k: "impact" },
+ { l: "MOST SETS", subtitle: "TOTAL NUMBER OF SETS CREATED", k: "sets" },
  ];
 
  return (
@@ -143,7 +143,7 @@ export const ASRHOF = React.memo(
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
  {sections.map((sec) => (
  <div key={sec.k} className="flex flex-col gap-5">
- <ASRSectionHeading title={sec.l} theme={theme} />
+ <ASRSectionHeading title={sec.l} subtitle={sec.subtitle} theme={theme} />
  <div
  className={cn(
  "rounded-[2.5rem] overflow-hidden transition-all duration-300 shadow-xl",

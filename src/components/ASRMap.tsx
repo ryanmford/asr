@@ -145,18 +145,31 @@ export const ASRMap = forwardRef(({
       keyboard: true,
     }).setView(defaultCenter, defaultZoom);
 
-    const osmTile = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    
+    let lightTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    let darkTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    
+    if (mapboxToken) {
+      lightTileUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
+      darkTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
+    }
 
-    const lightLayer = L.tileLayer(osmTile, {
+    const lightLayer = L.tileLayer(lightTileUrl, {
       maxZoom: 20,
       noWrap: true,
       className: "transition-opacity duration-[1000ms] ease-in-out",
     }).addTo(map);
 
-    const darkLayer = L.tileLayer(osmTile, {
+    let darkLayerClass = "transition-opacity duration-[1000ms] ease-in-out";
+    if (!mapboxToken) {
+      darkLayerClass += " map-tiles-dark";
+    }
+
+    const darkLayer = L.tileLayer(darkTileUrl, {
       maxZoom: 20,
       noWrap: true,
-      className: "map-tiles-dark transition-opacity duration-[1000ms] ease-in-out",
+      className: darkLayerClass,
     }).addTo(map);
 
     lightLayer.setOpacity(isDarkRef.current ? 0 : 1);

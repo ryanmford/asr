@@ -37,25 +37,37 @@ export const ASRStatCard = React.memo(
     const statInfoMap: any = {
       LQ: "LOCOMOTIVE QUOTIENT = POINTS / RUNS",
       "AVG POINTS": "AVERAGE POINTS PER RUN",
-      "🔥": "FIRE BONUS 🔥 🔥 🔥",
-      "🪙": "COINS EARNED FROM RUNS, WINS, & SETS",
+      "🔥": (
+        <>
+          <span className="block whitespace-nowrap">M: &lt;9 🔥, &lt;8 🔥🔥, &lt;7 🔥🔥🔥</span>
+          <span className="block mt-0.5 whitespace-nowrap">W: &lt;11 🔥, &lt;10 🔥🔥, &lt;9 🔥🔥🔥</span>
+        </>
+      ),
+      "🪙": "COINS EARNED FROM RUNS, SETS, & WR",
       RANK: "CURRENT WORLD RANK",
       POINTS: "TOTAL POINTS",
       PLAYERS: "TOTAL PLAYERS",
       SETTERS: "TOTAL SETTERS",
-      WINS: "TOTAL WINS",
+      WR: "TOTAL WORLD RECORDS",
       "TOTAL SETS": "TOTAL NUMBER OF SETS CREATED",
       "AVG SET RATING": "AVERAGE RATING FOR CREATED SETS",
       RATING: "CURRENT PLAYER RATING",
       RUNS: "TOTAL RUNS SUBMITTED",
-      "WIN %": "PERCENTAGE OF COURSES WON",
+      "WR %": "TOTAL WORLD RECORDS / TOTAL COURSES",
       "AVG TIME": "AVERAGE RUN TIME",
-      COURSES: "TOTAL COURSES COMPLETED",
+      COURSES: "TOTAL RUNS VERIFIED",
       "CR (M)": "MEN'S COURSE RECORD",
       "CR (W)": "WOMEN'S COURSE RECORD",
       "TOTAL RUNS": "TOTAL NUMBER OF RUNS",
       COMPLETIONS: "TOTAL NUMBER OF COURSE COMPLETIONS",
       "WORLD RECORD": "FASTEST OVERALL TIME",
+      LEVEL: "SETTER LEVEL",
+      IMPACT: "TOTAL RUNS ON ALL COURSES SET",
+      SETS: "TOTAL SETS",
+      LEADS: "TOTAL LEADS",
+      ASSISTS: "TOTAL ASSISTS",
+      FILMS: "TOTAL FILMS",
+      "AVG LENGTH": "AVERAGE COURSE LENGTH (M)",
     };
 
     const labelStr = String(label || "")

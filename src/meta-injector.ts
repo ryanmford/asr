@@ -99,7 +99,7 @@ export async function getPageMeta(urlPath: string, searchParams: URLSearchParams
          const firesCount = player.allTimeFireCount || 0;
          
          let newDesc = `COURSES: ${coursesCount} | RUNS: ${runsCount}`;
-         if (winsCount > 0) newDesc += ` | WINS: ${winsCount}`;
+         if (winsCount > 0) newDesc += ` | WR: ${winsCount}`;
          if (firesCount > 0) newDesc += ` | 🔥 ${firesCount}`;
 
          if (isAllTime) {

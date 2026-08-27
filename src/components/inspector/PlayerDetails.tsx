@@ -325,9 +325,9 @@ export const PlayerDetails = React.memo(
                     { label: "RUNS", value: stats.runs },
                     { label: "POINTS", value: stats.pts.toFixed(2) },
                     { label: "🔥", value: stats.fires },
-                    { label: "WINS", value: stats.wins },
+                    { label: "WR", value: stats.wins },
                     {
-                      label: "WIN %",
+                      label: "WR %",
                       value:
                         (stats.courses || stats.runs) > 0
                           ? `${((stats.wins / (stats.courses || stats.runs)) * 100).toFixed(2)}`
@@ -450,8 +450,8 @@ export const PlayerDetails = React.memo(
                     },
                     { label: "FILMS", value: meta.films || 0 },
                     {
-                      label: "AVG LEN",
-                      value: `${calculatedAvgLength.toFixed(2)}m`,
+                      label: "AVG LENGTH",
+                      value: calculatedAvgLength.toFixed(2),
                     },
                     {
                       label: "🪙",

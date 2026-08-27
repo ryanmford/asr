@@ -199,7 +199,7 @@ export const ASRRankList = ({
                   "IMPACT",
                   "🔥",
                   "FIRE",
-                  "WINS",
+                  "WR",
                   "RECORDS",
                   "SETS",
                   "RANK",
