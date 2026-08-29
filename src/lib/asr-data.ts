@@ -879,6 +879,7 @@ export const calculateWofStats = (
       medalCount: sortedMedalCount,
       topStats: {
         rating: [...qualifiedAthletes]
+          .filter(a => (a.rating || 0) > 0)
           .sort((a: any, b: any) => {
             if (Math.abs((b.rating || 0) - (a.rating || 0)) > 0.000001) {
               return (b.rating || 0) - (a.rating || 0);
@@ -888,31 +889,39 @@ export const calculateWofStats = (
             }
             return (a.latestRunDate?.getTime() || Infinity) - (b.latestRunDate?.getTime() || Infinity);
           })
-          .slice(0, 10),
+          .slice(0, 20),
         courses: [...qualifiedAthletes]
+          .filter(a => (a.courses || 0) > 0)
           .sort((a, b) => (b.courses || 0) - (a.courses || 0) || b.runs - a.runs)
-          .slice(0, 10),
+          .slice(0, 20),
         runs: [...qualifiedAthletes]
+          .filter(a => (a.runs || 0) > 0)
           .sort((a, b) => b.runs - a.runs)
-          .slice(0, 10),
+          .slice(0, 20),
         winPercentage: [...qualifiedAthletes]
+          .filter(a => (a.winPercentage || 0) > 0)
           .sort((a, b) => b.winPercentage - a.winPercentage || b.runs - a.runs)
-          .slice(0, 10),
+          .slice(0, 20),
         wins: [...qualifiedAthletes]
+          .filter(a => (a.wins || 0) > 0)
           .sort((a, b) => b.wins - a.wins)
-          .slice(0, 10),
+          .slice(0, 20),
         impact: [...(settersWithImpact || [])]
+          .filter(a => (a.impact || 0) > 0)
           .sort((a, b) => b.impact - a.impact)
-          .slice(0, 10),
+          .slice(0, 20),
         sets: [...(settersWithImpact || [])]
+          .filter(a => (a.sets || 0) > 0)
           .sort((a, b) => b.sets - a.sets)
-          .slice(0, 10),
+          .slice(0, 20),
         contributionScore: [...qualifiedAthletes]
+          .filter(a => (a.contributionScore || 0) > 0)
           .sort((a, b) => b.contributionScore - a.contributionScore)
-          .slice(0, 10),
+          .slice(0, 20),
         totalFireCount: [...qualifiedAthletes]
+          .filter(a => (a.allTimeFireCount || 0) > 0)
           .sort((a, b) => (b.allTimeFireCount || 0) - (a.allTimeFireCount || 0))
-          .slice(0, 10),
+          .slice(0, 20),
       },
     };
   } catch (e) {

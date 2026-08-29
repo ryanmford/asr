@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useDataStore } from "../../store/useDataStore";
 import { useSettersDerived } from "../../hooks/useDerivedData";
@@ -89,6 +89,8 @@ export const ASRHOF = React.memo(
  const atMet = useDataStore((s) => s.atMet);
  const { settersWithImpact } = useSettersDerived();
 
+ const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+
  const stats = useMemo(() => {
  if (!data || data.length === 0) return null;
  return calculateWofStats(
@@ -151,8 +153,13 @@ export const ASRHOF = React.memo(
  )}
  >
  <div className="flex flex-col divide-y divide-zinc-800/10">
- {(stats.topStats[sec.k] || []).map((a: any, i: number) => {
- const isSetterBoard = ["impact", "sets"].includes(sec.k);
+ {(() => {
+   const limit = visibleCounts[sec.k] || 10;
+   const items = stats.topStats[sec.k] || [];
+   return (
+     <>
+       {items.slice(0, limit).map((a: any, i: number) => {
+         const isSetterBoard = ["impact", "sets"].includes(sec.k);
  let displayVal: any;
  if (sec.k === "rating")
  displayVal = (a.rating || 0).toFixed(2);
@@ -189,9 +196,9 @@ export const ASRHOF = React.memo(
  i === 0 && (theme === "dark" ? "bg-white/[0.02]" : "bg-black/[0.02]")
  )}
  >
- <div className="flex items-center gap-4 min-w-0 z-10 relative">
+ <div className="flex items-center gap-4 min-w-0 z-10 relative flex-1 pr-4">
  <ASRRankBadge rank={i + 1} />
- <div className="flex flex-col text-left">
+ <div className="flex flex-col text-left min-w-0">
  <span
  className={cn(
  "text-[14px] sm:text-[18px] lg:text-[22px] font-black uppercase truncate pr-2 leading-tight transition-colors",
@@ -226,6 +233,26 @@ export const ASRHOF = React.memo(
  </button>
  );
  })}
+ {items.length > limit && (
+  <div className="flex justify-center p-4">
+    <button
+      className="group flex flex-col items-center gap-1 px-8 py-3 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10 active:scale-[0.98] text-[10px] font-black tracking-widest uppercase text-zinc-400 hover:text-blue-500 active:text-blue-500 transition-all duration-300 rounded-2xl"
+      onClick={() =>
+        setVisibleCounts((prev) => ({
+          ...prev,
+          [sec.k]: limit + 10,
+        }))
+      }
+      onTouchStart={() => {}}
+    >
+      <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+      Load More
+    </button>
+  </div>
+ )}
+ </>
+ );
+ })()}
  </div>
  </div>
  </div>

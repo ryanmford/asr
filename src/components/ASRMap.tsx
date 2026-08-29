@@ -165,8 +165,10 @@ export const ASRMap = forwardRef(({
     let darkTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     
     if (mapboxToken) {
-      lightTileUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
-      darkTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
+      const lightStyle = import.meta.env.VITE_MAPBOX_LIGHT_STYLE || "mapbox/light-v11";
+      const darkStyle = import.meta.env.VITE_MAPBOX_DARK_STYLE || "mapbox/dark-v11";
+      lightTileUrl = `https://api.mapbox.com/styles/v1/${lightStyle}/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
+      darkTileUrl = `https://api.mapbox.com/styles/v1/${darkStyle}/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`;
     }
 
     const lightLayer = L.tileLayer(lightTileUrl, {
