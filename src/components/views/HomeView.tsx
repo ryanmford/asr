@@ -77,6 +77,7 @@ export const HomeView = React.memo(() => {
     () => [
       "/ben-tivoli.mp4",
       "/joey-harbourfront1.mp4",
+      "/leon-iron-works.mp4",
       "/olof-c4c.mp4",
       "/taylor-navfac.mp4",
     ],
@@ -92,24 +93,20 @@ export const HomeView = React.memo(() => {
 
   const [activeVideoIndex] = React.useState(() => {
     const key = "asr_hero_video_index";
+    let nextIndex = Math.floor(Math.random() * 5);
     try {
       const saved = sessionStorage.getItem(key);
       if (saved !== null) {
         const parsed = parseInt(saved, 10);
-        if (!isNaN(parsed) && parsed >= 0 && parsed < 4) {
-          return parsed;
+        if (!isNaN(parsed) && parsed >= 0 && parsed < 5) {
+          nextIndex = (parsed + 1) % 5;
         }
       }
+      sessionStorage.setItem(key, String(nextIndex));
     } catch {
       // safe fallback
     }
-    const rand = Math.floor(Math.random() * 4);
-    try {
-      sessionStorage.setItem(key, String(rand));
-    } catch {
-      // safe fallback
-    }
-    return rand;
+    return nextIndex;
   });
 
   const currentVideoSrc = useMemo(() => {

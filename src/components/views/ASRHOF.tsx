@@ -125,13 +125,13 @@ export const ASRHOF = React.memo(
  const sections = [
  { l: "TOP LQ", subtitle: "LOCOMOTIVE QUOTIENT = POINTS / RUNS", k: "rating" },
  { l: "MOST WR", subtitle: "TOTAL WORLD RECORDS", k: "wins" },
- { l: "MOST COURSES", subtitle: "TOTAL RUNS VERIFIED", k: "courses" },
- { l: "MOST RUNS", subtitle: "TOTAL RUNS SUBMITTED", k: "runs" },
- { l: "HIGHEST WR %", subtitle: "TOTAL WORLD RECORDS / TOTAL COURSES", k: "winPercentage" },
+ { l: "MOST COURSES", subtitle: "TOTAL COURSES COMPLETED", k: "courses" },
+ { l: "MOST RUNS", subtitle: "TOTAL RUNS VERIFIED", k: "runs" },
+ { l: "HIGHEST WR %", subtitle: "TOTAL WORLD RECORDS / TOTAL COURSES COMPLETED", k: "winPercentage" },
  { l: "MOST 🪙", subtitle: "COINS EARNED FROM RUNS, WORLD RECORDS, & SETS", k: "contributionScore" },
  { l: "MOST 🔥", subtitle: <><span className="block whitespace-nowrap">M: &lt;9 🔥, &lt;8 🔥🔥, &lt;7 🔥🔥🔥</span><span className="block mt-0.5 whitespace-nowrap">W: &lt;11 🔥, &lt;10 🔥🔥, &lt;9 🔥🔥🔥</span></>, k: "totalFireCount" },
- { l: "MOST IMPACT", subtitle: "OVERALL SETTER IMPACT SCORE", k: "impact" },
- { l: "MOST SETS", subtitle: "TOTAL NUMBER OF SETS CREATED", k: "sets" },
+ { l: "MOST IMPACT", subtitle: "TOTAL RUNS ON ALL COURSES SET", k: "impact" },
+ { l: "MOST SETS", subtitle: "TOTAL SETS", k: "sets" },
  ];
 
  return (
