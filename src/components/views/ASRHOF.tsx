@@ -126,7 +126,7 @@ export const ASRHOF = React.memo(
  { l: "TOP LQ", subtitle: "LOCOMOTIVE QUOTIENT = POINTS / RUNS", k: "rating" },
  { l: "MOST WR", subtitle: "TOTAL WORLD RECORDS", k: "wins" },
  { l: "MOST COURSES", subtitle: "TOTAL COURSES COMPLETED", k: "courses" },
- { l: "MOST RUNS", subtitle: "TOTAL RUNS VERIFIED", k: "runs" },
+ { l: "MOST RUNS", subtitle: "TOTAL VERIFIED RUNS", k: "runs" },
  { l: "HIGHEST WR %", subtitle: "TOTAL WORLD RECORDS / TOTAL COURSES COMPLETED", k: "winPercentage" },
  { l: "MOST 🪙", subtitle: "COINS EARNED FROM RUNS, WORLD RECORDS, & SETS", k: "contributionScore" },
  { l: "MOST 🔥", subtitle: <><span className="block whitespace-nowrap">M: &lt;9 🔥, &lt;8 🔥🔥, &lt;7 🔥🔥🔥</span><span className="block mt-0.5 whitespace-nowrap">W: &lt;11 🔥, &lt;10 🔥🔥, &lt;9 🔥🔥🔥</span></>, k: "totalFireCount" },

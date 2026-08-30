@@ -231,8 +231,8 @@ export const PlayerDetails = React.memo(
             </span>
           }
           subtitle={
-            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1">
-              <MapPin size={12} />
+            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1 w-full min-w-0">
+              <MapPin size={12} className="shrink-0" />
               <span className="truncate">{formatLocation(meta || player)}</span>
             </div>
           }

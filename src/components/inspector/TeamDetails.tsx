@@ -108,8 +108,8 @@ export const TeamDetails = React.memo(
             </span>
           }
           subtitle={
-            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1">
-              <Globe size={12} />
+            <div className="flex items-center gap-1.5 opacity-60 font-black text-[11px] uppercase tracking-widest mt-1 w-full min-w-0">
+              <Globe size={12} className="shrink-0" />
               <span className="truncate">{formatLocation(tMeta || team) || "UNKNOWN LOC"}</span>
             </div>
           }
