@@ -11,6 +11,7 @@ interface ASRGoalCalculatorProps {
     pKey: string;
     pts: number;
   }>;
+  gender: "M" | "F";
   targetPts: number;
   setTargetPts: (v: number) => void;
 }
@@ -19,6 +20,7 @@ export const ASRGoalCalculator = ({
   theme,
   courseRecord,
   records,
+  gender,
   targetPts,
   setTargetPts,
 }: ASRGoalCalculatorProps) => {
@@ -88,7 +90,7 @@ export const ASRGoalCalculator = ({
             ? "⚠️ This requires tying or breaking the CR!"
             : `This places you approx #${
                 records.filter((r) => r.time <= requiredTimeForPts).length + 1
-              }`}
+              } in ${gender === "M" ? "Men's" : "Women's"}`}
         </div>
       </div>
     </div>

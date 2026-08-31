@@ -46,15 +46,21 @@ export const ASRWhatIfSlider = ({
   RollingNumber,
   isOpen,
 }: ASRWhatIfSliderProps) => {
-  const [rawTargetTime, setRawTargetTime] = useState<number>(
-    courseRecord || 10,
-  );
+  const [rawTargetTime, setRawTargetTime] = useState<number>(() => {
+    if (records.length > 0) {
+      const times = records.map((r) => r.time).filter((t) => t > 0);
+      times.sort((a, b) => a - b);
+      return Number((times[Math.floor(times.length / 2)] || courseRecord).toFixed(2));
+    }
+    return courseRecord || 10;
+  });
   const [selectedAthlete, setSelectedAthlete] = useState<PlayerProfile | null>(
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const prevGenderRef = useRef(gender);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -84,13 +90,24 @@ export const ASRWhatIfSlider = ({
   }, [selectedAthlete, records]);
 
   useEffect(() => {
-    if (records.length > 0 && !isOpen) {
+    const isGenderChange = prevGenderRef.current !== gender;
+    
+    if (records.length > 0 && (!isOpen || isGenderChange)) {
       const times = records.map((r) => r.time).filter((t) => t > 0);
       times.sort((a, b) => a - b);
       const median = times[Math.floor(times.length / 2)] || courseRecord;
       setRawTargetTime(Number(median.toFixed(2)));
+      
+      if (isGenderChange) {
+        setSelectedAthlete(null);
+      }
+    } else if (records.length === 0 && isGenderChange && courseRecord > 0) {
+      setRawTargetTime(courseRecord);
+      setSelectedAthlete(null);
     }
-  }, [records, courseRecord, isOpen]);
+    
+    prevGenderRef.current = gender;
+  }, [records, courseRecord, isOpen, gender]);
 
   const { minTime, maxTime } = useMemo(() => {
     if (!courseRecord || records.length === 0)
@@ -386,7 +403,7 @@ export const ASRWhatIfSlider = ({
 
           <div className="flex flex-col items-end flex-1">
             <span className="text-[9px] font-bold uppercase tracking-widest opacity-50 mb-1">
-              Est. Rank
+              Est. {gender === "M" ? "M" : "W"} Rank
             </span>
             <div
               className={cn(
@@ -596,7 +613,7 @@ export const ASRWhatIfSlider = ({
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-                Rank
+                {gender === "M" ? "M " : "W "}Rank
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-black opacity-50 line-through">

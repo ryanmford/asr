@@ -532,14 +532,6 @@ export const CourseDetails = React.memo(
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">
-                    <ASRTimeSimulator 
-                      theme={theme}
-                      courseRecord={atRecordsM.length > 0 ? Math.min(...atRecordsM.filter(r => r.time > 0).map(r => r.time)) : 0}
-                      records={atRecordsM.filter(r => !r.isInterim)}
-                      gender="M"
-                      dataContext={dataContext}
-                      cName={cName}
-                    />
                     <div className="flex flex-col gap-6">
                       <div className="flex items-center justify-between">
                         <SectionTitle noPadding>VERIFIED RUNS</SectionTitle>
@@ -623,14 +615,6 @@ export const CourseDetails = React.memo(
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">
-                    <ASRTimeSimulator 
-                      theme={theme}
-                      courseRecord={atRecordsF.length > 0 ? Math.min(...atRecordsF.filter(r => r.time > 0).map(r => r.time)) : 0}
-                      records={atRecordsF.filter(r => !r.isInterim)}
-                      gender="F"
-                      dataContext={dataContext}
-                      cName={cName}
-                    />
                     <div className="flex flex-col gap-6">
                       <div className="flex items-center justify-between">
                         <SectionTitle noPadding>VERIFIED RUNS</SectionTitle>
@@ -698,6 +682,16 @@ export const CourseDetails = React.memo(
                     </motion.div>
                   ))}
                 </div>
+
+                <ASRTimeSimulator 
+                  theme={theme}
+                  courseRecordM={atRecordsM.length > 0 ? Math.min(...atRecordsM.filter(r => r.time > 0).map(r => r.time)) : 0}
+                  courseRecordF={atRecordsF.length > 0 ? Math.min(...atRecordsF.filter(r => r.time > 0).map(r => r.time)) : 0}
+                  recordsM={atRecordsM.filter(r => !r.isInterim)}
+                  recordsF={atRecordsF.filter(r => !r.isInterim)}
+                  dataContext={dataContext}
+                  cName={cName}
+                />
               </div>
 
               <div className="flex flex-col gap-4">

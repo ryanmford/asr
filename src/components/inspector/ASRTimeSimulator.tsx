@@ -43,29 +43,41 @@ const RollingNumber = React.memo(
 
 interface ASRTimeSimulatorProps {
   theme: "light" | "dark";
-  courseRecord: number;
-  records: Array<{
+  courseRecordM: number;
+  courseRecordF: number;
+  recordsM: Array<{
     pKey: string;
     time: number;
     pts: number;
     rank: number | string;
   }>;
-  gender: "M" | "F";
+  recordsF: Array<{
+    pKey: string;
+    time: number;
+    pts: number;
+    rank: number | string;
+  }>;
   dataContext?: ASRDataContext;
   cName?: string;
 }
 
 export const ASRTimeSimulator = ({
   theme,
-  courseRecord,
-  records,
-  gender,
+  courseRecordM,
+  courseRecordF,
+  recordsM,
+  recordsF,
   dataContext,
   cName,
 }: ASRTimeSimulatorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<"slider" | "goal">("slider");
   const [targetPts, setTargetPts] = useState<number>(90);
+  const [simGender, setSimGender] = useState<"M" | "F">("M");
+
+  const gender = simGender;
+  const courseRecord = gender === "M" ? courseRecordM : courseRecordF;
+  const records = gender === "M" ? recordsM : recordsF;
 
   const playerList_M_AT = useDataStore((s) => s.playerList_M_AT) || [];
   const playerList_F_AT = useDataStore((s) => s.playerList_F_AT) || [];
@@ -76,7 +88,7 @@ export const ASRTimeSimulator = ({
       : playerList_F_AT.filter((p) => !p.isDivider);
   }, [gender, playerList_M_AT, playerList_F_AT]);
 
-  if (!courseRecord || records.length === 0) return null;
+  if ((!courseRecordM && !courseRecordF) || (recordsM.length === 0 && recordsF.length === 0)) return null;
 
   return (
     <div
@@ -120,12 +132,38 @@ export const ASRTimeSimulator = ({
             </span>
           </div>
         </div>
-        <div className="flex items-center justify-center shrink-0">
-          {isOpen ? (
-            <ChevronUp size={20} className="opacity-50" />
-          ) : (
-            <ChevronDown size={20} className="opacity-50" />
-          )}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex bg-black/10 dark:bg-white/10 rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
+            <div
+              onClick={() => setSimGender("M")}
+              className={cn(
+                "px-2 py-0.5 text-[10px] font-black rounded-md transition-all cursor-pointer",
+                simGender === "M"
+                  ? "bg-white dark:bg-zinc-800 shadow-sm text-black dark:text-white"
+                  : "text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white",
+              )}
+            >
+              M
+            </div>
+            <div
+              onClick={() => setSimGender("F")}
+              className={cn(
+                "px-2 py-0.5 text-[10px] font-black rounded-md transition-all cursor-pointer",
+                simGender === "F"
+                  ? "bg-white dark:bg-zinc-800 shadow-sm text-black dark:text-white"
+                  : "text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white",
+              )}
+            >
+              W
+            </div>
+          </div>
+          <div className="flex items-center justify-center">
+            {isOpen ? (
+              <ChevronUp size={20} className="opacity-50" />
+            ) : (
+              <ChevronDown size={20} className="opacity-50" />
+            )}
+          </div>
         </div>
       </button>
 
